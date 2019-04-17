@@ -1,22 +1,19 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script type="text/javascript">
-
-
-	
-</script>
-
-<script src="game.js"></script>
-
-
+<script src="game.004.js"></script>
+<link rel="stylesheet" href="game.2.css">
 <title>The Last Question</title>
 
 </head>
 <body>
-
-<div id="game_container">
-	<div id="start_button" onclick="Game.PublishLog('Oh, hello.');" style="cursor:pointer;">Click for a big bang.</div>
-	<div id="output_log" style="padding:64px 64px; background-color:#ededed;"></div>
+<div id="game_container" style="overflow:hidden;">
+	<div id="topbar" style="display:block;position:absolute;top:0px;left:0px;right:0px;padding:5px;height:90px;background-color:#fff9bc;text-align:left;overflow:hidden;"></div>
+	<div id="items" style="display:block;width:253px;position:absolute;top:100px;bottom:0px;left:0px;background-color:#f0f0f0;overflow:auto;">Column 1 didn't load.</div>
+	<div id="generators" style="display:block;width:265px;position:absolute;top:100px;bottom:0px;left:253px;background-color:#edf3ff;overflow:auto;">Column 2 didn't load.</div>
+	<div id="visualization_container" style="display:block;position:absolute;top:100px;left:518px;right:0px;bottom:0px;background-color:#000000;overflow:hidden;">
+		<canvas id="visualization"></canvas>
+	</div>
 </div>
 
 </body>

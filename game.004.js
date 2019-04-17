@@ -47,7 +47,7 @@ function AddEvent(object,event,fcn)
 }
 
 Game.Load = function() {
-	new Game.Object('quantumgenerator1','quantum','Quantum Field Equation','Quantum Field Equations',[0,0,10,0,0],[0,0,1,0,0],[0,0,0.2,0,0],1,[0,0,0,0,0],[100,10,100000000,100000000,100000000]);
+	new Game.Object('quantumgenerator1','quantum','Quantum Field Equation','Quantum Field Equations',[0,0,10,0,0],[0,0,1,0,0],[0,0,0.2,0,0],0,[0,0,0,0,0],[100,10,100000000,100000000,100000000]);
 	new Game.Object('quantumgenerator2','quantum','Quantum Field Actuator','Quantum Field Actuators',[0,0,100,0,0],[0,0,1,0,0],[0,0,1,0,0],0,[0,0,50,0,0],[100,10,100000000,100000000,100000000]);
 	new Game.Object('quantumgenerator3','quantum','Quantum Field Fluctuator','Quantum Field Fluctuators',[0,0,1000,0,0],[0,0,1,0,0],[0,0,12,0,0],0,[0,0,500,0,0],[100,10,100000000,100000000,100000000]);
 	new Game.Object('baryongenerator1','baryon','Baryon Generator1','Baryon Generator1',[0,0,5000,0,0],[0,0,1,0,0],[0,0,0,1,0],0,[0,0,2000,0,0],[100,100000000,100000000,100000000,100000000]);

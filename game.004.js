@@ -1,4 +1,4 @@
-var version = 0.03;
+var version = 0.03; //
 var Game = {};
 Game.Objects = [];
 
@@ -8,8 +8,8 @@ Game.Currencies =  [['Second','Seconds','secs'], // this is some kind of time un
 					['Quantum Foam','Quantum Foam','qfoams'],
 					['Baryon','Baryons','baryons'],
 					['Atom','Atoms','atoms']];
-Game.Rates = [0,0,200,0,0]; // starting point for testing - reduce for release
-Game.Wallet = [0,0,40,0,0]; // starting point for testing - reduce all to 0 for release
+Game.Rates = [0,0,1,0,0]; // starting point for testing - reduce for release
+Game.Wallet = [0,0,0,0,0]; // starting point for testing - reduce all to 0 for release
 
 Game.Nobjects = 1;
 Game.Object = function(id,type,singular,plural,basecosts,costgrowth,production,number,minreq,maxreq,color)

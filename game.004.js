@@ -292,7 +292,7 @@ document.addEventListener('keydown',function(event) {
     if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70) { // A/W/E/F
 		var amounts = starting_point.slice();
 		for (var i = 0; i < amounts.length; i++ ) {
-			amounts[i] = 30 * Game.Rates[i]/Game.FPS; //30 seconds worth of FPS
+			amounts[i] = 30 * Game.Rates[i]/Game.FPS;
 		}
 		Game.Produce(amounts);
     }

@@ -4,18 +4,17 @@ Game.Objects = [];
 
 Game.FPS = 30;
 Game.Currencies =  [['Second','Seconds','secs'], // this is some kind of time unit, I need to decide what – not implemented yet
-					['Kelvin','Kelvin','kelv'], // not sure how/if this will be used
+					['Kelvin','Kelvin','kelv'], // not sure how this will be used
 					['Quantum Foam','Quantum Foam','qfoam'],
 					['Elementary Particle','Elementary Particles','elementary'],
 					['Subatomic Particle','Subatomic Particles','subatomic'],
 					['Atom','Atoms','atom']];
 var starting_point = [];
 for (var i in Game.Currencies) {starting_point[i] = 0;}
-
-Game.Rates = starting_point.slice(); // starting point for testing - reduce for release
-Game.Wallet = [0,0,88,0,0,0]; // starting point for testing - reduce all to 0 for release
-
+Game.Rates = starting_point.slice(); // Initial production rates: 0 of all resources
+Game.Wallet = [0,0,88,0,0,0]; // Arbitrarily, initial resources: just 88 Quantum Foam
 Game.Nobjects = 1;
+
 Game.Object = function(id,type,singular,plural,basecosts,costgrowth,production,number,minreq,maxreq)
 {
     this.singular = singular;
@@ -26,10 +25,6 @@ Game.Object = function(id,type,singular,plural,basecosts,costgrowth,production,n
 	this.basecosts = basecosts; //[seconds,kelvin,Qfoam,baryons,atoms] (although nothing ever "costs time")
 	this.costgrowth = costgrowth; //[seconds,kelvin,Qfoam,baryons,atoms] (although nothing ever "costs time")
 	this.production = production; //[seconds,kelvin,Qfoam,baryons,atoms] ("Producing time" is the game's way of advancing the age of the universe)
-//	this.mouseOn = false;
-//	if (this.mouseOn) {
-//		//do something
-//	}
 	this.id = id;
 	this.type = type;
 	Game.Objects[this.singular] = this;
@@ -72,13 +67,13 @@ Game.Load = function() {
 	new Game.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',
 		[0,0,0,55555,0,0],[0,0,0,1,0,0],[0,0,0,0,55.5,0],0,[0,0,0,25555,0,0],[100,100000000,100000000,100000000,100000000,100000000]);
 	new Game.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condenser',
-		[0,0,0,0,90,0],[0,0,0,0,0.99,0],[0,0,0,0,0,1],0,[0,0,0,0,45,0],[100,100000000,100000000,100000000,100000000,100000000]);
+		[0,0,0,0,90,0],[0,0,0,0,0.998,0],[0,0,0,0,0,1],0,[0,0,0,0,45,0],[100,100000000,100000000,100000000,100000000,100000000]);
 	new Game.Object('atom2','atom','Isotope Organizer','Isotope Organizers',
-		[0,0,0,0,1800,0],[0,0,0,0,0.99,0],[0,0,0,0,0,17.5],0,[0,0,0,0,900,0],[100,100000000,100000000,100000000,100000000,100000000]);
+		[0,0,0,0,1800,0],[0,0,0,0,0.998,0],[0,0,0,0,0,17.5],0,[0,0,0,0,900,0],[100,100000000,100000000,100000000,100000000,100000000]);
 	new Game.Object('atom3','atom','Quantum Degenerator','Quantum Degenerators',
-		[0,0,0,0,36000,0],[0,0,0,0,0.99,0],[0,0,0,0,0,350],0,[0,0,0,0,18000,0],[100,100000000,100000000,100000000,100000000,100000000]);
+		[0,0,0,0,36000,0],[0,0,0,0,0.998,0],[0,0,0,0,0,350],0,[0,0,0,0,18000,0],[100,100000000,100000000,100000000,100000000,100000000]);
 	new Game.Object('atom4','atom','Heavy Element Engine (Star)','Heavy Element Engines (Stars)',
-		[0,0,0,0,0,720000],[0,0,0,0,0,0.99],[0,0,0,0,0,7000],0,[0,0,0,0,360000,0],[100,100000000,100000000,100000000,100000000,100000000]);
+		[0,0,0,0,0,720000],[0,0,0,0,0,0.998],[0,0,0,0,0,7000],0,[0,0,0,0,360000,0],[100,100000000,100000000,100000000,100000000,100000000]);
 
 	Game.ItemMenu();
 	Game.GeneratorMenu();
@@ -229,42 +224,6 @@ Game.Draw = function() //rename this
 		}
 	}
 
-
-// THIS IS THE OLD CODE FOR CHECKING IF GENERATORS SHOULD BE VISIBLE
-// 	var visible = 0;
-// 	if (generator.number >= 1) {
-// 		visible = 1;
-// 	} else {
-// 		var checker = 0;
-// 	 	for (var j = 0; j < Game.Currencies.length; j++) {
-// 	 		if (Game.Wallet[j] >= generator.minrequirements[j] && Game.Wallet[j] <= generator.maxrequirements[j]) {
-// 	 			checker++;
-// 	 		}
-// 	 	}
-// 	 	if (checker == Game.Currencies.length) {
-// 	 		visible = 1;
-// 	 	}
-//  	}
-//  	if (visible == 1) {
-// 		var prices = Game.getCost(generator.singular,1);
-// 		var checker2 = 0;
-// 		for (i = 0; i < prices.length; i++) {
-// 			if (prices[i] <= Game.Wallet[i]){
-// 		checker2++;
-// 		}
-// 		}
-// 		var affordable = 0;
-// 		if (checker2 == prices.length) {
-// 		affordable = 1;
-// 		} 	  			
-// 		if (affordable == 1 || generator.number > 0){
-//		generatortable += ' class="affordable ';
-//		} else {
-//		generatortable += ' class="unaffordable ';
-//		}
- 	  	
- 	  	
-
 // UPDATE ITEM BUTTONS
 	for (var i = 2; i < Game.Currencies.length; i++) {
 		lookup(Game.Currencies[i][2] + '_number').innerHTML = Math.floor(Game.Wallet[i]);
@@ -327,13 +286,13 @@ window.onload = function()
 	Game.Load();
 }
 
-// DELETE BEFORE RELEASE (this is so I can speed up production using the keyboard)
+// DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)
 document.addEventListener('keydown',function(event) {
     var control = 0;
-    if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70 || event.keyCode == 32) { // A-W-E-F-space
+    if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70) { // A/W/E/F
 		var amounts = starting_point.slice();
 		for (var i = 0; i < amounts.length; i++ ) {
-			amounts[i] = 300 * Game.Rates[i]/Game.FPS; //30 seconds worth of FPS
+			amounts[i] = 30 * Game.Rates[i]/Game.FPS; //30 seconds worth of FPS
 		}
 		Game.Produce(amounts);
     }

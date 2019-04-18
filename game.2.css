@@ -54,7 +54,7 @@ body{
 .itemtitle{
 	position:absolute;
 	font-size:17px;
-	top:8px;
+	top:3px;
 	left:100px;
 }
 
@@ -89,28 +89,28 @@ body{
 
 .generatorcost{
 	position:absolute;
-	font-size:9px;
-	top:35px;
-	left:57px;
+	font-size:8px;
+	top:37px;
+	left:70px;
 }
 
 .generatorproduction{
 	position:absolute;
-	font-size:9px;
+	font-size:8px;
 	top:47px;
-	left:60px;
+	left:55px;
 }
 
 .eachcosts{
 	position:absolute;
-	font-size:9px;
-	top:35px;
+	font-size:8px;
+	top:37px;
 	left:6px;
 }
 
 .generating{
 	position:absolute;
-	font-size:9px;
+	font-size:8px;
 	top:47px;
 	left:6px;
 }

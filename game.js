@@ -1,4 +1,4 @@
-var version = 0.07;
+var version = 0.08;
 var Univ = {};
 Univ.FPS = 30;
 Univ.Items = [];
@@ -19,7 +19,7 @@ Univ.Item = function(singular,plural,type,number,production,consumption){
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,VisibilityFcn,CostFcn,ProductionFcn,ConsumptionFcn){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,ProductionFcn,ConsumptionFcn){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -60,14 +60,91 @@ Univ.Object = function(id,type,singular,plural,number,VisibilityFcn,CostFcn,Prod
 				Univ.Transact('spend', item, this.Costs(howmany)[item]);
 			}
 			this.number += howmany;
+			Univ.Logic();
+			this.showPopup();
 		}
 	}
+	this.infoblurb = infoblurb;
+	this.targetactivity = 100; // percent of this generator chosen to be active
 	
-	Univ.Objects[this.singular] = this;
+	this.makePopup = function() {
+	// this makes a generic popup for all Generators. In the future maybe some of them will need distinct info or options...
+		var popup = '<div id="left_arrow_black" class="left_arrow_black"></div>';
+		popup += '<div id="left_arrow_background" class="left_arrow_background"></div>';
+		popup += '<div class="popup">';
+		popup += '<div class="popupinfoblurb">' + this.infoblurb + '</div>';
+		var totalproduction = 0;
+		var totalconsumption = 0;
+		for (var item in Univ.Items) {
+			if (item != 'secs' && item != 'kelvin') {
+				if ( typeof this.Production(this.activenumber)[item] !== 'undefined' && this.Production(this.activenumber)[item] > 0 ) {
+					totalproduction++;
+				}
+				if ( typeof this.Consumption(this.activenumber)[item] !== 'undefined' && this.Consumption(this.activenumber)[item] > 0 ) {
+					totalconsumption++;
+				}
+			}
+		}
+		var productionTxt = [];
+		var consumptionTxt = [];
+
+		for (var item in Univ.Items) {
+			if (item != 'secs' && item != 'kelvin') {
+				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
+					productionTxt += 'Generating ' + Math.round(this.Production(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Production(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
+				}
+				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
+					consumptionTxt += 'Consuming ' + Math.round(this.Consumption(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Consumption(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
+				}
+			}
+		}
+		popup += '<div class="popup_production">' + productionTxt + '</div><div class="popup_consumption">' + consumptionTxt + '</div>';
+		
+		if ( this.number > 0 ) {
+			popup += '<div class="slidercontainer" id="' + this.id + '_slidercontainer">Target activity: ';
+			popup += '<div id="' + this.id + '_sliderlabel" class="sliderlabel"></div>';
+			popup += '<input type="range" min="0" max="100" value="' + this.targetactivity + '" class="slider" id="' + this.id + '_slider"></div>';
+			popup += '<div id="' + this.id + '_currentlyactive" class="currentactive"></div>';
+		}
+		
+		popup += '</div>';
+		return popup;
+	}
+	
+	this.showPopup = function() {
+		lookup('popupcontainer').innerHTML = this.makePopup();
+		try{throw this.id}
+		catch(generator){
+			lookup(this.id + '_slider').oninput = function(){Univ.updateSlider(generator);};
+		}
+		Univ.updateSlider(this.id);
+		
+		var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
+		var buttonTop = buttonposition.top + window.scrollY;
+		var buttonBot = buttonposition.bottom + window.scrollY;
+		var buttonY = (buttonTop + buttonBot) / 2;
+		
+		var buttonLeft = buttonposition.left + window.scrollX;
+		var buttonLeft = buttonposition.left + window.scrollX;
+		
+		var PopupTop = Math.max(0, buttonY - lookup('popupcontainer').getBoundingClientRect().height / 2);
+		var PopupLeft = buttonLeft + buttonposition.width - 6;
+		var ArrowTop = lookup('popupcontainer').getBoundingClientRect().height / 2;
+
+		lookup('popupcontainer').style.top = PopupTop + 'px';
+		lookup('popupcontainer').style.left = PopupLeft + 'px';
+		lookup('left_arrow_black').style.top = ArrowTop - 14 + 'px';
+		lookup('left_arrow_background').style.top = lookup('left_arrow_black').style.top;
+				
+// eventually also modify width and height of the popup if they need to be bigger than the default for some things...
+		lookup('popupcontainer').style.visibility = 'visible';
+	}
+	
+	Univ.Objects[this.id] = this;
 	return this;
 }
 
-Univ.ActiveItem = '';
+Univ.ActiveItem = 'qfoam';
 
 function lookup(object) {return document.getElementById(object);}
 
@@ -101,7 +178,7 @@ Univ.Logic = function(){
 				}
  			}
  			if ( items_satisfied == items_checked ) {
-				generator.activenumber = i;
+				generator.activenumber = Math.min(i,Math.round(generator.number * generator.targetactivity/100));
 			}
  		}
  	}
@@ -155,9 +232,9 @@ Univ.UpdateItems = function(){
 			
 			// UPDATE INCOME/SPENDING
 			if (item.production > item.consumption) {
-				lookup(item.type + '_production').innerHTML = 'Net production: ' + Math.round((item.production-item.consumption) * 10)/10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +').';
+				lookup(item.type + '_production').innerHTML = '+' + Math.round((item.production-item.consumption) * 10)/10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
 			} else if  (item.production < item.consumption) {
-				lookup(item.type + '_production').innerHTML = 'Net consumption: ' + Math.round((item.production-item.consumption) * 10)/-10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +').';
+				lookup(item.type + '_production').innerHTML = '-' + Math.round((item.production-item.consumption) * 10)/-10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
 			} else {
 				lookup(item.type + '_production').innerHTML = '';
 			}
@@ -190,55 +267,6 @@ Univ.UpdateGenerators = function(){
 				}
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
-			
-			// UPDATE PRODUCTION/CONSUMPTION
-			var productionHTML = '';
-			var consumptionHTML = '';
-			var totalproduction = 0;
-			var totalconsumption = 0;
-			for (var item in Univ.Items) {
-				if (item != 'secs' && item != 'kelvin') {
-					if ( typeof generator.Production(generator.activenumber)[item] !== 'undefined' && generator.Production(generator.activenumber)[item] > 0 ) {
-						totalproduction++;
-					}
-					if ( typeof generator.Consumption(generator.activenumber)[item] !== 'undefined' && generator.Consumption(generator.activenumber)[item] > 0 ) {
-						totalconsumption++;
-					}
-				}
-			}
-			// this will display production of multiple different things – but it'll overflow the container quickly. Need a new solution if that ever comes up.
-			if (totalproduction > 0) {
-				var productionHTML = 'Generating ';
-				for (var item in Univ.Items) {
-					if (item != 'secs' && item != 'kelvin') {
-						if ( typeof generator.Production(generator.activenumber)[item] !== 'undefined') {
-							if (Math.round(generator.Production()[item] * 10)/10 == 1){
-								productionHTML += Math.round(generator.Production(generator.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].singular + ' per sec (' + Math.round(generator.Production(generator.activenumber)[item]/generator.activenumber*10)/10 + ' each). ';
-							} else {
-								productionHTML += Math.round(generator.Production(generator.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(generator.Production(generator.activenumber)[item]/generator.activenumber*10)/10 + ' each). ';
-							}
-						}
-					}
-				}
-			}
-			lookup(generator.id + '_production').innerHTML = productionHTML;
-
-			// this will display consumption of multiple different things – but it'll overflow the container quickly. Need a new solution if that ever comes up.
-			if (totalconsumption > 0) {
-				var consumptionHTML = 'Consuming ';
-				for (var item in Univ.Items) {
-					if (item != 'secs' && item != 'kelvin') {
-						if ( typeof generator.Consumption(generator.activenumber)[item] !== 'undefined') {
-							if (Math.round(generator.Consumption()[item] * 10)/10 == 1){
-								consumptionHTML += Math.round(generator.Consumption(generator.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].singular + ' per sec (' + Math.round(generator.Consumption(generator.activenumber)[item]/generator.activenumber*10)/10 + ' each). ';
-							} else {
-								consumptionHTML += Math.round(generator.Consumption(generator.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(generator.Consumption(generator.activenumber)[item]/generator.activenumber*10)/10 + ' each). ';
-							}
-						}
-					}
-				}
-			}
-			lookup(generator.id + '_consumption').innerHTML = consumptionHTML;
 
 		//// TO DO: check whether visibility requirements are met by calling generator.isVisible()
 			lookup(generator.id + '_button').style = 'display:block;';
@@ -247,6 +275,17 @@ Univ.UpdateGenerators = function(){
 			lookup(generator.id + '_button').style = 'display:none;';
 		}
 	}
+}
+
+Univ.updateSlider = function(generatorid) {
+	var sliderid = generatorid + '_slider';
+	var slidervalue = lookup(sliderid).value;
+	generator = Univ.Objects[generatorid];
+	generator.targetactivity = slidervalue;
+	
+	lookup(sliderid + 'label').style.left = 90 + Math.round(slidervalue * 0.6) + 'px';
+	lookup(sliderid + 'label').innerHTML = slidervalue + '%';
+	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
 
 Univ.ItemMenuHTML = function(){
@@ -278,7 +317,7 @@ Univ.GeneratorMenuHTML = function() {
 	var generatortable = [];
  	for (var i in Univ.Objects) {
  		var generator = Univ.Objects[i];
- 		generatortable += '<div id="' + generator.id + '_button" class="generatorbutton active" style="display:none;">';
+ 		generatortable += '<div id="' + generator.id + '_button" class="generatorbutton clickablegenerator" style="display:none;">';
   		generatortable += '<div id="' + generator.id + '_number" class="generatornumber"></div>'; 		
   		generatortable += '<div id="' + generator.id + '_title" class="generatortitle">' + generator.plural + '</div>';
 		generatortable += '<div id="' + generator.id + '_cost" class="generatorcost"></div>';
@@ -292,8 +331,13 @@ Univ.GeneratorMenuHTML = function() {
 		try{throw Univ.Objects[k]}
 		catch(generator){
 			AddEvent(lookup(generator.id + '_button'),'click',function(what){return function(e){generator.Buy(1);};}(generator.singular));
+			AddEvent(lookup(generator.id + '_button'),'mouseover',function(){return function(){generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_button'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
 		}
 	}
+	AddEvent(lookup('popupcontainer'),'mouseover',function(){return function(){lookup('popupcontainer').style.visibility='visible';};}());
+	AddEvent(lookup('popupcontainer'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
+	
 }
 
 window.onload = function(){

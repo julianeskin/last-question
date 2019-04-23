@@ -2,15 +2,16 @@ Univ.LoadItems = function(){
 // singular,plural,type,number,production_rate,consumption_rate
 	new Univ.Item('Second','Seconds','secs',0,0,0);
 	new Univ.Item('Kelvin','Kelvin','kelvin',0,0,0);
-	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',88,0,0);	// start with 90 Quantum Foam for testing
+	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',6000,0,0);	// start with 90 Quantum Foam for testing
 	new Univ.Item('Elementary Particle','Elementary Particles','elementary',0,0,0);
 	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',0,0,0);
 	new Univ.Item('Atom','Atoms','atom',0,0,0);
 }
 
 Univ.LoadObjects = function(){
-//	unique ID, type, Singular Name, Plural Name, number, Visibility Fcn, Cost Fcn, Production Fcn, Consumption Fcn
+//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, Cost Fcn, Production Fcn, Consumption Fcn
  	new Univ.Object('quantumgenerator1','qfoam','Quantum Field Equation','Quantum Field Equations',0,
+ 		'Quantum Field Equations are the most basic production unit. Use them to generate Quantum Foam out of nothing.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -30,7 +31,8 @@ Univ.LoadObjects = function(){
 			var consumption = {}
 			return consumption;
 		});
-	new Univ.Object('quantumgenerator2','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
+	new Univ.Object('quantumgenerator2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
+	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -50,7 +52,8 @@ Univ.LoadObjects = function(){
 			var consumption = {}
 			return consumption;
 		});
-	new Univ.Object('quantumgenerator3','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
+	new Univ.Object('quantumgenerator3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
+	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -71,6 +74,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -93,6 +97,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -115,6 +120,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -137,6 +143,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -159,6 +166,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -181,6 +189,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -203,6 +212,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -225,6 +235,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -247,6 +258,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('atom3','atom','Quantum Degenerator','Quantum Degenerators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},
@@ -269,6 +281,7 @@ Univ.LoadObjects = function(){
 			return consumption;
 		});
 	new Univ.Object('atom4','atom','Heavy Element Engine (Star)','Heavy Element Engines (Stars)',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
 		},

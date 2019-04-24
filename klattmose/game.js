@@ -308,12 +308,13 @@ Univ.UpdateItems = function(){
 			}
 			
 			// UPDATE INCOME/SPENDING
-			if (item.production > item.consumption) {
-				lookup(item.type + '_production').innerHTML = '+' + Math.round((item.production-item.consumption) * 10)/10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
-			} else if  (item.production < item.consumption) {
-				lookup(item.type + '_production').innerHTML = '-' + Math.round((item.production-item.consumption) * 10)/-10 + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
+			var netproduction = Math.round((item.production-item.consumption) * 10)/10;
+			if (netproduction > 0) {
+				lookup(item.type + '_production').innerHTML = '+' + netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
+			} else if  (netproduction < 0) {
+				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
 			} else {
-				lookup(item.type + '_production').innerHTML = '';
+				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
 			}
 		}
 	}

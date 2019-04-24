@@ -16,6 +16,38 @@ body{
 	user-select: none;
 }
 
+.itemicon{
+	width:60px;
+	height:60px;
+}
+
+.itemtitle{
+	position:absolute;
+	font-size:17px;
+	top:0px;
+	left:58px;
+	right:0px;
+	text-align:center;
+}
+
+.itemnumber{
+	position:absolute;
+	top:16px;
+	left:50px;
+	right:0px;
+	text-align:center;
+	font-size:30px;
+}
+
+.itemproduction{
+	position:absolute;
+	font-size:9px;
+	top:48px;
+	left:50px;
+	right:0px;
+	text-align:center;
+}
+
 .generatorbutton{
 	position:relative;
 	width:240px;
@@ -107,8 +139,10 @@ body{
 
 .slidercontainer{
 	position:absolute;
-	top:160px;
+	display:none;
+	top:165px;
 	left:20px;
+	right:20px;
 	font-size:10px;
 }
 
@@ -159,7 +193,7 @@ body{
 
 .currentactive{
 	position:absolute;
-	top:180px;
+	top:20px;
 	left:0px;
 	right:0px;
 	text-align:center;
@@ -172,33 +206,6 @@ body{
     
 .invisible{
 	display:none;
-}
-
-.itemtitle{
-	position:absolute;
-	font-size:17px;
-	top:0px;
-	left:50px;
-	right:0px;
-	text-align:center;
-}
-
-.itemnumber{
-	position:absolute;
-	top:16px;
-	left:50px;
-	right:0px;
-	text-align:center;
-	font-size:30px;
-}
-
-.itemproduction{
-	position:absolute;
-	font-size:9px;
-	top:48px;
-	left:50px;
-	right:0px;
-	text-align:center;
 }
 
 .generatornumber{

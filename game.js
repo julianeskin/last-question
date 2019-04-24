@@ -1,6 +1,7 @@
 var version = 0.08;
 var Univ = {};
 Univ.FPS = 30;
+Univ.Speedfactor = 10; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
 
@@ -76,7 +77,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalproduction = 0;
 		var totalconsumption = 0;
 		for (var item in Univ.Items) {
-			if (item != 'secs' && item != 'kelvin') {
+			if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 				if ( typeof this.Production(this.activenumber)[item] !== 'undefined' && this.Production(this.activenumber)[item] > 0 ) {
 					totalproduction++;
 				}
@@ -89,7 +90,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var consumptionTxt = [];
 
 		for (var item in Univ.Items) {
-			if (item != 'secs' && item != 'kelvin') {
+			if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
 					productionTxt += 'Generating ' + Math.round(this.Production(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Production(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
 				}
@@ -100,12 +101,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		}
 		popup += '<div class="popup_production">' + productionTxt + '</div><div class="popup_consumption">' + consumptionTxt + '</div>';
 		
-		if ( this.number > 0 ) {
-			popup += '<div class="slidercontainer" id="' + this.id + '_slidercontainer">Target activity: ';
-			popup += '<div id="' + this.id + '_sliderlabel" class="sliderlabel"></div>';
-			popup += '<input type="range" min="0" max="100" value="' + this.targetactivity + '" class="slider" id="' + this.id + '_slider"></div>';
-			popup += '<div id="' + this.id + '_currentlyactive" class="currentactive"></div>';
-		}
+		popup += '<div class="slidercontainer" id="' + this.id + '_slidercontainer">Target activity: ';
+		popup += '<div id="' + this.id + '_sliderlabel" class="sliderlabel"></div>';
+		popup += '<input type="range" min="0" max="100" value="' + this.targetactivity + '" class="slider" id="' + this.id + '_slider">';
+		popup += '<div id="' + this.id + '_currentlyactive" class="currentactive"></div></div>';
 		
 		popup += '</div>';
 		return popup;
@@ -118,6 +117,9 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			lookup(this.id + '_slider').oninput = function(){Univ.updateSlider(generator);};
 		}
 		Univ.updateSlider(this.id);
+		if ( this.number > 0 ) {
+			lookup(this.id + '_slidercontainer').style.display = 'block';
+		}
 		
 		var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
 		var buttonTop = buttonposition.top + window.scrollY;
@@ -197,8 +199,8 @@ Univ.Logic = function(){
 				item.consumption += generator.Consumption(generator.activenumber)[i];
 			}
 		}
-		Univ.Transact('spend',item.type, item.consumption / Univ.FPS);
-		Univ.Transact('gain',item.type, item.production / Univ.FPS);
+		Univ.Transact('spend',item.type, Univ.Speedfactor * item.consumption / Univ.FPS);
+		Univ.Transact('gain',item.type, Univ.Speedfactor * item.production / Univ.FPS);
 	}
 }
 
@@ -219,7 +221,7 @@ Univ.RefreshDisplay = function(){
 Univ.UpdateItems = function(){
 	for (var i in Univ.Items) {
 		var item = Univ.Items[i];
-		if (item.type != 'secs' && item.type != 'kelvin') {		
+		if (item.type != 'secs' && item.type != 'kelvin' && item.type != 'computation') {		
 			// UPDATE NUMBER
 			lookup(item.type + '_number').innerHTML = Math.floor(item.number);
 			
@@ -292,8 +294,9 @@ Univ.ItemMenuHTML = function(){
 	var itemtable = [];
 
 	for (var item in Univ.Items) {
-		if (item != 'secs' && item != 'kelvin') {
+		if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 			itemtable += '<div id="' + item + '_button" class="itembutton active visible">';
+			itemtable += '<img src="icons/' + item + '.png" class="itemicon">';
 			itemtable += '<div id="' + item + '_number" class="itemnumber"></div>';
 			itemtable += '<div id="' + item + '_title" class="itemtitle"></div>';
 			itemtable += '<div id="' + item + '_production" class="itemproduction"></div>';
@@ -304,10 +307,10 @@ Univ.ItemMenuHTML = function(){
 	lookup('items').innerHTML = itemtable;
 	
 	for (var item in Univ.Items) {
-		if (item != 'secs' && item != 'kelvin') {
+		if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 			try{throw item}
 			catch(item){
-				AddEvent(lookup(item + '_button'),'click',function(what){return function(e){Univ.ActiveItem = item;};}(item));
+				AddEvent(lookup(item + '_button'),'mouseover',function(what){return function(e){Univ.ActiveItem = item;};}(item));
 			}
 		}
 	}
@@ -337,7 +340,6 @@ Univ.GeneratorMenuHTML = function() {
 	}
 	AddEvent(lookup('popupcontainer'),'mouseover',function(){return function(){lookup('popupcontainer').style.visibility='visible';};}());
 	AddEvent(lookup('popupcontainer'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
-	
 }
 
 window.onload = function(){

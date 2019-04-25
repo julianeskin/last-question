@@ -1,33 +1,34 @@
 Univ.LoadItems = function(){
-// singular,plural,type,number,production_rate,consumption_rate
-	new Univ.Item('Second','Seconds','secs',0,0,0);
-	new Univ.Item('Kelvin','Kelvin','kelvin',0,0,0);
-	new Univ.Item('Computation','Computations','computation',0,0,0);
-	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',90,0,0);	// start with 90 Quantum Foam for testing
-	new Univ.Item('Elementary Particle','Elementary Particles','elementary',0,0,0);
-	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',0,0,0);
-	new Univ.Item('Light Atom','Light Atoms','lightatom',0,0,0);
-	new Univ.Item('Heavy Atom','Heavy Atoms','heavyatom',0,0,0);
-	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',0,0,0);
-	new Univ.Item('Nebula','Nebulae','nebula',0,0,0);
-	new Univ.Item('Star','Stars','star',0,0,0);
-	new Univ.Item('Galaxy','Galaxies','galaxy',0,0,0);
-	new Univ.Item('Galactic Cluster','Galactic Clusters','galaxycluster',0,0,0);
-	new Univ.Item('Supercluster','Superclusters','supercluster',0,0,0);
-	new Univ.Item('Planet','Planets','planet',0,0,0);
-	new Univ.Item('Habitable Planet','Habitable Planets','habitableplanet',0,0,0);
-	new Univ.Item('Molecule of Life','Molecules of Life','molecule',0,0,0);
-	new Univ.Item('Homeworld','Homeworlds','homeworld',0,0,0);
-	new Univ.Item('Unicellular Organism','Unicellular Organisms','unicellular',0,0,0);
-	new Univ.Item('Multicellular Organism','Multicellular Organisms','multicellular',0,0,0);
-	new Univ.Item('Sentient Organism','Sentient Organisms','sentient',0,0,0);
-	new Univ.Item('Computing Machine','Computing Machines','computer',0,0,0);
-	new Univ.Item('Planetary Computer','Planetary Computers','planetaryAC',0,0,0);
-	new Univ.Item('Matrioshka Brain','Matrioshka Brains','matrioshka',0,0,0);
-	new Univ.Item('Galactic Computer','Galactic Computer','galacticAC',0,0,0);
-	new Univ.Item('Galactic LAN Party','Galactic LAN Parties','superclusterAC',0,0,0);
-	new Univ.Item('Universal Computer','Universal Computer','universalAC',0,0,0);
-	new Univ.Item('Cosmic Computer','Cosmic Computer','cosmicAC',0,0,0);
+// singular,plural,type,visibility,available_number,total_number,production_rate,consumption_rate
+	new Univ.Item('Second','Seconds','secs',0,0,0,0,0);
+	new Univ.Item('Kelvin','Kelvin','kelvin',0,0,0,0,0);
+	new Univ.Item('Computation','Computations','computation',0,0,0,0,0);
+	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',1,90,90,0,0);	// start with 90 Quantum Foam for testing
+	new Univ.Item('Elementary Particle','Elementary Particles','elementary',1,0,0,0,0);
+	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',1,0,0,0,0);
+	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0);
+	new Univ.Item('Medium Atom','Medium Atoms','mediumatom',0,0,0,0,0);
+	new Univ.Item('Heavy Atom','Heavy Atoms','heavyatom',0,0,0,0,0);
+	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',1,0,0,0,0);
+	new Univ.Item('Nebula','Nebulae','nebula',1,0,0,0,0);
+	new Univ.Item('Star','Stars','star',1,0,0,0,0);
+	new Univ.Item('Galaxy','Galaxies','galaxy',1,0,0,0,0);
+	new Univ.Item('Galactic Cluster','Galactic Clusters','galaxycluster',1,0,0,0,0);
+	new Univ.Item('Supercluster','Superclusters','supercluster',1,0,0,0,0);
+	new Univ.Item('Planet','Planets','planet',1,0,0,0,0);
+	new Univ.Item('Habitable Planet','Habitable Planets','habitableplanet',1,0,0,0,0);
+	new Univ.Item('Molecule of Life','Molecules of Life','molecule',1,0,0,0,0);
+	new Univ.Item('Homeworld','Homeworlds','homeworld',1,0,0,0,0);
+	new Univ.Item('Unicellular Organism','Unicellular Organisms','unicellular',1,0,0,0,0);
+	new Univ.Item('Multicellular Organism','Multicellular Organisms','multicellular',1,0,0,0,0);
+	new Univ.Item('Sentient Organism','Sentient Organisms','sentient',1,0,0,0,0);
+	new Univ.Item('Computing Machine','Computing Machines','computer',1,0,0,0,0);
+	new Univ.Item('Planetary Computer','Planetary Computers','planetaryAC',1,0,0,0,0);
+	new Univ.Item('Matrioshka Brain','Matrioshka Brains','matrioshka',1,0,0,0,0);
+	new Univ.Item('Galactic Computer','Galactic Computer','galacticAC',1,0,0,0,0);
+	new Univ.Item('Galactic LAN Party','Galactic LAN Parties','superclusterAC',1,0,0,0,0);
+	new Univ.Item('Universal Computer','Universal Computer','universalAC',1,0,0,0,0);
+	new Univ.Item('Cosmic Computer','Cosmic Computer','cosmicAC',1,0,0,0,0);
 }
 
 Univ.LoadObjects = function(){
@@ -233,7 +234,7 @@ Univ.LoadObjects = function(){
 			}
 			return consumption;
 		});
-	new Univ.Object('lightatom1','lightatom','Hydrogen Condenser','Hydrogen Condensers',0,
+	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
@@ -246,7 +247,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				lightatom: 1 * number
+				atom: 1 * number
 			}
 			return production;
 		},
@@ -256,7 +257,7 @@ Univ.LoadObjects = function(){
 			}
 			return consumption;
 		});
-	new Univ.Object('lightatom2','lightatom','Isotope Organizer','Isotope Organizers',0,
+	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
@@ -269,7 +270,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				lightatom: 17.5 * number
+				atom: 17.5 * number
 			}
 			return production;
 		},
@@ -279,7 +280,7 @@ Univ.LoadObjects = function(){
 			}
 			return consumption;
 		});
-	new Univ.Object('lightatom3','lightatom','Quantum Degenerator','Quantum Degenerators',0,
+	new Univ.Object('atomatom3','atom','Quantum Degenerator','Quantum Degenerators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return 1;
@@ -292,16 +293,10 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				lightatom: 350 * number
+				atom: 350 * number
 			}
 			return production;
 		},
-		
-		
-		//Univ.Items['gascloud'].number;
-		//Univ.Items['lightatom'].number = 149900000;
-
-		
 		function(number){ // consumption
 			var consumption = {
 				subatomic: 500 * number
@@ -315,7 +310,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				lightatom: 10000000 * howmany
+				atom: 10000000 * howmany
 			}
 			return prices;
 		},
@@ -327,7 +322,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 150000000 * number
+				atom: 150000000 * number
 			}
 			return consumption;
 		});
@@ -338,7 +333,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				lightatom: 40000000 * howmany
+				atom: 40000000 * howmany
 			}
 			return prices;
 		},
@@ -350,7 +345,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 150000000 * 4.5 * number
+				atom: 150000000 * 4.5 * number
 			}
 			return consumption;
 		});
@@ -361,7 +356,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				lightatom: 160000000 * howmany
+				atom: 160000000 * howmany
 			}
 			return prices;
 		},
@@ -373,7 +368,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 150000000 * 18 * number
+				atom: 150000000 * 18 * number
 			}
 			return consumption;
 		});
@@ -534,7 +529,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 150000000 * number
+				atom: 150000000 * number
 			}
 			return consumption;
 		});
@@ -557,7 +552,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 15000000000 * number
+				atom: 15000000000 * number
 			}
 			return consumption;
 		});
@@ -580,7 +575,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				lightatom: 500000000 * number
+				atom: 500000000 * number
 			}
 			return consumption;
 		});

@@ -1,9 +1,13 @@
-var version = 0.08;
+var version = 0.09;
 var Univ = {};
 Univ.FPS = 30;
 Univ.Speedfactor = 10; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
+Univ.T = 0;
+Univ.SaveTo = 'LastQuestion';
+
+function l(what) {return document.getElementById(what);}
 
 Univ.Item = function(singular,plural,type,number,production,consumption){
  	this.singular = singular;
@@ -159,6 +163,66 @@ function AddEvent(object,event,fcn){
 	object.addEventListener(event,fcn,false);
 }
 
+Univ.WriteSave = function(mode){
+	var save = {
+		version: version,
+		Objects: {},
+		Items: {}
+	};
+	
+	for(var g in Univ.Objects){
+		save.Objects[g] = {};
+		save.Objects[g].number = Univ.Objects[g].number;
+		save.Objects[g].targetactivity = Univ.Objects[g].targetactivity;
+	}
+	
+	for(var i in Univ.Items){
+		save.Items[i] = {};
+		save.Items[i].number = Univ.Items[i].number;
+	}
+	
+	
+	if(mode == 3){
+		return JSON.stringify(save, null, 2);
+	}
+	else{
+		localStorage.setItem(Univ.SaveTo, JSON.stringify(save));
+	}
+}
+
+Univ.LoadSave = function(data){
+	var save = null;
+	var str = '';
+	
+	if(data){
+		str = data;
+	}else{
+		if(localStorage.getItem(Univ.SaveTo)) str = localStorage.getItem(Univ.SaveTo);
+	}
+		
+	if(str != ''){
+		save = JSON.parse(str);
+	}
+	
+	if(!save) return;
+	
+	if(save.version >= 0.08){
+		for(var g in save.Objects){
+			if(Univ.Objects[g]){
+				Univ.Objects[g].number = save.Objects[g].number;
+				Univ.Objects[g].targetactivity = save.Objects[g].targetactivity;
+			}
+		}
+		
+		for(var i in save.Items){
+			if(Univ.Items[i]){
+				Univ.Items[i].number = save.Items[i].number;
+			}
+		}
+	}
+	
+}
+
 Univ.Loop = function(){
  	Univ.Logic();
 	Univ.RefreshDisplay();
@@ -202,6 +266,19 @@ Univ.Logic = function(){
 		Univ.Transact('spend',item.type, Univ.Speedfactor * item.consumption / Univ.FPS);
 		Univ.Transact('gain',item.type, Univ.Speedfactor * item.production / Univ.FPS);
 	}
+	
+	if (Univ.toSave || (Univ.T % (Univ.FPS * 60) == 0 )) {
+		//check if we can save : no minigames are loading // Yes, I copied this from Cookie Clicker. I did warn you
+		var canSave=true;
+		/*for (var i in Game.Objects)
+		{
+			var me=Game.Objects[i];
+			if (me.minigameLoading){canSave=false;break;}
+		}*/
+		if (canSave) Univ.WriteSave();
+	}
+	
+	Univ.T++; // In case we don't want to run certain parts of code every frame
 }
 
 Univ.Transact = function(transaction,item,amount){
@@ -344,12 +421,18 @@ Univ.GeneratorMenuHTML = function() {
 }
 
 window.onload = function(){
+	l('topbar').innerHTML += 'Version ' + version;
 	Univ.LoadItems();
 	Univ.LoadObjects();
+	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
  	Univ.Loop();
- }
+}
+
+AddEvent(window,'keydown',function(e){
+	if (e.ctrlKey && e.keyCode==83) {Univ.toSave=true;e.preventDefault();}//ctrl-s saves the game
+});
 
 // DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)
 document.addEventListener('keydown',function(event) {

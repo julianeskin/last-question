@@ -7,8 +7,6 @@ Univ.Objects = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 
-function l(what) {return document.getElementById(what);}
-
 Univ.Item = function(singular,plural,type,number,production,consumption){
  	this.singular = singular;
 	this.plural = plural;
@@ -421,7 +419,7 @@ Univ.GeneratorMenuHTML = function() {
 }
 
 window.onload = function(){
-	l('topbar').innerHTML += 'Version ' + version;
+	lookup('topbar').innerHTML += 'Version ' + version;
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadSave();

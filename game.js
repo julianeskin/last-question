@@ -1,4 +1,4 @@
-var version = 0.09;
+var version = 0.10;
 var Univ = {};
 Univ.FPS = 30;
 Univ.Speedfactor = 10; // Factor to speed up everything -- for testing.
@@ -12,6 +12,7 @@ Univ.Item = function(singular,plural,type,number,production,consumption){
 	this.plural = plural;
 	this.type = type;
  	this.number = number;
+	this.defaultNumber = this.number;
 	this.production = production; 	// this might be a function in the future,
 	// to allow for nonlinear effects, or to trigger events when certain items get produced
 	
@@ -28,6 +29,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
     this.singular = singular;
 	this.plural = plural;
 	this.number = number;
+	this.defaultNumber = this.number;
  	this.activenumber = number;
 	
 	this.isAffordable = function(howmany){
@@ -219,10 +221,42 @@ Univ.LoadSave = function(data){
 		}
 	}
 	
+	Univ.T = 0; // Frame counter starts over
+}
+
+Univ.reset = function(hard){
+	for(var g in Univ.Objects){
+		if(Univ.Objects[g]){
+			Univ.Objects[g].number = Univ.Objects[g].defaultNumber;
+			Univ.Objects[g].targetactivity = 100;
+		}
+	}
+
+	for(var i in Univ.Items){
+		if(Univ.Items[i]){
+			Univ.Items[i].number = Univ.Items[i].defaultNumber;
+		}
+	}
 }
 
 Univ.Loop = function(){
+	Univ.catchupLogic = 0;
  	Univ.Logic();
+	Univ.catchupLogic = 1;
+	
+	var time = Date.now();
+	
+	//latency compensator
+	Univ.accumulatedDelay += ((time - Univ.time) - 1000 / Univ.FPS);
+	
+	Univ.accumulatedDelay = Math.min(Univ.accumulatedDelay, 1000 * 5); //don't compensate over 5 seconds; if you do, something's probably very wrong
+	Univ.time = time;
+	while(Univ.accumulatedDelay > 0){
+		Univ.Logic();
+		Univ.accumulatedDelay -= 1000 / Univ.FPS; //as long as we're detecting latency (slower than target fps), execute logic (this makes drawing slower but makes the logic behave closer to correct target fps)
+	}
+	Univ.catchupLogic = 0;
+	
 	Univ.RefreshDisplay();
 	setTimeout(Univ.Loop,1000/Univ.FPS);
 }
@@ -425,11 +459,20 @@ window.onload = function(){
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	
+	// Latency stuff
+	Univ.accumulatedDelay = 0;
+	Univ.lastActivity = Date.now();
+	Univ.time = Date.now();
+	
  	Univ.Loop();
 }
 
 AddEvent(window,'keydown',function(e){
 	if (e.ctrlKey && e.keyCode==83) {Univ.toSave=true;e.preventDefault();}//ctrl-s saves the game
+	if (e.ctrlKey && e.keyCode==88) {Univ.reset();e.preventDefault();}//ctrl-s saves the game
+	Univ.lastActivity = Date.now();
+	//console.log(e);
 });
 
 // DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)

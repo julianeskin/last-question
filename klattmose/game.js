@@ -6,18 +6,14 @@ Univ.Items = [];
 Univ.Objects = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
-Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
 
 function l(what) {return document.getElementById(what);}
-function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
-Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
+Univ.Item = function(singular,plural,type,number,production,consumption){
  	this.singular = singular;
 	this.plural = plural;
 	this.type = type;
-	this.visibility = visibility;
- 	this.available_number = available_number;
- 	this.total_number = total_number;
+ 	this.number = number;
 	this.production = production; 	// this might be a function in the future,
 	// to allow for nonlinear effects, or to trigger events when certain items get produced
 	
@@ -39,7 +35,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.isAffordable = function(howmany){
 		var notenough = 0;
 		for (var item in this.Costs(howmany)) {
-			if (this.Costs(howmany)[item] > Univ.Items[item].available_number) {
+			if (this.Costs(howmany)[item] > Univ.Items[item].number) {
 				notenough++;
 			}
 		}
@@ -85,7 +81,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalproduction = 0;
 		var totalconsumption = 0;
 		for (var item in Univ.Items) {
-			if (Univ.Items[item].visibility == 1) {
+			if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 				if ( typeof this.Production(this.activenumber)[item] !== 'undefined' && this.Production(this.activenumber)[item] > 0 ) {
 					totalproduction++;
 				}
@@ -98,7 +94,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var consumptionTxt = [];
 
 		for (var item in Univ.Items) {
-			if (Univ.Items[item].visibility == 1) {
+			if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
 					productionTxt += 'Generating ' + Math.round(this.Production(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Production(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
 				}
@@ -154,6 +150,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	return this;
 }
 
+Univ.ActiveItem = 'qfoam';
+
+function lookup(object) {return document.getElementById(object);}
+
 function AddEvent(object,event,fcn){
 	if(object.attachEvent) 
 		object.attachEvent('on' + event, function() {
@@ -178,7 +178,7 @@ Univ.WriteSave = function(mode){
 	
 	for(var i in Univ.Items){
 		save.Items[i] = {};
-		save.Items[i].available_number = Univ.Items[i].available_number;
+		save.Items[i].number = Univ.Items[i].number;
 	}
 	
 	
@@ -216,10 +216,11 @@ Univ.LoadSave = function(data){
 		
 		for(var i in save.Items){
 			if(Univ.Items[i]){
-				Univ.Items[i].available_number = save.Items[i].available_number;
+				Univ.Items[i].number = save.Items[i].number;
 			}
 		}
 	}
+	
 }
 
 Univ.Loop = function(){
@@ -238,7 +239,7 @@ Univ.Logic = function(){
  			var items_satisfied = 0;
  			for (var item in Univ.Items) {
  				items_checked++;
- 				if ( typeof generator.Consumption(i)[item] == 'undefined' || generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
+ 				if ( typeof generator.Consumption(i)[item] == 'undefined' || generator.Consumption(i)[item] <= Univ.Items[item].number ){
  					items_satisfied++;
 				}
  			}
@@ -282,10 +283,10 @@ Univ.Logic = function(){
 
 Univ.Transact = function(transaction,item,amount){
 	if (transaction == 'spend') {
-		Univ.Items[item].available_number -= amount*1;
+		Univ.Items[item].number -= amount*1;
 	}
 	if (transaction == 'gain') {
-		Univ.Items[item].available_number += amount*1;
+		Univ.Items[item].number += amount*1;
 	}
 }
 
@@ -297,19 +298,19 @@ Univ.RefreshDisplay = function(){
 Univ.UpdateItems = function(){
 	for (var i in Univ.Items) {
 		var item = Univ.Items[i];
-		if (Univ.Items[i].visibility == 1) {		
+		if (item.type != 'secs' && item.type != 'kelvin' && item.type != 'computation') {		
 			// UPDATE NUMBER
-			lookup(item.type + '_number').innerHTML = Math.floor(item.available_number);
+			lookup(item.type + '_number').innerHTML = Math.floor(item.number);
 			
 			// UPDATE TITLE
-			if (item.available_number == 1) {
+			if (item.number == 1) {
 				lookup(item.type + '_title').innerHTML = item.singular;
 			} else {
 				lookup(item.type + '_title').innerHTML = item.plural;
 			}
 			
 			// UPDATE INCOME/SPENDING
-			var netproduction = Math.round((item.production - item.consumption) * 10)/10;
+			var netproduction = Math.round((item.production-item.consumption) * 10)/10;
 			if (netproduction > 0) {
 				lookup(item.type + '_production').innerHTML = '+' + netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
 			} else if  (netproduction < 0) {
@@ -371,7 +372,7 @@ Univ.ItemMenuHTML = function(){
 	var itemtable = [];
 
 	for (var item in Univ.Items) {
-		if (Univ.Items[item].visibility == 1) {
+		if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 			itemtable += '<div id="' + item + '_button" class="itembutton active visible">';
 			itemtable += '<img src="icons/' + item + '.png" class="itemicon">';
 			itemtable += '<div id="' + item + '_number" class="itemnumber"></div>';
@@ -384,7 +385,7 @@ Univ.ItemMenuHTML = function(){
 	lookup('items').innerHTML = itemtable;
 	
 	for (var item in Univ.Items) {
-		if (Univ.Items[item].visibility == 1) {
+		if (item != 'secs' && item != 'kelvin' && item != 'computation') {
 			try{throw item}
 			catch(item){
 				AddEvent(lookup(item + '_button'),'mouseover',function(what){return function(e){Univ.ActiveItem = item;};}(item));
@@ -430,7 +431,7 @@ window.onload = function(){
 }
 
 AddEvent(window,'keydown',function(e){
-	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} //ctrl-s saves the game
+	if (e.ctrlKey && e.keyCode==83) {Univ.toSave=true;e.preventDefault();}//ctrl-s saves the game
 });
 
 // DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)

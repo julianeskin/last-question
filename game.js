@@ -73,6 +73,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			}
 			this.number += howmany;
 			Univ.Logic();
+			Univ.RefreshDisplay();
 			this.showPopup();
 		}
 	}
@@ -187,9 +188,8 @@ Univ.WriteSave = function(mode){
 	for(var i in Univ.Items){
 		save.Items[i] = {};
 		save.Items[i].available_number = Univ.Items[i].available_number;
+//		save.Items[i].total_number = Univ.Items[i].total_number;
 	}
-	
-	
 	if(mode == 3){
 		return JSON.stringify(save, null, 2);
 	}
@@ -214,7 +214,7 @@ Univ.LoadSave = function(data){
 	
 	if(!save) return;
 	
-	if(save.version >= 0.08){
+	if(save.version >= 0.010){
 		for(var g in save.Objects){
 			if(Univ.Objects[g]){
 				Univ.Objects[g].number = save.Objects[g].number;
@@ -228,17 +228,51 @@ Univ.LoadSave = function(data){
 			}
 		}
 	}
+	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
 
 Univ.Loop = function(){
+	Univ.catchupLogic = 0;
  	Univ.Logic();
-	if (Univ.toSave || (Univ.T % (Univ.FPS * 60) == 0 )) {
-		var canSave = true;
-//		if (canSave) Univ.WriteSave();
+ 	Univ.catchupLogic = 1;
+ 	
+ 	var time = Date.now();
+	
+	//latency compensator
+	Univ.accumulatedDelay += ((time - Univ.time) - 1000 / Univ.FPS);
+	
+	Univ.accumulatedDelay = Math.min(Univ.accumulatedDelay, 1000 * 5); //don't compensate over 5 seconds; if you do, something's probably very wrong
+	Univ.time = time;
+	while(Univ.accumulatedDelay > 0){
+		Univ.Logic();
+		Univ.accumulatedDelay -= 1000 / Univ.FPS; //as long as we're detecting latency (slower than target fps), execute logic (this makes drawing slower but makes the logic behave closer to correct target fps)
 	}
-	Univ.T++; // In case we don't want to run certain parts of code every frame
-	Univ.RefreshDisplay();
+	Univ.catchupLogic = 0;
+
+	if (Univ.T % (Univ.FPS / 4) == 0 ) {
+		Univ.RefreshDisplay();
+	}
 	setTimeout(Univ.Loop,1000/Univ.FPS);
+	
+	if (Univ.toSave || (Univ.T % (Univ.FPS * 60) == 0 )) {	// from Cookie Clicker
+		var canSave = true;									// from Cookie Clicker
+		if (canSave) Univ.WriteSave();						// from Cookie Clicker
+	}
+	Univ.T++; // In case we don't want to run certain parts of code every frame	// from Cookie Clicker
+}
+
+Univ.reset = function(hard){
+	for(var g in Univ.Objects){
+		var obj = Univ.Objects[g];
+		Univ.Objects[g].number = 0;
+		Univ.Objects[g].targetactivity = 100;
+	}
+	
+	for(var i in Univ.Items){
+		Univ.Items[i].available_number = 0;
+	}
+	
+	Univ.Items['qfoam'].available_number = 100;
 }
 
 Univ.Logic = function(){
@@ -414,8 +448,6 @@ update_speedslider = function() {
 	lookup('speedslider_label').innerHTML = slidervalue + 'x';
 }
 
-
-
 Univ.ItemMenuHTML = function(){
 	var itemtable = [];
 
@@ -470,13 +502,19 @@ Univ.GeneratorMenuHTML = function() {
 
 window.onload = function(){
 	l('topbar').innerHTML += 'Version ' + version;
-	make_speedslider();
+	make_speedslider(); // delete for release
 	
 	Univ.LoadItems();
 	Univ.LoadObjects();
-//	Univ.LoadSave();
+	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	
+	// Latency stuff
+	Univ.accumulatedDelay = 0;
+	Univ.lastActivity = Date.now();
+	Univ.time = Date.now();
+	
  	Univ.Loop();
 }
 

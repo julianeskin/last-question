@@ -8,8 +8,7 @@ Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
 
-function l(what) {return document.getElementById(what);}
-function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
+function lookup(object) {return document.getElementById(object);}
 
 function round(num, places){ 
 	return +(Math.round(num + 'e+' + places)  + 'e-' + places);
@@ -228,6 +227,7 @@ Univ.LoadSave = function(data){
 			}
 		}
 	}
+
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
 
@@ -503,7 +503,7 @@ Univ.GeneratorMenuHTML = function() {
 window.onload = function(){
 	l('topbar').innerHTML += 'Version ' + version;
 	make_speedslider(); // delete for release
-	
+
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadSave();
@@ -520,6 +520,9 @@ window.onload = function(){
 
 AddEvent(window,'keydown',function(e){
 	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} //ctrl-s saves the game
+	if (e.ctrlKey && e.keyCode == 88) {Univ.reset();e.preventDefault();}//ctrl-x resets the game
+	Univ.lastActivity = Date.now();
+	//console.log(e);
 });
 
 // DELETE BEFORE RELEASE (this is so we can speed up production using the A/W/E/F keys)

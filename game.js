@@ -112,7 +112,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + 'sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -188,7 +188,7 @@ Univ.WriteSave = function(mode){
 	for(var i in Univ.Items){
 		save.Items[i] = {};
 		save.Items[i].available_number = Univ.Items[i].available_number;
-//		save.Items[i].total_number = Univ.Items[i].total_number;
+		save.Items[i].total_number = Univ.Items[i].total_number;
 	}
 	if(mode == 3){
 		return JSON.stringify(save, null, 2);
@@ -196,6 +196,15 @@ Univ.WriteSave = function(mode){
 	else{
 		localStorage.setItem(Univ.SaveTo, JSON.stringify(save));
 	}
+	var today = new Date();
+	var hour = today.getHours();
+	var minute = today.getMinutes();
+	var second = today.getSeconds();
+	hour = (hour < 10 ?'0' : '') + hour;
+	minute = (minute < 10 ? '0' : '') + minute;
+	second = (second < 10 ? '0' : '') + second;
+	var time = hour + ':' + minute + ':' + second;
+	lookup('savebutton').innerHTML = 'Save (last saved at ' + time + ')';
 }
 
 Univ.LoadSave = function(data){
@@ -261,7 +270,7 @@ Univ.Loop = function(){
 	Univ.T++; // In case we don't want to run certain parts of code every frame	// from Cookie Clicker
 }
 
-Univ.reset = function(hard){
+Univ.Reset = function(){
 	for(var g in Univ.Objects){
 		var obj = Univ.Objects[g];
 		Univ.Objects[g].number = 0;
@@ -373,14 +382,15 @@ Univ.UpdateItemDisplay = function(){
 			}
 			
 			// UPDATE INCOME/SPENDING
-			var netproduction = round((item.production - item.consumption),2);
-			if (netproduction > 0) {
-				lookup(item.type + '_production').innerHTML = '+' + netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
-			} else if  (netproduction < 0) {
-				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
-			} else {
-				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
+			productionHTML = [];
+			if (item.available_number > 0) {
+				var netproduction = round((item.production - item.consumption),2);
+				if (netproduction > 0) {
+					productionHTML = '+';
+				}
+				productionHTML += netproduction + ' per sec (+' + round(item.production,1) + '/' + round(item.consumption,1) +')'; 
 			}
+			lookup(item.type + '_production').innerHTML = productionHTML;
 		}
 	}
 }
@@ -448,6 +458,13 @@ update_speedslider = function() {
 	lookup('speedslider_label').innerHTML = slidervalue + 'x';
 }
 
+Univ.LoadMenus = function() {
+	lookup('topbar').innerHTML += '<div id="versionbox" style="width:100px;height:25px;text-align:center;line-height:25px;background-color:#f7f7f7;border:black 1px solid;margin:2px;">Version ' + version + '</div>';
+	lookup('topbar').innerHTML += '<div id="savebutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#c9ffd2;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.WriteSave();">Save</div>';
+	lookup('topbar').innerHTML += '<div id="resetbutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#ffd3dd;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	make_speedslider(); // delete for release
+}
+
 Univ.ItemMenuHTML = function(){
 	var itemtable = [];
 
@@ -501,9 +518,7 @@ Univ.GeneratorMenuHTML = function() {
 }
 
 window.onload = function(){
-	lookup('topbar').innerHTML += 'Version ' + version;
-	make_speedslider(); // delete for release
-	
+	Univ.LoadMenus();	
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadSave();

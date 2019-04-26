@@ -1,6 +1,6 @@
 var version = 0.010;
 var Univ = {};
-Univ.FPS = 30;
+Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
@@ -343,7 +343,7 @@ Univ.UpdateRates = function(generator){
 	}
 }
 
-Univ.ActiveNumber = function(generator){
+Univ.ActiveNumber2 = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
 	generator.activenumber = 0;
 	for (var i = 1; i <= generator.number; i++) {
@@ -355,10 +355,32 @@ Univ.ActiveNumber = function(generator){
 				items_satisfied++;
 			}
 		}
-			if ( items_satisfied == items_checked ) {
+		if ( items_satisfied == items_checked ) {
 			generator.activenumber = Math.min(i,Math.round(generator.number * generator.targetactivity/100));
 		}
 	}
+}
+
+Univ.ActiveNumber = function(generator){
+// Find the number of a Generator that can run (by checking their consumption needs)
+	generator.activenumber = 0;
+	for (var i = generator.number - 1; i >= 0; i--) {
+		var items_checked = 0;
+		var items_satisfied = 0;
+		for (var item in generator.Consumption(i)) {
+			if ( item != 'undefined' && item != 'interval') {
+				items_checked++;
+				if ( generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
+					items_satisfied++;
+				}
+			}
+		}
+		if ( items_satisfied != items_checked ) {
+			break;
+			alert(i);
+		}
+	}
+	generator.activenumber = Math.min( generator.number - i - 1, Math.round(generator.number * generator.targetactivity/100));
 }
 
 Univ.RefreshDisplay = function(){
@@ -441,25 +463,24 @@ Univ.updateSlider = function(generatorid) {
 	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
 
-// temp for playtesting:
-make_speedslider = function() {
+make_speedslider = function() { // delete for release
 	slider_HTML = [];
 	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
 	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
-	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="1000" value="1" class="speedslider" id="speedslider"></div>';
+	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="100" value="1" class="speedslider" id="speedslider"></div>';
 	lookup('topbar').innerHTML += slider_HTML;
 	lookup('speedslider').oninput = function(){update_speedslider();};
 }
-update_speedslider = function() {
+update_speedslider = function() { // delete for release
 	var slidervalue = lookup('speedslider').value;
 	Univ.Speedfactor = slidervalue;
 	Univ.UpdateRates();
-	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 0.157) + 'px';
+	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 1.6) + 'px';
 	lookup('speedslider_label').innerHTML = slidervalue + 'x';
 }
 
 Univ.LoadMenus = function() {
-	lookup('topbar').innerHTML += '<div id="versionbox" style="width:100px;height:25px;text-align:center;line-height:25px;background-color:#f7f7f7;border:black 1px solid;margin:2px;">Version ' + version + '</div>';
+	lookup('topbar').innerHTML += '<div id="versionbox" style="width:100px;height:25px;text-align:center;line-height:25px;background-color:#f7f7f7;border:black 1px solid;margin:2px;">Version ' + version.toFixed(3) + '</div>';
 	lookup('topbar').innerHTML += '<div id="savebutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#c9ffd2;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.WriteSave();">Save</div>';
 	lookup('topbar').innerHTML += '<div id="resetbutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#ffd3dd;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
 	make_speedslider(); // delete for release

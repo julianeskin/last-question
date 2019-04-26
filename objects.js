@@ -46,8 +46,8 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				interval: 1, 		// 10 seconds
-				qfoam: 1 * number	// each makes 1 qfoam every 10 seconds
+				interval: 1, 		// 1 second
+				qfoam: 1 * number	// each makes 1 qfoam every 1 second
 			}
 			return production;
 		},
@@ -55,7 +55,7 @@ Univ.LoadObjects = function(){
 			var consumption = {}
 			return consumption;
 		});
-	new Univ.Object('quantumgenerator2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
+	new Univ.Object('qfoam2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
 			return 1;
@@ -77,7 +77,7 @@ Univ.LoadObjects = function(){
 			var consumption = {}
 			return consumption;
 		});
-	new Univ.Object('quantumgenerator3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
+	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
 			return 1;
@@ -91,7 +91,7 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 10,
-				qfoam: 150 * number
+				qfoam: 150 * number // 150 qfoam every 10 seconds
 			}
 			return production;
 		},
@@ -113,14 +113,14 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 5,
-				elementary: 1 * number
+				elementary: 25 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
 				interval: this.Production(1)['interval'],
-				qfoam: 4 * number
+				qfoam: 100 * number
 			}
 			return consumption;
 		});
@@ -138,14 +138,14 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 5,
-				elementary: 7 * number
+				elementary: 124 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
 				interval: this.Production(1)['interval'],
-				qfoam: 14 * number
+				qfoam: 248 * number
 			}
 			return consumption;
 		});
@@ -163,14 +163,14 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 5,
-				elementary: 35 * number
+				elementary: 625 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
 				interval: this.Production(1)['interval'],
-				qfoam: 35 * number
+				qfoam: 625 * number
 			}
 			return consumption;
 		});

@@ -46,7 +46,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				interval: 1, 		// 1 second
+				interval: 1/Univ.FPS, 	// in seconds
 				qfoam: 1 * number	// each makes 1 qfoam every 1 second
 			}
 			return production;
@@ -174,75 +174,81 @@ Univ.LoadObjects = function(){
 			}
 			return consumption;
 		});
-// 	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				elementary: 555 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				subatomic: 0.333 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				elementary: 1 * number
-// 			}
-// 			return consumption;
-// 		});
-// 	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				elementary: 5555 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				subatomic: 4.333 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				elementary: 13 * number
-// 			}
-// 			return consumption;
-// 		});
-// 	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				elementary: 55555 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				subatomic: 55.333 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				elementary: 166 * number
-// 			}
-// 			return consumption;
-// 		});
+	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				elementary: 555 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 2/Univ.FPS,
+				subatomic: 2 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				elementary: 5 * number
+			}
+			return consumption;
+		});
+	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				elementary: 5555 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 4/Univ.FPS,
+				subatomic: 60 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				elementary: 120 * number
+			}
+			return consumption;
+		});
+	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				elementary: 55555 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 8/Univ.FPS,
+				subatomic: 1800 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				elementary: 1200 * number
+			}
+			return consumption;
+		});
 // 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
 // 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 // 		function(){ // isVisible

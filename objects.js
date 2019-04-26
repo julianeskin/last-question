@@ -46,7 +46,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				interval: 1/Univ.FPS, 	// in seconds
+				interval: 1/Univ.FPS, 	// in seconds (So 1/Univ.FPS = 1 game tick, the fastest possible rate)
 				qfoam: 1 * number	// each makes 1 qfoam every 1 second
 			}
 			return production;
@@ -213,14 +213,14 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 4/Univ.FPS,
-				subatomic: 60 * number
+				subatomic: 2 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
 				interval: this.Production(1)['interval'],
-				elementary: 120 * number
+				elementary: 4 * number
 			}
 			return consumption;
 		});
@@ -238,63 +238,67 @@ Univ.LoadObjects = function(){
 		function(number){ // production
 			var production = {
 				interval: 8/Univ.FPS,
-				subatomic: 1800 * number
+				subatomic: 20 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
 				interval: this.Production(1)['interval'],
-				elementary: 1200 * number
+				elementary: 35 * number
 			}
 			return consumption;
 		});
-// 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				subatomic: 90
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				atom: 1 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				subatomic: 1 * number
-// 			}
-// 			return consumption;
-// 		});
-// 	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				subatomic: 1800
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				atom: 17.5 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				subatomic: 25 * number
-// 			}
-// 			return consumption;
-// 		});
+	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				subatomic: 900
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 14,
+				atom: 1 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				subatomic: 1 * number // 1 proton per hydrogen
+			}
+			return consumption;
+		});
+	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				subatomic: 18000
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 12,
+				atom: 17.5 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				subatomic: 25 * number
+			}
+			return consumption;
+		});
 // 	new Univ.Object('atomatom3','atom','Quantum Degenerator','Quantum Degenerators',0,
 // 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 // 		function(){ // isVisible

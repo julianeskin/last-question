@@ -1,6 +1,6 @@
-var version = 0.010;
+var version = 0.011;
 var Univ = {};
-Univ.FPS = 30;
+Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
@@ -109,10 +109,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.Production(1)['interval'],2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.Production(1)['interval'],2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}

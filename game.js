@@ -406,7 +406,7 @@ Univ.UpdateItemDisplay = function(){
 			// UPDATE INCOME/SPENDING
 			productionHTML = [];
 			if (item.available_number > 0) {
-				var netproduction = round((item.production - item.consumption),2);
+				var netproduction = round((item.production + item.consumption),2);
 				if (netproduction > 0) {
 					productionHTML = '+';
 				}

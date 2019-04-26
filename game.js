@@ -1,7 +1,7 @@
-var version = 0.09;
+var version = 0.010;
 var Univ = {};
 Univ.FPS = 30;
-Univ.Speedfactor = 10; // Factor to speed up everything -- for testing.
+Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
 Univ.T = 0;
@@ -10,6 +10,10 @@ Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes t
 
 function l(what) {return document.getElementById(what);}
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
+
+function round(num, places){ 
+	return +(Math.round(num + 'e+' + places)  + 'e-' + places);
+}
 
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
  	this.singular = singular;
@@ -51,8 +55,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	}
 
 	this.Costs = CostFcn;
-	this.Production = ProductionFcn;
-	this.Consumption = ConsumptionFcn;
+	
 	this.isVisible = VisibilityFcn;
 	this.isClickable = function(){ // eventually this will check both if it's affordable, and if other conditions are met
 		if (this.isAffordable) {
@@ -66,15 +69,20 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.Buy = function(howmany){
 		if (this.isAffordable(howmany)) {
 			for (var item in this.Costs(howmany)) {
-				Univ.Transact('spend', item, this.Costs(howmany)[item]);
+				Univ.Items[item].available_number -= this.Costs(howmany)[item];
 			}
 			this.number += howmany;
 			Univ.Logic();
 			this.showPopup();
 		}
 	}
+	
 	this.infoblurb = infoblurb;
 	this.targetactivity = 100; // percent of this generator chosen to be active
+	
+	this.Production = ProductionFcn;
+	this.Consumption = ConsumptionFcn;
+	this.ticks_since_production = 0;	
 	
 	this.makePopup = function() {
 	// this makes a generic popup for all Generators. In the future maybe some of them will need distinct info or options...
@@ -100,10 +108,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + Math.round(this.Production(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Production(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + Math.round(this.Consumption(this.activenumber)[item] * 10)/10 + ' ' + Univ.Items[item].plural + ' per sec (' + Math.round(this.Consumption(this.activenumber)[item]/this.activenumber*10)/10 + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + Math.round(this.Production(1)['interval'],1) + 'sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -224,77 +232,99 @@ Univ.LoadSave = function(data){
 
 Univ.Loop = function(){
  	Univ.Logic();
+	if (Univ.toSave || (Univ.T % (Univ.FPS * 60) == 0 )) {
+		var canSave = true;
+//		if (canSave) Univ.WriteSave();
+	}
+	Univ.T++; // In case we don't want to run certain parts of code every frame
 	Univ.RefreshDisplay();
 	setTimeout(Univ.Loop,1000/Univ.FPS);
 }
 
 Univ.Logic = function(){
-// Find the number of each Generator that can run (by checking their consumption needs)
-	for (var g in Univ.Objects) {
- 		var generator = Univ.Objects[g];
- 		generator.activenumber = 0;
- 		for (var i = 1; i <= generator.number; i++) {
- 			var items_checked = 0;
- 			var items_satisfied = 0;
- 			for (var item in Univ.Items) {
- 				items_checked++;
- 				if ( typeof generator.Consumption(i)[item] == 'undefined' || generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
- 					items_satisfied++;
+	for ( var g in Univ.Objects ) {
+		var generator = Univ.Objects[g];
+		if ( generator.number > 0 ) {
+			generator.ticks_since_production++;
+			Univ.ActiveNumber(generator);
+			if ( generator.ticks_since_production >= (generator.Production(1)['interval'] * Univ.FPS)) {
+				for ( var item in generator.Production(1) ) {
+					if ( item != 'interval' ) {
+						itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
+						Univ.Items[item].available_number += itemproduction;
+						Univ.Items[item].total_number += itemproduction;
+						generator.ticks_since_production = 0;
+					}
 				}
- 			}
- 			if ( items_satisfied == items_checked ) {
-				generator.activenumber = Math.min(i,Math.round(generator.number * generator.targetactivity/100));
+				for ( var item in generator.Consumption(1) ) {
+					if ( item != 'interval' ) {
+						itemconsumption = generator.Consumption(generator.activenumber)[item] * Univ.Speedfactor;
+						Univ.Items[item].available_number -= itemconsumption;
+						generator.ticks_since_production = 0;
+					}
+				}
 			}
- 		}
- 	}
-
-// Update rates and spend/earn the Items accordingly
-	for (var i in Univ.Items) {
-		var item = Univ.Items[i];
-		item.production = 0;
-		item.consumption = 0;
-		for (var h in Univ.Objects) {
-			var generator = Univ.Objects[h];
-			if ( typeof generator.Production(generator.activenumber)[i] !== 'undefined') {
-				item.production += generator.Production(generator.activenumber)[i];
-			}
-			if ( typeof generator.Consumption(generator.activenumber)[i] !== 'undefined') {
-				item.consumption += generator.Consumption(generator.activenumber)[i];
-			}
-		}
-		Univ.Transact('spend',item.type, Univ.Speedfactor * item.consumption / Univ.FPS);
-		Univ.Transact('gain',item.type, Univ.Speedfactor * item.production / Univ.FPS);
+		} else { generator.activenumber = 0; }
 	}
-	
-	if (Univ.toSave || (Univ.T % (Univ.FPS * 60) == 0 )) {
-		//check if we can save : no minigames are loading // Yes, I copied this from Cookie Clicker. I did warn you
-		var canSave=true;
-		/*for (var i in Game.Objects)
-		{
-			var me=Game.Objects[i];
-			if (me.minigameLoading){canSave=false;break;}
-		}*/
-		if (canSave) Univ.WriteSave();
-	}
-	
-	Univ.T++; // In case we don't want to run certain parts of code every frame
 }
 
-Univ.Transact = function(transaction,item,amount){
-	if (transaction == 'spend') {
-		Univ.Items[item].available_number -= amount*1;
+Univ.UpdateRates = function(generator){
+	var productionrates = {};
+	var consumptionrates = {};
+	for (var item in Univ.Items) {
+		productionrates[item] = 0;
+		consumptionrates[item] = 0;
 	}
-	if (transaction == 'gain') {
-		Univ.Items[item].available_number += amount*1;
+
+	for ( var g in Univ.Objects ) {
+		var generator = Univ.Objects[g];
+		if ( generator.number > 0 ) {
+			Univ.ActiveNumber(generator);
+			for ( var item in generator.Production(1) ) {
+				if ( item != 'interval' ) {
+					itemproduction = generator.Production(generator.activenumber)[item];
+					productionrates[item] += itemproduction / generator.Production(1)['interval'] * Univ.Speedfactor;
+				}
+			}
+			for ( var item in generator.Consumption(1) ) {
+				if ( item != 'interval' ) {
+					itemconsumption = generator.Consumption(generator.activenumber)[item];
+					consumptionrates[item] -= itemconsumption / generator.Consumption(1)['interval'] * Univ.Speedfactor;
+				}
+			}
+		} else { generator.activenumber = 0; }
+	}
+	for (var item in Univ.Items) {
+		Univ.Items[item].production = productionrates[item];
+		Univ.Items[item].consumption = consumptionrates[item];
+	}
+}
+
+Univ.ActiveNumber = function(generator){
+// Find the number of a Generator that can run (by checking their consumption needs)
+	generator.activenumber = 0;
+	for (var i = 1; i <= generator.number; i++) {
+		var items_checked = 0;
+		var items_satisfied = 0;
+		for (var item in Univ.Items) {
+			items_checked++;
+			if ( typeof generator.Consumption(i)[item] == 'undefined' || generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
+				items_satisfied++;
+			}
+		}
+			if ( items_satisfied == items_checked ) {
+			generator.activenumber = Math.min(i,Math.round(generator.number * generator.targetactivity/100));
+		}
 	}
 }
 
 Univ.RefreshDisplay = function(){
-	Univ.UpdateItems();
-	Univ.UpdateGenerators();
+	Univ.UpdateRates();
+	Univ.UpdateItemDisplay();
+	Univ.UpdateGeneratorDisplay();
 }
 
-Univ.UpdateItems = function(){
+Univ.UpdateItemDisplay = function(){
 	for (var i in Univ.Items) {
 		var item = Univ.Items[i];
 		if (Univ.Items[i].visibility == 1) {		
@@ -309,19 +339,19 @@ Univ.UpdateItems = function(){
 			}
 			
 			// UPDATE INCOME/SPENDING
-			var netproduction = Math.round((item.production - item.consumption) * 10)/10;
+			var netproduction = round((item.production - item.consumption),2);
 			if (netproduction > 0) {
-				lookup(item.type + '_production').innerHTML = '+' + netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
+				lookup(item.type + '_production').innerHTML = '+' + netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
 			} else if  (netproduction < 0) {
-				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
+				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
 			} else {
-				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + Math.round(item.production*10)/10 + '/-' + Math.round(item.consumption*10)/10 +')';
+				lookup(item.type + '_production').innerHTML = netproduction + ' per sec (+' + round(item.production,1) + '/-' + round(item.consumption,1) +')';
 			}
 		}
 	}
 }
 
-Univ.UpdateGenerators = function(){
+Univ.UpdateGeneratorDisplay = function(){
 	for (var i in Univ.Objects) {
  		var generator = Univ.Objects[i];
 		if (generator.type == Univ.ActiveItem){
@@ -366,6 +396,25 @@ Univ.updateSlider = function(generatorid) {
 	lookup(sliderid + 'label').innerHTML = slidervalue + '%';
 	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
+
+// temp for playtesting:
+make_speedslider = function() {
+	slider_HTML = [];
+	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
+	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
+	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="1000" value="1" class="speedslider" id="speedslider"></div>';
+	l('topbar').innerHTML += slider_HTML;
+	l('speedslider').oninput = function(){update_speedslider();};
+}
+update_speedslider = function() {
+	var slidervalue = l('speedslider').value;
+	Univ.Speedfactor = slidervalue;
+	Univ.UpdateRates();
+	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 0.157) + 'px';
+	lookup('speedslider_label').innerHTML = slidervalue + 'x';
+}
+
+
 
 Univ.ItemMenuHTML = function(){
 	var itemtable = [];
@@ -421,9 +470,11 @@ Univ.GeneratorMenuHTML = function() {
 
 window.onload = function(){
 	l('topbar').innerHTML += 'Version ' + version;
+	make_speedslider();
+	
 	Univ.LoadItems();
 	Univ.LoadObjects();
-	Univ.LoadSave();
+//	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
  	Univ.Loop();
@@ -433,13 +484,13 @@ AddEvent(window,'keydown',function(e){
 	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} //ctrl-s saves the game
 });
 
-// DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)
-document.addEventListener('keydown',function(event) {
-    var control = 0;
-    if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70) { // A/W/E/F
-		for (var i in Univ.Items) {
-			var item = Univ.Items[i];
-			Univ.Transact('gain',item.type, item.production / Univ.FPS * 30 );
-		}
-    }
-});
+// DELETE BEFORE RELEASE (this is so we can speed up production using the A/W/E/F keys)
+// document.addEventListener('keydown',function(event) {
+//     var control = 0;
+//     if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70) { // A/W/E/F
+// 		for (var i in Univ.Items) {
+// 			var item = Univ.Items[i];
+// 		//	Univ.Transact('gain',item.type, item.production / Univ.FPS * 30 ); // this is outdated
+// 		}
+//     }
+// });

@@ -8,8 +8,7 @@ Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
 
-function l(what) {return document.getElementById(what);}
-function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
+function lookup(object) {return document.getElementById(object);}
 
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
  	this.singular = singular;
@@ -220,6 +219,22 @@ Univ.LoadSave = function(data){
 			}
 		}
 	}
+	
+	Univ.T = 0; // Frame counter starts over
+}
+
+Univ.reset = function(hard){
+	for(var g in Univ.Objects){
+		var obj = Univ.Objects[g];
+		Univ.Objects[g].number = 0;
+		Univ.Objects[g].targetactivity = 100;
+	}
+	
+	for(var i in Univ.Items){
+		Univ.Items[i].available_number = 0;
+	}
+	
+	Univ.Items['qfoam'].available_number = 90;
 }
 
 Univ.Loop = function(){
@@ -431,6 +446,9 @@ window.onload = function(){
 
 AddEvent(window,'keydown',function(e){
 	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} //ctrl-s saves the game
+	if (e.ctrlKey && e.keyCode == 88) {Univ.reset();e.preventDefault();}//ctrl-x resets the game
+	Univ.lastActivity = Date.now();
+	//console.log(e);
 });
 
 // DELETE BEFORE RELEASE (this is so I can speed up production using the A/W/E/F keys)

@@ -238,7 +238,23 @@ Univ.reset = function(hard){
 }
 
 Univ.Loop = function(){
+ 	Univ.catchupLogic = 0;
  	Univ.Logic();
+	Univ.catchupLogic = 1;
+	
+	var time = Date.now();
+	
+	//latency compensator
+	Univ.accumulatedDelay += ((time - Univ.time) - 1000 / Univ.FPS);
+	
+	Univ.accumulatedDelay = Math.min(Univ.accumulatedDelay, 1000 * 5); //don't compensate over 5 seconds; if you do, something's probably very wrong
+	Univ.time = time;
+	while(Univ.accumulatedDelay > 0){
+		Univ.Logic();
+		Univ.accumulatedDelay -= 1000 / Univ.FPS; //as long as we're detecting latency (slower than target fps), execute logic (this makes drawing slower but makes the logic behave closer to correct target fps)
+	}
+	Univ.catchupLogic = 0;
+	
 	Univ.RefreshDisplay();
 	setTimeout(Univ.Loop,1000/Univ.FPS);
 }
@@ -441,6 +457,12 @@ window.onload = function(){
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	
+	// Latency stuff
+	Univ.accumulatedDelay = 0;
+	Univ.lastActivity = Date.now();
+	Univ.time = Date.now();
+	
  	Univ.Loop();
 }
 

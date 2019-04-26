@@ -468,7 +468,7 @@ Univ.ItemMenuHTML = function(){
 		if (Univ.Items[item].visibility == 1) {
 			try{throw item}
 			catch(item){
-				AddEvent(lookup(item + '_button'),'mouseover',function(what){return function(e){Univ.ActiveItem = item;};}(item));
+				AddEvent(lookup(item + '_button'),'mouseover',function(what){return function(e){Univ.ActiveItem = item;Univ.UpdateGeneratorDisplay();};}(item));
 			}
 		}
 	}

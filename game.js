@@ -435,7 +435,7 @@ Univ.GeneratorMenuHTML = function() {
 }
 
 window.onload = function(){
-	l('topbar').innerHTML += 'Version ' + version;
+	lookup('topbar').innerHTML += 'Version ' + version;
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadSave();

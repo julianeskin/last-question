@@ -46,7 +46,7 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // production
 			var production = {
-				interval: 10, 		// 10 seconds
+				interval: 1, 		// 10 seconds
 				qfoam: 1 * number	// each makes 1 qfoam every 10 seconds
 			}
 			return production;
@@ -55,48 +55,50 @@ Univ.LoadObjects = function(){
 			var consumption = {}
 			return consumption;
 		});
-// 	new Univ.Object('quantumgenerator2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
-// 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				qfoam: 100 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				qfoam: 1.2 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {}
-// 			return consumption;
-// 		});
-// 	new Univ.Object('quantumgenerator3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
-// 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				qfoam: 1000 * how many
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				qfoam: 15 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {}
-// 			return consumption;
-// 		});
+	new Univ.Object('quantumgenerator2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
+	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				qfoam: 100 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 1,
+				qfoam: 12 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {}
+			return consumption;
+		});
+	new Univ.Object('quantumgenerator3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
+	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				qfoam: 1000 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 10,
+				qfoam: 150 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {}
+			return consumption;
+		});
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
@@ -117,57 +119,61 @@ Univ.LoadObjects = function(){
 		},
 		function(number){ // consumption
 			var consumption = {
-				interval: this.Production(1)['interval'], // it needs to be the same interval so it produces when it consumes
+				interval: this.Production(1)['interval'],
 				qfoam: 4 * number
 			}
 			return consumption;
 		});
-// 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				qfoam: 20000 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				elementary: 7 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				qfoam: 14 * number
-// 			}
-// 			return consumption;
-// 		});
-// 	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
-// 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-// 		function(){ // isVisible
-// 			return 1;
-// 		},
-// 		function(howmany){ // costs
-// 			var prices = {
-// 				qfoam: 80000 * howmany
-// 			}
-// 			return prices;
-// 		},
-// 		function(number){ // production
-// 			var production = {
-// 				elementary: 35 * number
-// 			}
-// 			return production;
-// 		},
-// 		function(number){ // consumption
-// 			var consumption = {
-// 				qfoam: 35 * number
-// 			}
-// 			return consumption;
-// 		});
+	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				qfoam: 20000 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 5,
+				elementary: 7 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				qfoam: 14 * number
+			}
+			return consumption;
+		});
+	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return 1;
+		},
+		function(howmany){ // costs
+			var prices = {
+				qfoam: 80000 * howmany
+			}
+			return prices;
+		},
+		function(number){ // production
+			var production = {
+				interval: 5,
+				elementary: 35 * number
+			}
+			return production;
+		},
+		function(number){ // consumption
+			var consumption = {
+				interval: this.Production(1)['interval'],
+				qfoam: 35 * number
+			}
+			return consumption;
+		});
 // 	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
 // 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 // 		function(){ // isVisible

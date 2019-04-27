@@ -58,19 +58,71 @@ body{
 	height:50px;
 	margin:5px;
 	border-radius:5px;
-	cursor:pointer;
 	text-align:left;
-	user-select: none;
+	user-select:none;
+	border:2px solid black;
 }
 
-.unclickablegenerator{
-	color: grey;
-	border: 2px solid grey;
+.generatorbuyone{
+	position:absolute;
+	width:30px;
+	height:16px;
+	top:0px;
+	right:0px;
+	text-align:center;
+	color:grey;
+	line-height:16px;
+	z-index:3;
+	border-left-style:solid;
+	border-bottom-style:solid;
+	border-left-width:1px;
+	border-bottom-width:1px;
+	border-left-color:grey;
+	border-bottom-color:grey;
 }
 
-.clickablegenerator{
-	color: black;
-	border: 2px solid black;
+.generatorbuymid{
+	position:absolute;
+	visibility:visible;
+	width:30px;
+	height:16px;
+	top:17px;
+	right:0px;
+	color:grey;
+	line-height:16px;
+	z-index:2;
+	text-align:center;
+	border-left-style:solid;
+	border-bottom-style:solid;
+	border-left-width:1px;
+	border-bottom-width:1px;
+	border-left-color:grey;
+	border-bottom-color:grey;
+}
+
+.generatorbuymax{
+	position:absolute;
+	visibility:visible;
+	width:30px;
+	height:16px;
+	top:33px;
+	right:0px;
+	color:grey;
+	line-height:16px;
+	z-index:1;
+	text-align:center;
+	border-left-style:solid;
+	border-top-style:solid;
+	border-left-width:1px;
+	border-top-width:1px;
+	border-left-color:grey;
+	border-top-color:grey;
+}
+
+.affordable{
+	color:black;
+	border-color:black;
+	cursor:pointer;
 }
 
 .popupcontainer{
@@ -280,6 +332,7 @@ body{
 	font-size:15px;
 	top:0px;
 	left:80px;
+	right:30px;
 }
 
 .generatorcost{
@@ -292,6 +345,7 @@ body{
 .menuTitle{
 	text-align:center;
 	font-size:30px;
+	user-select:none;
 }
 
 .optionsButton{
@@ -302,6 +356,7 @@ body{
 	border:black 1px solid;
 	cursor:pointer;
 	margin:10px;
+	user-select:none;
 }
 
 .hovered{

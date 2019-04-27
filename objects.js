@@ -58,7 +58,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['qfoam'].total_number >= 100 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -80,7 +80,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['qfoam'].total_number >= 1000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -102,7 +102,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['qfoam'].total_number >= 5000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -127,7 +127,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['qfoam'].total_number >= 20000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -152,7 +152,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['qfoam'].total_number >= 80000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -177,7 +177,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['elementary'].total_number >= 555 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -202,7 +202,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['elementary'].total_number >= 5555 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -227,7 +227,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['elementary'].total_number >= 55555 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -252,7 +252,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['subatomic'].total_number >= 900 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -277,7 +277,7 @@ Univ.LoadObjects = function(){
 	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return Univ.Items['subatomic'].total_number >= 18000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {

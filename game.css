@@ -303,3 +303,7 @@ body{
 	cursor:pointer;
 	margin:10px;
 }
+
+.hovered{
+	border:black 3px solid;
+}

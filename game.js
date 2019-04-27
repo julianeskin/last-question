@@ -1,4 +1,4 @@
-var version = 0.012;
+var version = 0.013;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -7,6 +7,8 @@ Univ.Objects = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
+Univ.ItemsById = [];
+Univ.ObjectsById = [];
 
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
@@ -28,6 +30,8 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	// to allow for nonlinear effects, or to trigger events when certain items get consumed
 	
 	Univ.Items[this.type] = this;
+	this.num = Univ.ItemsById.length;
+	Univ.ItemsById.push(this);
 	return this;
 }
 
@@ -159,6 +163,8 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	}
 	
 	Univ.Objects[this.id] = this;
+	this.num = Univ.ObjectsById.length;
+	Univ.ObjectsById.push(this);
 	return this;
 }
 
@@ -174,6 +180,7 @@ function AddEvent(object,event,fcn){
 Univ.WriteSave = function(mode){
 	var save = {
 		version: version,
+		ActiveItem: Univ.ActiveItem,
 		Objects: {},
 		Items: {}
 	};
@@ -224,7 +231,10 @@ Univ.LoadSave = function(data){
 	
 	if(!save) return;
 	
-	if(save.version >= 0.010){
+	
+	if(save.version >= 0.013){
+		Univ.ActiveItem = save.ActiveItem;
+		
 		for(var g in save.Objects){
 			if(Univ.Objects[g]){
 				Univ.Objects[g].number = save.Objects[g].number;
@@ -235,6 +245,7 @@ Univ.LoadSave = function(data){
 		for(var i in save.Items){
 			if(Univ.Items[i]){
 				Univ.Items[i].available_number = save.Items[i].available_number;
+				Univ.Items[i].total_number = save.Items[i].total_number;
 			}
 		}
 	}
@@ -280,9 +291,11 @@ Univ.Reset = function(){
 	
 	for(var i in Univ.Items){
 		Univ.Items[i].available_number = 0;
+		Univ.Items[i].total_number = 0;
 	}
 	
 	Univ.Items['qfoam'].available_number = 100;
+	Univ.Items['qfoam'].total_number = 100;
 }
 
 Univ.Logic = function(){
@@ -397,27 +410,46 @@ Univ.RefreshDisplay = function(){
 Univ.UpdateItemDisplay = function(){
 	for (var i in Univ.Items) {
 		var item = Univ.Items[i];
+		
+		// Calculate whether to show this item
+		var showItem = 0;
+		for(var j in Univ.Objects){
+			var generator = Univ.Objects[j];
+			if(generator.type == i && generator.isVisible()){
+				showItem = 1;
+				break;
+			}
+		}
+		
 		if (Univ.Items[i].visibility == 1) {		
-			// UPDATE NUMBER
-			lookup(item.type + '_number').innerHTML = Math.floor(item.available_number);
-			
-			// UPDATE TITLE
-			if (item.available_number == 1) {
-				lookup(item.type + '_title').innerHTML = item.singular;
-			} else {
-				lookup(item.type + '_title').innerHTML = item.plural;
-			}
-			
-			// UPDATE INCOME/SPENDING
-			productionHTML = [];
-			if (item.available_number > 0) {
-				var netproduction = round((item.production + item.consumption),2);
-				if (netproduction > 0) {
-					productionHTML = '+';
+			if(showItem){
+				// UPDATE NUMBER
+				lookup(item.type + '_number').innerHTML = Math.floor(item.available_number);
+				
+				// UPDATE TITLE
+				if (item.available_number == 1) {
+					lookup(item.type + '_title').innerHTML = item.singular;
+				} else {
+					lookup(item.type + '_title').innerHTML = item.plural;
 				}
-				productionHTML += netproduction + ' per sec (+' + round(item.production,1) + '/' + round(item.consumption,1) +')'; 
+				
+				// UPDATE INCOME/SPENDING
+				productionHTML = [];
+				if (item.available_number > 0) {
+					var netproduction = round((item.production + item.consumption),2);
+					if (netproduction > 0) {
+						productionHTML = '+';
+					}
+					productionHTML += netproduction + ' per sec (+' + round(item.production,1) + '/' + round(item.consumption,1) +')'; 
+				}
+				lookup(i + '_production').innerHTML = productionHTML;
+				lookup(i + '_button').classList.remove('invisible');
+				lookup(i + '_button').classList.add('visible');
 			}
-			lookup(item.type + '_production').innerHTML = productionHTML;
+			else{
+				lookup(i + '_button').classList.add('invisible');
+				lookup(i + '_button').classList.remove('visible');
+			}
 		}
 	}
 }
@@ -425,7 +457,7 @@ Univ.UpdateItemDisplay = function(){
 Univ.UpdateGeneratorDisplay = function(){
 	for (var i in Univ.Objects) {
  		var generator = Univ.Objects[i];
-		if (generator.type == Univ.ActiveItem){
+		if (generator.type == Univ.ActiveItem && generator.isVisible()){
 			// UPDATE NUMBER	
 			lookup(generator.id + '_number').innerHTML = generator.number;
 
@@ -512,7 +544,8 @@ Univ.ItemMenuHTML = function(){
 	itemtable += '<div class="menuTitle">Menu</div>';
 	itemtable += '</div>';
 
-	for (var item in Univ.Items) {
+	for (var i = Univ.ItemsById.length - 1; i >= 0; i--) {
+		item = Univ.ItemsById[i].type;
 		if (Univ.Items[item].visibility == 1) {
 			itemtable += '<div id="' + item + '_button" class="itembutton active visible">';
 			itemtable += '<img src="icons/' + item + '.png" class="itemicon">';
@@ -541,9 +574,9 @@ Univ.GeneratorMenuHTML = function() {
 	
 	// Options menu. Set the entire div to none or block to hide or show
 	generatortable += '<div id="options_menu" style="display:none;">';
-	generatortable += '<div id="versionbox" class="optionsButton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
-	generatortable += '<div id="savebutton" class="optionsButton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
-	generatortable += '<div id="resetbutton" class="optionsButton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	generatortable += '<div id="versionbox" class="optionsButton menubutton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
+	generatortable += '<div id="savebutton" class="optionsButton menubutton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
+	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
 	
 	generatortable += '</div>';
 	
@@ -570,6 +603,13 @@ Univ.GeneratorMenuHTML = function() {
 	}
 	AddEvent(lookup('popupcontainer'),'mouseover',function(){return function(){lookup('popupcontainer').style.visibility='visible';};}());
 	AddEvent(lookup('popupcontainer'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
+	
+	var menubuttons = document.getElementsByClassName('menubutton');
+	for(var i in menubuttons){
+		var button = menubuttons[i];
+		AddEvent(button,'mouseover',function(what){return function(){what.classList.add('hovered');};}(button));
+		AddEvent(button,'mouseout',function(what){return function(){what.classList.remove('hovered');};}(button));
+	}
 }
 
 window.onload = function(){

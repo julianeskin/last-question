@@ -7,8 +7,8 @@ Univ.LoadItems = function(){
 	new Univ.Item('Elementary Particle','Elementary Particles','elementary',1,0,0,0,0);
 	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',1,0,0,0,0);
 	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0);
-	new Univ.Item('Medium Atom','Medium Atoms','mediumatom',0,0,0,0,0);
-	new Univ.Item('Heavy Atom','Heavy Atoms','heavyatom',0,0,0,0,0);
+	new Univ.Item('Atom','Atoms','mediumatom',0,0,0,0,0);
+	new Univ.Item('Atom','Atoms','heavyatom',0,0,0,0,0);
 	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',1,0,0,0,0);
 	new Univ.Item('Nebula','Nebulae','nebula',1,0,0,0,0);
 	new Univ.Item('Star','Stars','star',1,0,0,0,0);

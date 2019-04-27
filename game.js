@@ -35,7 +35,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,ProductionFcn,ConsumptionFcn){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,interval,ProductionFcn,ConsumptionFcn){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -75,7 +75,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				Univ.Items[item].available_number -= this.Costs(howmany)[item];
 			}
 			this.number += howmany;
-			//Univ.Logic();
+			if (this.number == 1) { this.ticks_since_production = this.interval - 1; } // for the first one, produce immediately instead of waiting the whole interval
 			Univ.RefreshDisplay();
 			this.showPopup();
 		}
@@ -83,7 +83,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	
 	this.infoblurb = infoblurb;
 	this.targetactivity = 100; // percent of this generator chosen to be active
-	
+	this.interval = interval;
 	this.Production = ProductionFcn;
 	this.Consumption = ConsumptionFcn;
 	this.ticks_since_production = 0;	
@@ -112,10 +112,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.Production(1)['interval'],2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.Production(1)['interval'],2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -304,21 +304,17 @@ Univ.Logic = function(){
 		if ( generator.number > 0 ) {
 			generator.ticks_since_production++;
 			Univ.ActiveNumber(generator);
-			if ( generator.ticks_since_production >= (generator.Production(1)['interval'] * Univ.FPS)) {
+			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS)) {
 				for ( var item in generator.Production(1) ) {
-					if ( item != 'interval' ) {
-						itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
-						Univ.Items[item].available_number += itemproduction;
-						Univ.Items[item].total_number += itemproduction;
-						generator.ticks_since_production = 0;
-					}
+					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
+					Univ.Items[item].available_number += itemproduction;
+					Univ.Items[item].total_number += itemproduction;
+					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					if ( item != 'interval' ) {
-						itemconsumption = generator.Consumption(generator.activenumber)[item] * Univ.Speedfactor;
-						Univ.Items[item].available_number -= itemconsumption;
-						generator.ticks_since_production = 0;
-					}
+					itemconsumption = generator.Consumption(generator.activenumber)[item] * Univ.Speedfactor;
+					Univ.Items[item].available_number -= itemconsumption;
+					generator.ticks_since_production = 0;
 				}
 			}
 		} else { generator.activenumber = 0; }
@@ -338,16 +334,12 @@ Univ.UpdateRates = function(generator){
 		if ( generator.number > 0 ) {
 			Univ.ActiveNumber(generator);
 			for ( var item in generator.Production(1) ) {
-				if ( item != 'interval' ) {
-					itemproduction = generator.Production(generator.activenumber)[item];
-					productionrates[item] += itemproduction / generator.Production(1)['interval'] * Univ.Speedfactor;
-				}
+				itemproduction = generator.Production(generator.activenumber)[item];
+				productionrates[item] += itemproduction / generator.interval * Univ.Speedfactor;
 			}
 			for ( var item in generator.Consumption(1) ) {
-				if ( item != 'interval' ) {
-					itemconsumption = generator.Consumption(generator.activenumber)[item];
-					consumptionrates[item] -= itemconsumption / generator.Consumption(1)['interval'] * Univ.Speedfactor;
-				}
+				itemconsumption = generator.Consumption(generator.activenumber)[item];
+				consumptionrates[item] -= itemconsumption / generator.interval * Univ.Speedfactor;
 			}
 		} else { generator.activenumber = 0; }
 	}
@@ -357,32 +349,15 @@ Univ.UpdateRates = function(generator){
 	}
 }
 
-Univ.ActiveNumber2 = function(generator){
-// Find the number of a Generator that can run (by checking their consumption needs)
-	generator.activenumber = 0;
-	for (var i = 1; i <= generator.number; i++) {
-		var items_checked = 0;
-		var items_satisfied = 0;
-		for (var item in Univ.Items) {
-			items_checked++;
-			if ( typeof generator.Consumption(i)[item] == 'undefined' || generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
-				items_satisfied++;
-			}
-		}
-		if ( items_satisfied == items_checked ) {
-			generator.activenumber = Math.min(i,Math.round(generator.number * generator.targetactivity/100));
-		}
-	}
-}
-
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
+// We can probably speed this up by only checking from 0 to targetactivity
 	generator.activenumber = 0;
 	for (var i = generator.number - 1; i >= 0; i--) {
 		var items_checked = 0;
 		var items_satisfied = 0;
 		for (var item in generator.Consumption(i)) {
-			if ( item != 'undefined' && item != 'interval') {
+			if ( item != 'undefined') {
 				items_checked++;
 				if ( generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
 					items_satisfied++;
@@ -589,6 +564,9 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_cost" class="generatorcost"></div>';
 		generatortable += '<div id="' + generator.id + '_production" class="generatorproduction"></div>';
 		generatortable += '<div id="' + generator.id + '_consumption" class="generatorconsumption"></div>';
+		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">1</div>';
+		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">10</div>';
+		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">100</div>';
  		generatortable += '</div>';
  	}
  	lookup('generators').innerHTML = generatortable;
@@ -596,7 +574,30 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			AddEvent(lookup(generator.id + '_button'),'click',function(what){return function(e){generator.Buy(1);};}(generator.singular));
+			var max = 100;  // should be the maximum affordable
+			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+
+			if (generator.isAffordable(1)) {
+				lookup(generator.id + '_buyone').classList.add('affordable');
+				AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){generator.Buy(1);};}());
+			} else {
+				lookup(generator.id + '_buyone').classList.remove('affordable');
+				lookup(generator.id + '_buyone').removeEventListener('click',function(what){return function(e){generator.Buy(1);};}());
+			}
+			if (generator.isAffordable(mid)) {
+				lookup(generator.id + '_buymid').classList.add('affordable');
+				AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){generator.Buy(mid);};}());
+			} else {
+				lookup(generator.id + '_buymid').classList.remove('affordable');
+				lookup(generator.id + '_buymid').removeEventListener('click',function(what){return function(e){generator.Buy(mid);};}());
+			}
+			if (generator.isAffordable(max)) {
+				lookup(generator.id + '_buymax').classList.add('affordable');
+				AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){generator.Buy(max);};}());
+			} else {
+				lookup(generator.id + '_buymax').classList.remove('affordable');
+				lookup(generator.id + '_buymax').removeEventListener('click',function(what){return function(e){generator.Buy(max);};}());
+			}
 			AddEvent(lookup(generator.id + '_button'),'mouseover',function(){return function(){generator.showPopup();};}());
 			AddEvent(lookup(generator.id + '_button'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
 		}
@@ -629,16 +630,5 @@ window.onload = function(){
 }
 
 AddEvent(window,'keydown',function(e){
-	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} //ctrl-s saves the game
+	if (e.ctrlKey && e.keyCode == 83) {Univ.toSave = true;e.preventDefault();} // ctrl-s saves the game
 });
-
-// DELETE BEFORE RELEASE (this is so we can speed up production using the A/W/E/F keys)
-// document.addEventListener('keydown',function(event) {
-//     var control = 0;
-//     if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 69 || event.keyCode == 70) { // A/W/E/F
-// 		for (var i in Univ.Items) {
-// 			var item = Univ.Items[i];
-// 		//	Univ.Transact('gain',item.type, item.production / Univ.FPS * 30 ); // this is outdated
-// 		}
-//     }
-// });

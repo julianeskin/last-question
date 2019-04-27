@@ -454,7 +454,29 @@ Univ.UpdateGeneratorDisplay = function(){
 				}
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
-
+			
+			var max = 100;  // should be the maximum affordable
+			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			
+			lookup(generator.id + '_buymid').innerHTML = mid;
+			lookup(generator.id + '_buymax').innerHTML = max;
+			
+			if (generator.isAffordable(1)) {
+				lookup(generator.id + '_buyone').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buyone').classList.remove('affordable');
+			}
+			if (generator.isAffordable(mid)) {
+				lookup(generator.id + '_buymid').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymid').classList.remove('affordable');
+			}
+			if (generator.isAffordable(max)) {
+				lookup(generator.id + '_buymax').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymax').classList.remove('affordable');
+			}
+			
 		//// TO DO: check whether visibility requirements are met by calling generator.isVisible()
 			lookup(generator.id + '_button').style = 'display:block;';
 		//// TO DO: check whether it should be greyed out and unclickable by calling generator.isClickable()
@@ -564,9 +586,9 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_cost" class="generatorcost"></div>';
 		generatortable += '<div id="' + generator.id + '_production" class="generatorproduction"></div>';
 		generatortable += '<div id="' + generator.id + '_consumption" class="generatorconsumption"></div>';
-		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">1</div>';
-		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">10</div>';
-		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">100</div>';
+		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone noselect">1</div>';
+		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid noselect">10</div>';
+		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax noselect">100</div>';
  		generatortable += '</div>';
  	}
  	lookup('generators').innerHTML = generatortable;
@@ -576,27 +598,25 @@ Univ.GeneratorMenuHTML = function() {
 		catch(generator){
 			var max = 100;  // should be the maximum affordable
 			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			
+			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
+			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());
+			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(max)) generator.Buy(max);};}());
 
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');
-				AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){generator.Buy(1);};}());
 			} else {
 				lookup(generator.id + '_buyone').classList.remove('affordable');
-				lookup(generator.id + '_buyone').removeEventListener('click',function(what){return function(e){generator.Buy(1);};}());
 			}
 			if (generator.isAffordable(mid)) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
-				AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){generator.Buy(mid);};}());
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
-				lookup(generator.id + '_buymid').removeEventListener('click',function(what){return function(e){generator.Buy(mid);};}());
 			}
 			if (generator.isAffordable(max)) {
 				lookup(generator.id + '_buymax').classList.add('affordable');
-				AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){generator.Buy(max);};}());
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');
-				lookup(generator.id + '_buymax').removeEventListener('click',function(what){return function(e){generator.Buy(max);};}());
 			}
 			AddEvent(lookup(generator.id + '_button'),'mouseover',function(){return function(){generator.showPopup();};}());
 			AddEvent(lookup(generator.id + '_button'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());

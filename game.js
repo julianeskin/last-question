@@ -1,4 +1,4 @@
-var version = 0.011;
+var version = 0.012;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -8,7 +8,6 @@ Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
 
-function l(what) {return document.getElementById(what);}
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
 function round(num, places){ 
@@ -72,7 +71,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				Univ.Items[item].available_number -= this.Costs(howmany)[item];
 			}
 			this.number += howmany;
-			Univ.Logic();
+			//Univ.Logic();
 			Univ.RefreshDisplay();
 			this.showPopup();
 		}
@@ -205,6 +204,8 @@ Univ.WriteSave = function(mode){
 	second = (second < 10 ? '0' : '') + second;
 	var time = hour + ':' + minute + ':' + second;
 	lookup('savebutton').innerHTML = 'Save (last saved at ' + time + ')';
+	
+	Univ.toSave = false;
 }
 
 Univ.LoadSave = function(data){
@@ -383,6 +384,10 @@ Univ.ActiveNumber = function(generator){
 	generator.activenumber = Math.min( generator.number - i - 1, Math.round(generator.number * generator.targetactivity/100));
 }
 
+
+/**=====================================
+Menu functions
+=====================================**/
 Univ.RefreshDisplay = function(){
 	Univ.UpdateRates();
 	Univ.UpdateItemDisplay();
@@ -450,6 +455,25 @@ Univ.UpdateGeneratorDisplay = function(){
 			lookup(generator.id + '_button').style = 'display:none;';
 		}
 	}
+	
+	if('options' == Univ.ActiveItem){
+		lookup('optionsmenu_button').classList.add('itemSelected');
+		lookup('options_menu').style = 'display:block;';
+	}
+	else{
+		lookup('optionsmenu_button').classList.remove('itemSelected');
+		lookup('options_menu').style = 'display:none;';
+	}
+	
+	for(var item in Univ.Items){
+		if(Univ.Items[item].visibility == 1){
+			if(item == Univ.ActiveItem){
+				lookup(item + '_button').classList.add('itemSelected');
+			}else{
+				lookup(item + '_button').classList.remove('itemSelected');
+			}
+		}
+	}
 }
 
 Univ.updateSlider = function(generatorid) {
@@ -480,14 +504,13 @@ update_speedslider = function() { // delete for release
 }
 
 Univ.LoadMenus = function() {
-	lookup('topbar').innerHTML += '<div id="versionbox" style="width:100px;height:25px;text-align:center;line-height:25px;background-color:#f7f7f7;border:black 1px solid;margin:2px;">Version ' + version.toFixed(3) + '</div>';
-	lookup('topbar').innerHTML += '<div id="savebutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#c9ffd2;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.WriteSave();">Save</div>';
-	lookup('topbar').innerHTML += '<div id="resetbutton" style="width:200px;height:25px;text-align:center;line-height:25px;background-color:#ffd3dd;border:black 1px solid;cursor:pointer;margin:2px;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
 	make_speedslider(); // delete for release
 }
 
 Univ.ItemMenuHTML = function(){
-	var itemtable = [];
+	var itemtable = '<div id="optionsmenu_button" class="itembutton active visible">';
+	itemtable += '<div class="menuTitle">Menu</div>';
+	itemtable += '</div>';
 
 	for (var item in Univ.Items) {
 		if (Univ.Items[item].visibility == 1) {
@@ -502,6 +525,7 @@ Univ.ItemMenuHTML = function(){
 
 	lookup('items').innerHTML = itemtable;
 	
+	AddEvent(lookup('optionsmenu_button'),'mouseover',function(what){return function(e){Univ.ActiveItem = what;Univ.UpdateGeneratorDisplay();};}('options'));
 	for (var item in Univ.Items) {
 		if (Univ.Items[item].visibility == 1) {
 			try{throw item}
@@ -513,7 +537,17 @@ Univ.ItemMenuHTML = function(){
 }
 
 Univ.GeneratorMenuHTML = function() {
-	var generatortable = [];
+	var generatortable = '';
+	
+	// Options menu. Set the entire div to none or block to hide or show
+	generatortable += '<div id="options_menu" style="display:none;">';
+	generatortable += '<div id="versionbox" class="optionsButton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
+	generatortable += '<div id="savebutton" class="optionsButton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
+	generatortable += '<div id="resetbutton" class="optionsButton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	
+	generatortable += '</div>';
+	
+	
  	for (var i in Univ.Objects) {
  		var generator = Univ.Objects[i];
  		generatortable += '<div id="' + generator.id + '_button" class="generatorbutton clickablegenerator" style="display:none;">';

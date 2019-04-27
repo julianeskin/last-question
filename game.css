@@ -48,6 +48,10 @@ body{
 	text-align:center;
 }
 
+.itemSelected{
+	background-color: #DDDDFF;
+}
+
 .generatorbutton{
 	position:relative;
 	width:240px;
@@ -283,4 +287,19 @@ body{
 	font-size:8px;
 	top:37px;
 	left:6px;
+}
+
+.menuTitle{
+	text-align:center;
+	font-size:30px;
+}
+
+.optionsButton{
+	width:200px;
+	height:25px;
+	text-align:center;
+	line-height:25px;
+	border:black 1px solid;
+	cursor:pointer;
+	margin:10px;
 }

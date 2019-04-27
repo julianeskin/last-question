@@ -541,9 +541,9 @@ Univ.GeneratorMenuHTML = function() {
 	
 	// Options menu. Set the entire div to none or block to hide or show
 	generatortable += '<div id="options_menu" style="display:none;">';
-	generatortable += '<div id="versionbox" class="optionsButton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
-	generatortable += '<div id="savebutton" class="optionsButton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
-	generatortable += '<div id="resetbutton" class="optionsButton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	generatortable += '<div id="versionbox" class="optionsButton menubutton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
+	generatortable += '<div id="savebutton" class="optionsButton menubutton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
+	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
 	
 	generatortable += '</div>';
 	
@@ -570,6 +570,13 @@ Univ.GeneratorMenuHTML = function() {
 	}
 	AddEvent(lookup('popupcontainer'),'mouseover',function(){return function(){lookup('popupcontainer').style.visibility='visible';};}());
 	AddEvent(lookup('popupcontainer'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
+	
+	var menubuttons = document.getElementsByClassName('menubutton');
+	for(var i in menubuttons){
+		var button = menubuttons[i];
+		AddEvent(button,'mouseover',function(what){return function(){what.classList.add('hovered');};}(button));
+		AddEvent(button,'mouseout',function(what){return function(){what.classList.remove('hovered');};}(button));
+	}
 }
 
 window.onload = function(){

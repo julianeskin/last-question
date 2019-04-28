@@ -1,4 +1,4 @@
-var version = 0.016;
+var version = 0.017;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -44,6 +44,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.plural = plural;
 	this.number = number;
  	this.activenumber = number;
+	this.maxAffordable = 1000;
 	
 	this.isAffordable = function(howmany){
 		var notenough = 0;
@@ -472,7 +473,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number <  (consumption[item] * multiplier)) tooHigh = true;
+				if(Univ.Items[item].available_number < (consumption[item] * multiplier)) tooHigh = true;
 			}
 		}
 		if(active <= 0) tooHigh = false;
@@ -485,13 +486,65 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number <  (consumption[item] * multiplier)) tooHigh = true;
+				if(Univ.Items[item].available_number < (consumption[item] * multiplier)) tooHigh = true;
 			}
 		}
 		if(tooHigh) break;
 	}
 	
 	generator.activenumber = Math.max(0, active - 1);
+}
+
+Univ.GetMaxAffordable = function(generator){
+	var cost = generator.Costs(1);
+	var ret = -1;
+	var tooHigh = false;
+	
+	var multiplier = 1;
+	for (var i in Univ.GeneratorUpgrades) {
+		var upgrade = Univ.GeneratorUpgrades[i];
+		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+			if (upgrade.type == 'costMult') {
+				multiplier *= upgrade.multiplier; 
+			}
+		}
+	}
+	
+	// Linear cost functions first
+	for(var item in cost){
+		if(item != 'undefined'){
+			ret = ret == -1 ? Math.floor(Univ.Items[item].available_number / cost[item]) : Math.min(ret, Math.floor(Univ.Items[item].available_number / cost[item]));
+		}
+	}
+	
+	cost = generator.Costs(ret);
+	for(var item in cost){
+		if(item != 'undefined'){
+			if(Univ.Items[item].available_number < (cost[item] * multiplier)) tooHigh = true;
+		}
+	}
+	
+	if(tooHigh){
+		// Above linear cost (exponential or polynomial)
+		// Just have to iterate through and hope for the best
+		ret = 0;
+		tooHigh = false;
+		while(!tooHigh){
+			ret++;
+			cost = generator.Costs(ret);
+			for(var item in cost){
+				if(item != 'undefined'){
+					if(Univ.Items[item].available_number < (cost[item] * multiplier)) tooHigh = true;
+				}
+			}
+		}
+		ret--;
+	}
+	else{
+		// Linear or below. Leave ret as is for now
+	}
+	
+	return ret;
 }
 
 
@@ -577,11 +630,11 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
 			
-			var max = 1000;  // should be the maximum affordable
+			generator.maxAffordable = Univ.GetMaxAffordable(generator);  // should be the maximum affordable
 			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			lookup(generator.id + '_buymid').innerHTML = mid;
-			lookup(generator.id + '_buymax').innerHTML = max;
+			lookup(generator.id + '_buymax').innerHTML = generator.maxAffordable;
 			
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');
@@ -593,7 +646,7 @@ Univ.UpdateGeneratorDisplay = function(){
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
 			}
-			if (generator.isAffordable(max)) {
+			if (generator.isAffordable(generator.maxAffordable) && generator.maxAffordable > 0) {
 				lookup(generator.id + '_buymax').classList.add('affordable');
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');
@@ -739,7 +792,7 @@ Univ.GeneratorMenuHTML = function() {
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
 			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());
-			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(max)) generator.Buy(max);};}());
+			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(generator.maxAffordable)) generator.Buy(generator.maxAffordable);};}());
 
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');

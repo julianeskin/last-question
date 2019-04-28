@@ -4,6 +4,7 @@ Univ.LoadUpgrades = function(){
 TYPES:
 	'multiply'		: Multiplies Production and Consumption by factor
 	'efficiency'	: Multiplies Consumption by factor
+	'costMult'		: Multiplies Costs by factor
 
 **/
 

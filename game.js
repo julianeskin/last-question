@@ -1,4 +1,4 @@
-var version = 0.015;
+var version = 0.016;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -443,11 +443,25 @@ Univ.ActiveNumber = function(generator){
 	var capable;
 	var tooHigh = true;
 	
+	// Take into account upgrades and Speedfactor
+	var multiplier = Univ.Speedfactor;
+	for (var i in Univ.GeneratorUpgrades) {
+		var upgrade = Univ.GeneratorUpgrades[i];
+		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+			if (upgrade.type == 'multiply') {
+				multiplier *= upgrade.multiplier; 
+			}
+			else if (upgrade.type == 'efficiency') {
+				multiplier *= upgrade.multiplier; 
+			}
+		}
+	}
+	
 	while(tooHigh){
 		// Linear consumption functions will be satisfied here
 		for(var item in consumption){
 			if(item != 'undefined'){
-				capable = Math.floor(Math.min(Univ.Items[item].available_number / consumption[item], 1) * chosenMax);
+				capable = Math.floor(Math.min(Univ.Items[item].available_number / (consumption[item] * multiplier), 1) * chosenMax);
 				active = Math.min(capable, active);
 			}
 		}
@@ -458,7 +472,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+				if(Univ.Items[item].available_number <  (consumption[item] * multiplier)) tooHigh = true;
 			}
 		}
 		if(active <= 0) tooHigh = false;
@@ -471,7 +485,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+				if(Univ.Items[item].available_number <  (consumption[item] * multiplier)) tooHigh = true;
 			}
 		}
 		if(tooHigh) break;

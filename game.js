@@ -1,4 +1,4 @@
-var version = 0.014;
+var version = 0.015;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -224,7 +224,8 @@ Univ.WriteSave = function(mode){
 		version: version,
 		ActiveItem: Univ.ActiveItem,
 		Objects: {},
-		Items: {}
+		Items: {},
+		Upgrades: {}
 	};
 	
 	for(var g in Univ.Objects){
@@ -238,6 +239,13 @@ Univ.WriteSave = function(mode){
 		save.Items[i].available_number = Univ.Items[i].available_number;
 		save.Items[i].total_number = Univ.Items[i].total_number;
 	}
+		
+	for(var i in Univ.Upgrades){
+		save.Upgrades[i] = {};
+		save.Upgrades[i].bought = Univ.Upgrades[i].bought;
+	}
+	
+	
 	if(mode == 3){
 		return JSON.stringify(save, null, 2);
 	}
@@ -290,6 +298,12 @@ Univ.LoadSave = function(data){
 				Univ.Items[i].total_number = save.Items[i].total_number;
 			}
 		}
+		
+		for(var i in save.Upgrades){
+			if(Univ.Upgrades[i]){
+				Univ.Upgrades[i].bought = save.Upgrades[i].bought;
+			}
+		}
 	}
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
@@ -334,6 +348,10 @@ Univ.Reset = function(){
 	for(var i in Univ.Items){
 		Univ.Items[i].available_number = 0;
 		Univ.Items[i].total_number = 0;
+	}
+	
+	for(var i in Univ.Upgrades){
+		Univ.Upgrades[i].bought = 0;
 	}
 	
 	Univ.Items['qfoam'].available_number = 100;
@@ -419,28 +437,47 @@ Univ.UpdateRates = function(){
 
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
-// We can probably speed this up by only checking from 0 to targetactivity
-	generator.activenumber = 0;
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	var consumption = generator.Consumption(chosenMax);
+	var active = chosenMax;
+	var capable;
+	var tooHigh = true;
 	
-	for (var i = 1; i <= chosenMax; i++) {
-		var enough = true;
-		for (var item in generator.Consumption(i)) {
-			if ( item != 'undefined') {
-				if ( (generator.Consumption(i)[item] * Univ.Speedfactor) > Univ.Items[item].available_number ){
-					enough = false;
-				}
+	while(tooHigh){
+		// Linear consumption functions will be satisfied here
+		for(var item in consumption){
+			if(item != 'undefined'){
+				capable = Math.floor(Math.min(Univ.Items[item].available_number / consumption[item], 1) * chosenMax);
+				active = Math.min(capable, active);
 			}
 		}
 		
-		generator.activenumber++;
-		if (!enough) {
-			generator.activenumber--;
-			break;
-			alert(i);
+		// Detect for less than linear growth
+		chosenMax = active;
+		consumption = generator.Consumption(chosenMax);
+		tooHigh = false;
+		for(var item in consumption){
+			if(item != 'undefined'){
+				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+			}
 		}
+		if(active <= 0) tooHigh = false;
 	}
-	//generator.activenumber = Math.max(Math.min(i, Math.round(generator.number * generator.targetactivity/100)), 0);
+	
+	// Above linear growth, not likely to have so many it causes lag
+	chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	for(;active <= chosenMax; active++){
+		consumption = generator.Consumption(active);
+		tooHigh = false;
+		for(var item in consumption){
+			if(item != 'undefined'){
+				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+			}
+		}
+		if(tooHigh) break;
+	}
+	
+	generator.activenumber = Math.max(0, active - 1);
 }
 
 
@@ -526,8 +563,8 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
 			
-			var max = 100;  // should be the maximum affordable
-			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			var max = 1000;  // should be the maximum affordable
+			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			lookup(generator.id + '_buymid').innerHTML = mid;
 			lookup(generator.id + '_buymax').innerHTML = max;
@@ -683,8 +720,8 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			var max = 100;  // should be the maximum affordable
-			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			var max = 1000;  // should be the maximum affordable
+			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
 			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());

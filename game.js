@@ -1,4 +1,4 @@
-var version = 0.013;
+var version = 0.014;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -304,7 +304,7 @@ Univ.Logic = function(){
 		if ( generator.number > 0 ) {
 			generator.ticks_since_production++;
 			Univ.ActiveNumber(generator);
-			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS)) {
+			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
 					Univ.Items[item].available_number += itemproduction;
@@ -321,7 +321,7 @@ Univ.Logic = function(){
 	}
 }
 
-Univ.UpdateRates = function(generator){
+Univ.UpdateRates = function(){
 	var productionrates = {};
 	var consumptionrates = {};
 	for (var item in Univ.Items) {
@@ -353,23 +353,26 @@ Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
 // We can probably speed this up by only checking from 0 to targetactivity
 	generator.activenumber = 0;
-	for (var i = generator.number - 1; i >= 0; i--) {
-		var items_checked = 0;
-		var items_satisfied = 0;
+	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	
+	for (var i = 1; i <= chosenMax; i++) {
+		var enough = true;
 		for (var item in generator.Consumption(i)) {
 			if ( item != 'undefined') {
-				items_checked++;
-				if ( generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
-					items_satisfied++;
+				if ( (generator.Consumption(i)[item] * Univ.Speedfactor) > Univ.Items[item].available_number ){
+					enough = false;
 				}
 			}
 		}
-		if ( items_satisfied != items_checked ) {
+		
+		generator.activenumber++;
+		if (!enough) {
+			generator.activenumber--;
 			break;
 			alert(i);
 		}
 	}
-	generator.activenumber = Math.min( generator.number - i - 1, Math.round(generator.number * generator.targetactivity/100));
+	//generator.activenumber = Math.max(Math.min(i, Math.round(generator.number * generator.targetactivity/100)), 0);
 }
 
 
@@ -454,28 +457,29 @@ Univ.UpdateGeneratorDisplay = function(){
 				}
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
-
-			try{throw generator}
-			catch(generator){
-				var max = 1000;  // should be the maximum affordable
-				var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
-				
-				if (generator.isAffordable(1)) {
-					lookup(generator.id + '_buyone').classList.add('affordable');
-				} else {
-					lookup(generator.id + '_buyone').classList.remove('affordable');
-				}
-				if (generator.isAffordable(mid)) {
-					lookup(generator.id + '_buymid').classList.add('affordable');
-				} else {
-					lookup(generator.id + '_buymid').classList.remove('affordable');
-				}
-				if (generator.isAffordable(max)) {
-					lookup(generator.id + '_buymax').classList.add('affordable');
-				} else {
-					lookup(generator.id + '_buymax').classList.remove('affordable');
-				}
+			
+			var max = 100;  // should be the maximum affordable
+			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			
+			lookup(generator.id + '_buymid').innerHTML = mid;
+			lookup(generator.id + '_buymax').innerHTML = max;
+			
+			if (generator.isAffordable(1)) {
+				lookup(generator.id + '_buyone').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buyone').classList.remove('affordable');
 			}
+			if (generator.isAffordable(mid)) {
+				lookup(generator.id + '_buymid').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymid').classList.remove('affordable');
+			}
+			if (generator.isAffordable(max)) {
+				lookup(generator.id + '_buymax').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymax').classList.remove('affordable');
+			}
+      
 			lookup(generator.id + '_button').style = 'display:block;';
 		} else {
 			lookup(generator.id + '_button').style = 'display:none;';
@@ -593,12 +597,28 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			var max = 1000;  // should be the maximum affordable
-			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
+			var max = 100;  // should be the maximum affordable
+			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			
+			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
+			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());
+			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(max)) generator.Buy(max);};}());
 
-			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){generator.Buy(1);};}());
-			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){generator.Buy(mid);};}());
-			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){generator.Buy(max);};}());
+			if (generator.isAffordable(1)) {
+				lookup(generator.id + '_buyone').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buyone').classList.remove('affordable');
+			}
+			if (generator.isAffordable(mid)) {
+				lookup(generator.id + '_buymid').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymid').classList.remove('affordable');
+			}
+			if (generator.isAffordable(max)) {
+				lookup(generator.id + '_buymax').classList.add('affordable');
+			} else {
+				lookup(generator.id + '_buymax').classList.remove('affordable');
+			}
 			AddEvent(lookup(generator.id + '_button'),'mouseover',function(){return function(){generator.showPopup();};}());
 			AddEvent(lookup(generator.id + '_button'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
 		}

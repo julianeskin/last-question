@@ -343,11 +343,11 @@ Univ.LoadObjects = function(){
 		new Univ.Object('gascloud2','gascloud','Interstellar Large','Interstellar Large',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['atom'].total_number >= 400000 / 4;
+			return Univ.Items['atom'].total_number >= 4000000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
-				atom: 400000 * howmany
+				atom: 4000000 * howmany
 			}
 			return prices;
 		},
@@ -367,11 +367,11 @@ Univ.LoadObjects = function(){
 		new Univ.Object('gascloud3','gascloud','Interstellar XL','Interstellar XL',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['atom'].total_number >= 1600000 / 4;
+			return Univ.Items['atom'].total_number >= 16000000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
-				atom: 1600000 * howmany
+				atom: 16000000 * howmany
 			}
 			return prices;
 		},

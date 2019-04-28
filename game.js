@@ -1,4 +1,4 @@
-var version = 0.018;
+var version = 0.019;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -11,11 +11,18 @@ Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
 Univ.ItemsById = [];
 Univ.ObjectsById = [];
+Univ.precision = 10;
 
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
+// Need a function to differentiate between stupidly big numbers and stupidly small numbers
+// Also exponential cost growth so the numbers don't get so big so fast
 function round(num, places){ 
 	return +(Math.round(num + 'e+' + places)  + 'e-' + places);
+}
+function bigRound(num, places){
+	var p = Math.max(Math.ceil(Math.log10(num)) - places, 0);
+	return Math.round(num / Math.pow(10, p)) * Math.pow(10, p);
 }
 
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
@@ -50,7 +57,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.isAffordable = function(howmany){
 		var notenough = 0;
 		for (var item in this.Costs(howmany)) {
-			if (this.Costs(howmany)[item] > Univ.Items[item].available_number) {
+			if (bigRound(this.Costs(howmany)[item], Univ.precision) > bigRound(Univ.Items[item].available_number, Univ.precision)) {
 				notenough++;
 			}
 		}
@@ -76,7 +83,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.Buy = function(howmany){
 		if (this.isAffordable(howmany)) {
 			for (var item in this.Costs(howmany)) {
-				Univ.Items[item].available_number -= this.Costs(howmany)[item];
+				Univ.Items[item].available_number -= bigRound(this.Costs(howmany)[item], Univ.precision);
 			}
 			this.number += howmany;
 			if (this.number == 1) { this.ticks_since_production = this.interval - 1; } // for the first one, produce immediately instead of waiting the whole interval
@@ -380,13 +387,13 @@ Univ.Logic = function(){
 				}
 
 				for ( var item in generator.Production(1) ) {
-					itemproduction = generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor;
+					itemproduction = bigRound(generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
 					Univ.Items[item].available_number += itemproduction;
 					Univ.Items[item].total_number += itemproduction;
 					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					itemconsumption = generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor;
+					itemconsumption = bigRound(generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
 					Univ.Items[item].available_number -= itemconsumption;
 					generator.ticks_since_production = 0;
 				}
@@ -422,18 +429,18 @@ Univ.UpdateRates = function(){
 				}
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item];
-					productionrates[item] += itemproduction * multiplier / generator.interval * Univ.Speedfactor;
+					productionrates[item] += bigRound(itemproduction * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 				for ( var item in generator.Consumption(1) ) {
 					itemconsumption = generator.Consumption(generator.activenumber)[item];
-					consumptionrates[item] -= itemconsumption * multiplier / generator.interval * Univ.Speedfactor;
+					consumptionrates[item] -= bigRound(itemconsumption * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 			}
 		} else { generator.activenumber = 0; }
 	}
 	for (var item in Univ.Items) {
-		Univ.Items[item].production = productionrates[item];
-		Univ.Items[item].consumption = consumptionrates[item];
+		Univ.Items[item].production = bigRound(productionrates[item], Univ.precision);
+		Univ.Items[item].consumption = bigRound(consumptionrates[item], Univ.precision);
 	}
 }
 
@@ -444,6 +451,7 @@ Univ.ActiveNumber = function(generator){
 	var active = chosenMax;
 	var capable;
 	var tooHigh = true;
+	var step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(chosenMax)) - 4));
 	
 	// Take into account upgrades and Speedfactor
 	var multiplier = Univ.Speedfactor;
@@ -474,7 +482,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number < (consumption[item] * multiplier)) tooHigh = true;
+				if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
 			}
 		}
 		if(active <= 0) tooHigh = false;
@@ -482,24 +490,25 @@ Univ.ActiveNumber = function(generator){
 	
 	// Above linear growth, not likely to have so many it causes lag
 	chosenMax = Math.round(generator.number * generator.targetactivity / 100);
-	for(;active <= chosenMax; active++){
+	for(;active <= chosenMax; active += step){
 		consumption = generator.Consumption(active);
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(Univ.Items[item].available_number < (consumption[item] * multiplier)) tooHigh = true;
+				if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
 			}
 		}
 		if(tooHigh) break;
 	}
 	
-	generator.activenumber = Math.max(0, active - 1);
+	generator.activenumber = Math.max(0, active - step);
 }
 
 Univ.GetMaxAffordable = function(generator){
 	var cost = generator.Costs(1);
 	var ret = -1;
 	var tooHigh = false;
+	var step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(generator.number)) - 4));
 	
 	var multiplier = 1;
 	for (var i in Univ.GeneratorUpgrades) {
@@ -521,7 +530,7 @@ Univ.GetMaxAffordable = function(generator){
 	cost = generator.Costs(ret);
 	for(var item in cost){
 		if(item != 'undefined'){
-			if(Univ.Items[item].available_number < (cost[item] * multiplier)) tooHigh = true;
+			if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(cost[item] * multiplier, Univ.precision)) tooHigh = true;
 		}
 	}
 	
@@ -531,15 +540,15 @@ Univ.GetMaxAffordable = function(generator){
 		ret = 0;
 		tooHigh = false;
 		while(!tooHigh){
-			ret++;
+			ret += step;
 			cost = generator.Costs(ret);
 			for(var item in cost){
 				if(item != 'undefined'){
-					if(Univ.Items[item].available_number < (cost[item] * multiplier)) tooHigh = true;
+					if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(cost[item] * multiplier, Univ.precision)) tooHigh = true;
 				}
 			}
 		}
-		ret--;
+		ret -= step;
 	}
 	else{
 		// Linear or below. Leave ret as is for now
@@ -822,11 +831,9 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			var max = 1000;  // should be the maximum affordable
-			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
-			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(generator.midAffordable);};}());
+			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(generator.midAffordable)) generator.Buy(generator.midAffordable);};}());
 			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(generator.maxAffordable)) generator.Buy(generator.maxAffordable);};}());
 
 			if (generator.isAffordable(1)) {
@@ -834,12 +841,12 @@ Univ.GeneratorMenuHTML = function() {
 			} else {
 				lookup(generator.id + '_buyone').classList.remove('affordable');
 			}
-			if (generator.isAffordable(mid)) {
+			if (generator.isAffordable(generator.midAffordable)) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
 			}
-			if (generator.isAffordable(max)) {
+			if (generator.isAffordable(generator.maxAffordable)) {
 				lookup(generator.id + '_buymax').classList.add('affordable');
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');

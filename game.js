@@ -1,4 +1,4 @@
-var version = 0.013;
+var version = 0.014;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -304,7 +304,7 @@ Univ.Logic = function(){
 		if ( generator.number > 0 ) {
 			generator.ticks_since_production++;
 			Univ.ActiveNumber(generator);
-			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS)) {
+			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
 					Univ.Items[item].available_number += itemproduction;
@@ -321,7 +321,7 @@ Univ.Logic = function(){
 	}
 }
 
-Univ.UpdateRates = function(generator){
+Univ.UpdateRates = function(){
 	var productionrates = {};
 	var consumptionrates = {};
 	for (var item in Univ.Items) {
@@ -353,23 +353,26 @@ Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
 // We can probably speed this up by only checking from 0 to targetactivity
 	generator.activenumber = 0;
-	for (var i = generator.number - 1; i >= 0; i--) {
-		var items_checked = 0;
-		var items_satisfied = 0;
+	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	
+	for (var i = 1; i <= chosenMax; i++) {
+		var enough = true;
 		for (var item in generator.Consumption(i)) {
 			if ( item != 'undefined') {
-				items_checked++;
-				if ( generator.Consumption(i)[item] <= Univ.Items[item].available_number ){
-					items_satisfied++;
+				if ( (generator.Consumption(i)[item] * Univ.Speedfactor) > Univ.Items[item].available_number ){
+					enough = false;
 				}
 			}
 		}
-		if ( items_satisfied != items_checked ) {
+		
+		generator.activenumber++;
+		if (!enough) {
+			generator.activenumber--;
 			break;
 			alert(i);
 		}
 	}
-	generator.activenumber = Math.min( generator.number - i - 1, Math.round(generator.number * generator.targetactivity/100));
+	//generator.activenumber = Math.max(Math.min(i, Math.round(generator.number * generator.targetactivity/100)), 0);
 }
 
 
@@ -586,9 +589,9 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_cost" class="generatorcost"></div>';
 		generatortable += '<div id="' + generator.id + '_production" class="generatorproduction"></div>';
 		generatortable += '<div id="' + generator.id + '_consumption" class="generatorconsumption"></div>';
-		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone noselect">1</div>';
-		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid noselect">10</div>';
-		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax noselect">100</div>';
+		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">1</div>';
+		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">10</div>';
+		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">100</div>';
  		generatortable += '</div>';
  	}
  	lookup('generators').innerHTML = generatortable;

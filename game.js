@@ -437,19 +437,47 @@ Univ.UpdateRates = function(){
 
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
-	generator.activenumber = 0;
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
 	var consumption = generator.Consumption(chosenMax);
 	var active = chosenMax;
 	var capable;
+	var tooHigh = true;
 	
-	for(var item in consumption){
-		if(item != 'undefined'){
-			capable = Math.floor(Math.min(Univ.Items[item].available_number / consumption[item], 1) * chosenMax);
-			active = Math.min(capable, active);
+	while(tooHigh){
+		// Linear consumption functions will be satisfied here
+		for(var item in consumption){
+			if(item != 'undefined'){
+				capable = Math.floor(Math.min(Univ.Items[item].available_number / consumption[item], 1) * chosenMax);
+				active = Math.min(capable, active);
+			}
 		}
+		
+		// Detect for less than linear growth
+		chosenMax = active;
+		consumption = generator.Consumption(chosenMax);
+		tooHigh = false;
+		for(var item in consumption){
+			if(item != 'undefined'){
+				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+			}
+		}
+		if(active <= 0) tooHigh = false;
 	}
-	generator.activenumber = Math.max(0, active);
+	
+	// Above linear growth, not likely to have so many it causes lag
+	chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	for(;active <= chosenMax; active++){
+		consumption = generator.Consumption(active);
+		tooHigh = false;
+		for(var item in consumption){
+			if(item != 'undefined'){
+				if(Univ.Items[item].available_number < consumption[item]) tooHigh = true;
+			}
+		}
+		if(tooHigh) break;
+	}
+	
+	generator.activenumber = Math.max(0, active - 1);
 }
 
 

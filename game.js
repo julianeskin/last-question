@@ -15,14 +15,14 @@ Univ.precision = 10;
 
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
-// Need a function to differentiate between stupidly big numbers and stupidly small numbers
-// Also exponential cost growth so the numbers don't get so big so fast
 function round(num, places){ 
-	return +(Math.round(num + 'e+' + places)  + 'e-' + places);
-}
-function bigRound(num, places){
-	var p = Math.max(Math.ceil(Math.log10(num)) - places, 0);
-	return Math.round(num / Math.pow(10, p)) * Math.pow(10, p);
+	if(Math.log10(num) < 10){
+		return +(Math.round(num + 'e+' + places)  + 'e-' + places);
+	}
+	else{
+		var p = Math.max(Math.ceil(Math.log10(Math.abs(num))) - places, 0);
+		return Math.round(num / Math.pow(10, p)) * Math.pow(10, p);
+	}
 }
 
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
@@ -57,7 +57,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.isAffordable = function(howmany){
 		var notenough = 0;
 		for (var item in this.Costs(howmany)) {
-			if (bigRound(this.Costs(howmany)[item], Univ.precision) > bigRound(Univ.Items[item].available_number, Univ.precision)) {
+			if (round(this.Costs(howmany)[item], Univ.precision) > round(Univ.Items[item].available_number, Univ.precision)) {
 				notenough++;
 			}
 		}
@@ -83,7 +83,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.Buy = function(howmany){
 		if (this.isAffordable(howmany)) {
 			for (var item in this.Costs(howmany)) {
-				Univ.Items[item].available_number -= bigRound(this.Costs(howmany)[item], Univ.precision);
+				Univ.Items[item].available_number -= round(this.Costs(howmany)[item], Univ.precision);
 			}
 			this.number += howmany;
 			if (this.number == 1) { this.ticks_since_production = this.interval - 1; } // for the first one, produce immediately instead of waiting the whole interval
@@ -387,13 +387,13 @@ Univ.Logic = function(){
 				}
 
 				for ( var item in generator.Production(1) ) {
-					itemproduction = bigRound(generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
+					itemproduction = round(generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
 					Univ.Items[item].available_number += itemproduction;
 					Univ.Items[item].total_number += itemproduction;
 					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					itemconsumption = bigRound(generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
+					itemconsumption = round(generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
 					Univ.Items[item].available_number -= itemconsumption;
 					generator.ticks_since_production = 0;
 				}
@@ -429,18 +429,18 @@ Univ.UpdateRates = function(){
 				}
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item];
-					productionrates[item] += bigRound(itemproduction * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
+					productionrates[item] += round(itemproduction * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 				for ( var item in generator.Consumption(1) ) {
 					itemconsumption = generator.Consumption(generator.activenumber)[item];
-					consumptionrates[item] -= bigRound(itemconsumption * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
+					consumptionrates[item] -= round(itemconsumption * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 			}
 		} else { generator.activenumber = 0; }
 	}
 	for (var item in Univ.Items) {
-		Univ.Items[item].production = bigRound(productionrates[item], Univ.precision);
-		Univ.Items[item].consumption = bigRound(consumptionrates[item], Univ.precision);
+		Univ.Items[item].production = round(productionrates[item], Univ.precision);
+		Univ.Items[item].consumption = round(consumptionrates[item], Univ.precision);
 	}
 }
 
@@ -482,7 +482,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
+				if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
 			}
 		}
 		if(active <= 0) tooHigh = false;
@@ -495,7 +495,7 @@ Univ.ActiveNumber = function(generator){
 		tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
+				if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
 			}
 		}
 		if(tooHigh) break;
@@ -530,7 +530,7 @@ Univ.GetMaxAffordable = function(generator){
 	cost = generator.Costs(ret);
 	for(var item in cost){
 		if(item != 'undefined'){
-			if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(cost[item] * multiplier, Univ.precision)) tooHigh = true;
+			if(round(Univ.Items[item].available_number, Univ.precision) < round(cost[item] * multiplier, Univ.precision)) tooHigh = true;
 		}
 	}
 	
@@ -544,7 +544,7 @@ Univ.GetMaxAffordable = function(generator){
 			cost = generator.Costs(ret);
 			for(var item in cost){
 				if(item != 'undefined'){
-					if(bigRound(Univ.Items[item].available_number, Univ.precision) < bigRound(cost[item] * multiplier, Univ.precision)) tooHigh = true;
+					if(round(Univ.Items[item].available_number, Univ.precision) < round(cost[item] * multiplier, Univ.precision)) tooHigh = true;
 				}
 			}
 		}
@@ -554,7 +554,7 @@ Univ.GetMaxAffordable = function(generator){
 		// Linear or below. Leave ret as is for now
 	}
 	
-	return ret;
+	return Math.max(ret, 0);
 }
 
 Univ.GetMidAffordable = function(generator){

@@ -224,7 +224,8 @@ Univ.WriteSave = function(mode){
 		version: version,
 		ActiveItem: Univ.ActiveItem,
 		Objects: {},
-		Items: {}
+		Items: {},
+		Upgrades: {}
 	};
 	
 	for(var g in Univ.Objects){
@@ -238,6 +239,13 @@ Univ.WriteSave = function(mode){
 		save.Items[i].available_number = Univ.Items[i].available_number;
 		save.Items[i].total_number = Univ.Items[i].total_number;
 	}
+		
+	for(var i in Univ.Upgrades){
+		save.Upgrades[i] = {};
+		save.Upgrades[i].bought = Univ.Upgrades[i].bought;
+	}
+	
+	
 	if(mode == 3){
 		return JSON.stringify(save, null, 2);
 	}
@@ -290,6 +298,12 @@ Univ.LoadSave = function(data){
 				Univ.Items[i].total_number = save.Items[i].total_number;
 			}
 		}
+		
+		for(var i in save.Upgrades){
+			if(Univ.Upgrades[i]){
+				Univ.Upgrades[i].bought = save.Upgrades[i].bought;
+			}
+		}
 	}
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
@@ -334,6 +348,10 @@ Univ.Reset = function(){
 	for(var i in Univ.Items){
 		Univ.Items[i].available_number = 0;
 		Univ.Items[i].total_number = 0;
+	}
+	
+	for(var i in Univ.Upgrades){
+		Univ.Upgrades[i].bought = 0;
 	}
 	
 	Univ.Items['qfoam'].available_number = 100;
@@ -526,8 +544,8 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
 			lookup(generator.id + '_cost').innerHTML = costHTML;
 			
-			var max = 100;  // should be the maximum affordable
-			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			var max = 1000;  // should be the maximum affordable
+			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			lookup(generator.id + '_buymid').innerHTML = mid;
 			lookup(generator.id + '_buymax').innerHTML = max;
@@ -683,8 +701,8 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			var max = 100;  // should be the maximum affordable
-			var mid = 10;	// should be the maximum that wouldn't result in any negative incomes
+			var max = 1000;  // should be the maximum affordable
+			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
 			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());

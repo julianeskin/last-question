@@ -1,4 +1,4 @@
-var version = 0.017;
+var version = 0.018;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -45,6 +45,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.number = number;
  	this.activenumber = number;
 	this.maxAffordable = 1000;
+	this.midAffordable = 80;
 	
 	this.isAffordable = function(howmany){
 		var notenough = 0;
@@ -513,7 +514,7 @@ Univ.GetMaxAffordable = function(generator){
 	// Linear cost functions first
 	for(var item in cost){
 		if(item != 'undefined'){
-			ret = ret == -1 ? Math.floor(Univ.Items[item].available_number / cost[item]) : Math.min(ret, Math.floor(Univ.Items[item].available_number / cost[item]));
+			ret = ret == -1 ? Math.floor(Univ.Items[item].available_number / (cost[item] * multiplier)) : Math.min(ret, Math.floor(Univ.Items[item].available_number / (cost[item] * multiplier)));
 		}
 	}
 	
@@ -545,6 +546,40 @@ Univ.GetMaxAffordable = function(generator){
 	}
 	
 	return ret;
+}
+
+Univ.GetMidAffordable = function(generator){
+	var consumption = generator.Consumption(1);
+	var wiggleRoom = {};
+	var ret = -1;
+	var alreadyNegative = false;
+	
+	var multiplier = Univ.Speedfactor;
+	for (var i in Univ.GeneratorUpgrades) {
+		var upgrade = Univ.GeneratorUpgrades[i];
+		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+			if (upgrade.type == 'costMult') {
+				multiplier *= upgrade.multiplier; 
+			}
+		}
+	}
+	
+	for(var item in consumption){
+		consumption[item] *= multiplier / generator.interval;
+		wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
+		if(wiggleRoom[item] <= 0){alreadyNegative = true;break;}
+	}
+	
+	if(!alreadyNegative){
+		// Linear cost functions first
+		for(var item in consumption){
+			if(item != 'undefined'){
+				ret = ret == -1 ? Math.floor(wiggleRoom[item] / (consumption[item])) : Math.min(ret, Math.floor(wiggleRoom[item] / (consumption[item])));
+			}
+		}
+	}
+	
+	return Math.min(Math.max(ret, 0), generator.maxAffordable);
 }
 
 
@@ -631,9 +666,9 @@ Univ.UpdateGeneratorDisplay = function(){
 			lookup(generator.id + '_cost').innerHTML = costHTML;
 			
 			generator.maxAffordable = Univ.GetMaxAffordable(generator);  // should be the maximum affordable
-			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
+			generator.midAffordable = Univ.GetMidAffordable(generator);  // should be the maximum that wouldn't result in any negative incomes
 			
-			lookup(generator.id + '_buymid').innerHTML = mid;
+			lookup(generator.id + '_buymid').innerHTML = generator.midAffordable;
 			lookup(generator.id + '_buymax').innerHTML = generator.maxAffordable;
 			
 			if (generator.isAffordable(1)) {
@@ -641,7 +676,7 @@ Univ.UpdateGeneratorDisplay = function(){
 			} else {
 				lookup(generator.id + '_buyone').classList.remove('affordable');
 			}
-			if (generator.isAffordable(mid)) {
+			if (generator.isAffordable(generator.midAffordable) && generator.midAffordable > 0) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
@@ -791,7 +826,7 @@ Univ.GeneratorMenuHTML = function() {
 			var mid = 80;	// should be the maximum that wouldn't result in any negative incomes
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
-			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(mid);};}());
+			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(mid)) generator.Buy(generator.midAffordable);};}());
 			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(generator.maxAffordable)) generator.Buy(generator.maxAffordable);};}());
 
 			if (generator.isAffordable(1)) {

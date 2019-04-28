@@ -13,7 +13,7 @@ Univ.LoadObjects = function(){
 			for(var i = 0; i < howmany; i++){
 				price += start * Math.pow(base, this.number + i);
 			} */
-			var price = 10;
+			var price = 10 * howmany;
 			var prices = {
 				qfoam: price
 			}

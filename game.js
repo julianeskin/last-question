@@ -1,4 +1,4 @@
-var version = 0.014;
+var version = 0.015;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -440,8 +440,19 @@ Univ.ActiveNumber = function(generator){
 // We can probably speed this up by only checking from 0 to targetactivity
 	generator.activenumber = 0;
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
+	var consumption = generator.Consumption(chosenMax);
+	var active = chosenMax;
+	var capable;
 	
-	for (var i = 1; i <= chosenMax; i++) {
+	for(var item in consumption){
+		if(item != 'undefined'){
+			capable = Math.floor(Math.min(Univ.Items[item].available_number / consumption[item], 1) * chosenMax);
+			active = Math.min(capable, active);
+		}
+	}
+	generator.activenumber = Math.max(0, active);
+	
+	/*for (var i = 1; i <= chosenMax; i++) {
 		var enough = true;
 		for (var item in generator.Consumption(i)) {
 			if ( item != 'undefined') {
@@ -457,7 +468,7 @@ Univ.ActiveNumber = function(generator){
 			break;
 			alert(i);
 		}
-	}
+	}*/
 	//generator.activenumber = Math.max(Math.min(i, Math.round(generator.number * generator.targetactivity/100)), 0);
 }
 

@@ -251,7 +251,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				subatomic: 900
+				subatomic: 900 * howmany
 			}
 			return prices;
 		},
@@ -275,7 +275,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				subatomic: 18000
+				subatomic: 18000 * howmany
 			}
 			return prices;
 		},
@@ -299,7 +299,7 @@ Univ.LoadObjects = function(){
 		},
 		function(howmany){ // costs
 			var prices = {
-				subatomic: 36000
+				subatomic: 36000 * howmany
 			}
 			return prices;
 		},

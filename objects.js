@@ -7,6 +7,7 @@ Univ.LoadItems = function(){
 	new Univ.Item('Elementary Particle','Elementary Particles','elementary',1,0,0,0,0);
 	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',1,0,0,0,0);
 	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0);
+	new Univ.Item('Atom','Atoms','lightatom',0,0,0,0,0);
 	new Univ.Item('Atom','Atoms','mediumatom',0,0,0,0,0);
 	new Univ.Item('Atom','Atoms','heavyatom',0,0,0,0,0);
 	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',1,0,0,0,0);
@@ -342,11 +343,11 @@ Univ.LoadObjects = function(){
 		new Univ.Object('gascloud2','gascloud','Interstellar Large','Interstellar Large',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['atom'].total_number >= 400000 / 4;
+			return Univ.Items['atom'].total_number >= 4000000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
-				atom: 400000 * howmany
+				atom: 4000000 * howmany
 			}
 			return prices;
 		},
@@ -366,11 +367,11 @@ Univ.LoadObjects = function(){
 		new Univ.Object('gascloud3','gascloud','Interstellar XL','Interstellar XL',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['atom'].total_number >= 1600000 / 4;
+			return Univ.Items['atom'].total_number >= 16000000 / 4;
 		},
 		function(howmany){ // costs
 			var prices = {
-				atom: 1600000 * howmany
+				atom: 16000000 * howmany
 			}
 			return prices;
 		},
@@ -606,7 +607,7 @@ Univ.LoadObjects = function(){
 		new Univ.Object('heavyatom1','atom','Supernova Spark','Supernova Sparks',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return (Univ.Items['star'].total_number >= 313 / 4 && Univ.Items['atom'].total_number >= 100000000 / 4 );
 		},
 		function(howmany){ // costs
 			var prices = {

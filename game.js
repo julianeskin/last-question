@@ -437,7 +437,6 @@ Univ.UpdateRates = function(){
 
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
-// We can probably speed this up by only checking from 0 to targetactivity
 	generator.activenumber = 0;
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
 	var consumption = generator.Consumption(chosenMax);
@@ -451,25 +450,6 @@ Univ.ActiveNumber = function(generator){
 		}
 	}
 	generator.activenumber = Math.max(0, active);
-	
-	/*for (var i = 1; i <= chosenMax; i++) {
-		var enough = true;
-		for (var item in generator.Consumption(i)) {
-			if ( item != 'undefined') {
-				if ( (generator.Consumption(i)[item] * Univ.Speedfactor) > Univ.Items[item].available_number ){
-					enough = false;
-				}
-			}
-		}
-		
-		generator.activenumber++;
-		if (!enough) {
-			generator.activenumber--;
-			break;
-			alert(i);
-		}
-	}*/
-	//generator.activenumber = Math.max(Math.min(i, Math.round(generator.number * generator.targetactivity/100)), 0);
 }
 
 

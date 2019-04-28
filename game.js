@@ -479,10 +479,8 @@ Univ.UpdateGeneratorDisplay = function(){
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');
 			}
-			
-		//// TO DO: check whether visibility requirements are met by calling generator.isVisible()
+      
 			lookup(generator.id + '_button').style = 'display:block;';
-		//// TO DO: check whether it should be greyed out and unclickable by calling generator.isClickable()
 		} else {
 			lookup(generator.id + '_button').style = 'display:none;';
 		}
@@ -590,8 +588,8 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_production" class="generatorproduction"></div>';
 		generatortable += '<div id="' + generator.id + '_consumption" class="generatorconsumption"></div>';
 		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">1</div>';
-		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">10</div>';
-		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">100</div>';
+		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">80</div>';
+		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">1000</div>';
  		generatortable += '</div>';
  	}
  	lookup('generators').innerHTML = generatortable;

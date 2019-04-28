@@ -6,9 +6,10 @@ Univ.LoadItems = function(){
 	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',1,100,100,0,0);	// start with 100 Quantum Foam for testing
 	new Univ.Item('Elementary Particle','Elementary Particles','elementary',1,0,0,0,0);
 	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',1,0,0,0,0);
-	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0);
-	new Univ.Item('Atom','Atoms','mediumatom',0,0,0,0,0);
-	new Univ.Item('Atom','Atoms','heavyatom',0,0,0,0,0);
+	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0); 		// Atomic Numbers 1-2
+	new Univ.Item('Atom','Atoms','lightatom',0,0,0,0,0);	// Atomic Numbers 3-5
+	new Univ.Item('Atom','Atoms','mediumatom',0,0,0,0,0);	// Atomic Numbers 6-26
+	new Univ.Item('Atom','Atoms','heavyatom',0,0,0,0,0);	// Atomic Numbers 27+
 	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',1,0,0,0,0);
 	new Univ.Item('Nebula','Nebulae','nebula',1,0,0,0,0);
 	new Univ.Item('Star','Stars','star',1,0,0,0,0);
@@ -569,13 +570,13 @@ Univ.LoadObjects = function(){
 		1/Univ.FPS, // interval
 		function(number){ // production
 			var production = {
-				heavyatom: 9000000 * number
+				mediumatom: 900000 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
-				atom: 150000000 * number
+				atom: 9500000 * number
 			}
 			return consumption;
 		});
@@ -593,20 +594,20 @@ Univ.LoadObjects = function(){
 		4/Univ.FPS, // interval
 		function(number){ // production
 			var production = {
-				heavyatom: 900000000 * number
+				mediumatom: 900000 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
-				atom: 15000000000 * number
+				atom: 8500000 * number
 			}
 			return consumption;
 		});
 		new Univ.Object('heavyatom1','atom','Supernova Spark','Supernova Sparks',0,
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return 1;
+			return (Univ.Items['star'].total_number >= 313 / 4 && Univ.Items['mediumatom'].total_number >= 100000000 / 4 );
 		},
 		function(howmany){ // costs
 			var prices = {
@@ -617,13 +618,13 @@ Univ.LoadObjects = function(){
 		300, // interval
 		function(number){ // production
 			var production = {
-				heavyatom: 90000000000 * number
+				heavyatom: 9000000 * number
 			}
 			return production;
 		},
 		function(number){ // consumption
 			var consumption = {
-				star: 1000 * number
+				star: 10 * number
 			}
 			return consumption;
 		});

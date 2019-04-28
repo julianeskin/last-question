@@ -4,6 +4,8 @@ Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
 Univ.Items = [];
 Univ.Objects = [];
+Univ.Upgrades = [];
+Univ.GeneratorUpgrades = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
@@ -106,16 +108,29 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				}
 			}
 		}
+		
+		var multiplier = 1;
+		for (var i in Univ.GeneratorUpgrades) {
+			var upgrade = Univ.GeneratorUpgrades[i];
+			if (upgrade.generator == this.id) {
+				if (Univ.upgradeBought(upgrade.id)){
+					if (upgrade.type == 'multiply') {
+						multiplier *= upgrade.multiplier; 
+						// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+					}
+				}
+			}
+		}
+		
 		var productionTxt = [];
 		var consumptionTxt = [];
-
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * multiplier * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * multiplier * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * multiplier * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * multiplier * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -166,6 +181,33 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.num = Univ.ObjectsById.length;
 	Univ.ObjectsById.push(this);
 	return this;
+}
+
+Univ.GeneratorUpgrade = function(id,name,item,type,generator,factor,infoblurb,cost,VisibilityFcn) {
+	this.id = id;
+	this.name = name;
+	this.item = item;
+	this.type = type;
+	this.multiplier = factor;
+	this.generator = generator;
+	this.bought = 0;
+	this.infoblurb = infoblurb;
+	this.isVisible = VisibilityFcn;
+	this.cost = cost;
+	this.isAffordable = function(){
+		return 1; // actually calculate this
+	}
+	this.Buy = function(){
+		this.bought = 1;
+		// possibly trigger other effects
+	}
+	
+	Univ.Upgrades[this.id] = this;
+	Univ.GeneratorUpgrades[this.id] = this;
+}
+
+Univ.upgradeBought = function(id){
+	return (Univ.Upgrades[id].bought);
 }
 
 function AddEvent(object,event,fcn){
@@ -305,14 +347,26 @@ Univ.Logic = function(){
 			generator.ticks_since_production++;
 			Univ.ActiveNumber(generator);
 			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
+				
+				var multiplier = 1;
+				for (var i in Univ.GeneratorUpgrades) {
+					var upgrade = Univ.GeneratorUpgrades[i];
+					if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+						if (upgrade.type == 'multiply') {
+							multiplier *= upgrade.multiplier; 
+							// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+						}
+					}
+				}
+
 				for ( var item in generator.Production(1) ) {
-					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
+					itemproduction = generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor;
 					Univ.Items[item].available_number += itemproduction;
 					Univ.Items[item].total_number += itemproduction;
 					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					itemconsumption = generator.Consumption(generator.activenumber)[item] * Univ.Speedfactor;
+					itemconsumption = generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor;
 					Univ.Items[item].available_number -= itemconsumption;
 					generator.ticks_since_production = 0;
 				}
@@ -333,13 +387,27 @@ Univ.UpdateRates = function(){
 		var generator = Univ.Objects[g];
 		if ( generator.number > 0 ) {
 			Univ.ActiveNumber(generator);
-			for ( var item in generator.Production(1) ) {
-				itemproduction = generator.Production(generator.activenumber)[item];
-				productionrates[item] += itemproduction / generator.interval * Univ.Speedfactor;
-			}
-			for ( var item in generator.Consumption(1) ) {
-				itemconsumption = generator.Consumption(generator.activenumber)[item];
-				consumptionrates[item] -= itemconsumption / generator.interval * Univ.Speedfactor;
+			if ( generator.activenumber > 0 ) {
+				var multiplier = 1;
+				for (var i in Univ.GeneratorUpgrades) {
+					var upgrade = Univ.GeneratorUpgrades[i];
+					if (upgrade.generator == generator.id) {
+						if (Univ.upgradeBought(upgrade.id)){
+							if (upgrade.type == 'multiply') {
+								multiplier *= upgrade.multiplier; 
+								// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+							}
+						}
+					}
+				}
+				for ( var item in generator.Production(1) ) {
+					itemproduction = generator.Production(generator.activenumber)[item];
+					productionrates[item] += itemproduction * multiplier / generator.interval * Univ.Speedfactor;
+				}
+				for ( var item in generator.Consumption(1) ) {
+					itemconsumption = generator.Consumption(generator.activenumber)[item];
+					consumptionrates[item] -= itemconsumption * multiplier / generator.interval * Univ.Speedfactor;
+				}
 			}
 		} else { generator.activenumber = 0; }
 	}
@@ -486,6 +554,15 @@ Univ.UpdateGeneratorDisplay = function(){
 		}
 	}
 	
+	for (var i in Univ.GeneratorUpgrades) {
+		var upgrade = Univ.GeneratorUpgrades[i];
+		if (upgrade.item == Univ.ActiveItem && upgrade.isVisible()){
+			lookup(upgrade.id + '_button').style = 'display:block;';
+		} else {
+			lookup(upgrade.id + '_button').style = 'display:none;';
+		}
+	}
+	
 	if('options' == Univ.ActiveItem){
 		lookup('optionsmenu_button').classList.add('itemSelected');
 		lookup('options_menu').style = 'display:block;';
@@ -592,6 +669,15 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">1000</div>';
  		generatortable += '</div>';
  	}
+ 	
+ 	for (var i in Univ.GeneratorUpgrades) {
+ 		var upgrade = Univ.GeneratorUpgrades[i];
+ 		generatortable += '<div id="' + upgrade.id + '_button" class="upgradebutton" style="display:none;">';
+ 		generatortable += '<div id="' + upgrade.id + '_title" class="upgradetitle">' + upgrade.name + '</div>';
+		generatortable += '<div id="' + upgrade.id + '_title" class="upgradetext">' + upgrade.infoblurb + '</div>';
+ 		generatortable += '</div>';
+ 	}
+ 	
  	lookup('generators').innerHTML = generatortable;
  	
 	for (var k in Univ.Objects) {
@@ -623,6 +709,14 @@ Univ.GeneratorMenuHTML = function() {
 			AddEvent(lookup(generator.id + '_button'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
 		}
 	}
+	
+	for (var k in Univ.GeneratorUpgrades) {
+		try{throw Univ.GeneratorUpgrades[k]}
+		catch(upgrade){
+			AddEvent(lookup(upgrade.id + '_button'),'click',function(what){return function(e){if(upgrade.isAffordable(1)) upgrade.Buy();};}());
+		}
+	}
+	
 	AddEvent(lookup('popupcontainer'),'mouseover',function(){return function(){lookup('popupcontainer').style.visibility='visible';};}());
 	AddEvent(lookup('popupcontainer'),'mouseout',function(){return function(){lookup('popupcontainer').style.visibility='hidden';};}());
 	
@@ -638,6 +732,7 @@ window.onload = function(){
 	Univ.LoadMenus();	
 	Univ.LoadItems();
 	Univ.LoadObjects();
+	Univ.LoadUpgrades();
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();

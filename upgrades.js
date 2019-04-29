@@ -101,7 +101,7 @@ new Univ.GeneratorUpgrade('qfoam_intervalupgrade_1','Upgrade 6','qfoam','speed',
 		return vis;
 	});
 new Univ.GeneratorUpgrade('qfoam_intervalupgrade_2','Upgrade 7','qfoam','speed','qfoam1',1/2,
-	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
+	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
 			qfoam: 1000

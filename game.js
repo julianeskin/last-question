@@ -1,4 +1,4 @@
-var version = 0.020;
+var version = 0.022;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -400,7 +400,7 @@ Univ.RestoreDefaultPrefs = function(){
 	Univ.prefs = {};
 	
 	Univ.prefs.numberformat = 'Normal';
-	Univ.prefs.shortsuffix = 0;
+	Univ.prefs.shortsuffix = 1;
 	
 }
 
@@ -728,7 +728,7 @@ Univ.UpdateItemDisplay = function(){
 		if (Univ.Items[i].visibility == 1) {		
 			if(showItem){
 				// UPDATE NUMBER
-				lookup(item.type + '_number').innerHTML = Math.floor(item.available_number);
+				lookup(item.type + '_number').innerHTML = prettify(Math.floor(item.available_number), {maxSmall: 0, sigfigs: 6});
 				
 				// UPDATE TITLE
 				if (item.available_number == 1) {

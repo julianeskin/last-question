@@ -31,6 +31,22 @@ function round(num, places){
 
 function prettify(num, formOverride){
 	if(!formOverride) formOverride = {};
+	
+	formOverride.flavor = Univ.prefs.shortsuffix ? 'short' : '';
+	switch(Univ.prefs.numberformat){
+		case 'Normal':
+			formOverride.format = 'standard';
+			break;
+		case 'Scientific':
+			formOverride.format = 'scientific';
+			break;
+		case 'Engineering':
+			formOverride.format = 'engineering';
+			break;
+		default:
+			formOverride.format = 'standard';
+	}
+	
 	return Univ.format.format(num, formOverride);
 }
 
@@ -262,7 +278,8 @@ Univ.WriteSave = function(mode){
 		ActiveItem: Univ.ActiveItem,
 		Objects: {},
 		Items: {},
-		Upgrades: {}
+		Upgrades: {},
+		prefs: {}
 	};
 	
 	for(var g in Univ.Objects){
@@ -280,6 +297,10 @@ Univ.WriteSave = function(mode){
 	for(var i in Univ.Upgrades){
 		save.Upgrades[i] = {};
 		save.Upgrades[i].bought = Univ.Upgrades[i].bought;
+	}
+		
+	for(var i in Univ.prefs){
+		save.prefs[i] = Univ.prefs[i];
 	}
 	
 	
@@ -341,6 +362,10 @@ Univ.LoadSave = function(data){
 				Univ.Upgrades[i].bought = save.Upgrades[i].bought;
 			}
 		}
+		
+		for(var i in save.prefs){
+			Univ.prefs[i] = save.prefs[i];
+		}
 	}
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
@@ -361,10 +386,64 @@ Univ.Reset = function(){
 		Univ.Upgrades[i].bought = 0;
 	}
 	
+	Univ.RestoreDefaultPrefs();
+	
 	Univ.Items['qfoam'].available_number = 10;
 	Univ.Items['qfoam'].total_number = 10;
 }
 
+
+/**=====================================
+Preference functions
+=====================================**/
+Univ.RestoreDefaultPrefs = function(){
+	Univ.prefs = {};
+	
+	Univ.prefs.numberformat = 'Normal';
+	Univ.prefs.shortsuffix = 0;
+	
+}
+
+Univ.TogglePref = function(pref, on, off){
+	Univ.prefs[pref] = 1 - Univ.prefs[pref];
+	var l = lookup('option' + pref);
+	
+	if(Univ.prefs[pref]){
+		l.classList.add('optionOn');
+		l.classList.remove('optionOff');
+		l.innerHTML = on;
+	}
+	else{
+		l.classList.remove('optionOn');
+		l.classList.add('optionOff');
+		l.innerHTML = off;
+	}
+}
+
+Univ.CycleNumberFormat = function(){
+	var l = lookup('optionnumberformat');
+	
+	switch(Univ.prefs.numberformat){
+		case 'Normal':
+			Univ.prefs.numberformat = 'Scientific';
+			break;
+		case 'Scientific':
+			Univ.prefs.numberformat = 'Engineering';
+			break;
+		case 'Engineering':
+			Univ.prefs.numberformat = 'Normal';
+			break;
+		default:
+			Univ.prefs.numberformat = 'Normal';
+	}
+	
+	l.innerHTML = 'Number format : ' + Univ.prefs.numberformat;
+}
+
+
+/**=====================================
+Game functions
+=====================================**/
 Univ.Loop = function(){
 	Univ.catchupLogic = 0;
  	Univ.Logic();
@@ -835,13 +914,19 @@ Univ.ItemMenuHTML = function(){
 }
 
 Univ.GeneratorMenuHTML = function() {
+	function WriteButton(pref, text, callback, Class){
+		return '<div id="option' + pref + '" class="optionsButton menubutton' + (Class ? ' ' + Class: '') + '" style="background-color:#f7f7f7;" onmousedown="' + callback + '">' + text + '</div>';
+	}
+	
 	var generatortable = '';
 	
 	// Options menu. Set the entire div to none or block to hide or show
 	generatortable += '<div id="options_menu" style="display:none;">';
-	generatortable += '<div id="versionbox" class="optionsButton menubutton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
+	generatortable += '<div id="versionbox" class="optionsButton" style="background-color:#f7f7f7;cursor:auto;">Version ' + version.toFixed(3) + '</div>';
 	generatortable += '<div id="savebutton" class="optionsButton menubutton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
-	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div><hr>';
+	generatortable += WriteButton('numberformat', 'Number format : ' + Univ.prefs.numberformat, "Univ.CycleNumberFormat()");
+	generatortable += WriteButton('shortsuffix', (Univ.prefs.shortsuffix ? 'Short number suffix ON' : 'Short number suffix OFF'), "Univ.TogglePref('shortsuffix','Short number suffix ON','Short number suffix OFF')", (Univ.prefs.shortsuffix ? 'optionOn' : 'optionOff'));
 	generatortable += '</div>';
 	
 	
@@ -936,6 +1021,7 @@ window.onload = function(){
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadUpgrades();
+	Univ.RestoreDefaultPrefs();
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();

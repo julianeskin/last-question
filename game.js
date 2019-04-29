@@ -13,10 +13,14 @@ Univ.ItemsById = [];
 Univ.ObjectsById = [];
 Univ.precision = 10;
 
+
+/**=====================================
+Helper functions
+=====================================**/
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
 function round(num, places){ 
-	if(Math.log10(num) < 10){
+	if(Math.log10(Math.abs(num)) < 10){
 		return +(Math.round(num + 'e+' + places)  + 'e-' + places);
 	}
 	else{
@@ -25,6 +29,24 @@ function round(num, places){
 	}
 }
 
+function prettify(num, formOverride){
+	if(!formOverride) formOverride = {};
+	return Univ.format.format(num, formOverride);
+}
+
+function AddEvent(object,event,fcn){
+	if(object.attachEvent) 
+		object.attachEvent('on' + event, function() {
+			fcn.call(object);
+		});
+	else if(object.addEventListener) 
+	object.addEventListener(event,fcn,false);
+}
+
+
+/**=====================================
+Creation functions
+=====================================**/
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
  	this.singular = singular;
 	this.plural = plural;
@@ -123,10 +145,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -230,15 +252,10 @@ Univ.upgradeBought = function(id){
 	return (Univ.Upgrades[id].bought);
 }
 
-function AddEvent(object,event,fcn){
-	if(object.attachEvent) 
-		object.attachEvent('on' + event, function() {
-			fcn.call(object);
-		});
-	else if(object.addEventListener) 
-	object.addEventListener(event,fcn,false);
-}
 
+/**=====================================
+Save functions
+=====================================**/
 Univ.WriteSave = function(mode){
 	var save = {
 		version: version,
@@ -328,6 +345,26 @@ Univ.LoadSave = function(data){
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
 
+Univ.Reset = function(){
+	for(var g in Univ.Objects){
+		var obj = Univ.Objects[g];
+		Univ.Objects[g].number = 0;
+		Univ.Objects[g].targetactivity = 100;
+	}
+	
+	for(var i in Univ.Items){
+		Univ.Items[i].available_number = 0;
+		Univ.Items[i].total_number = 0;
+	}
+	
+	for(var i in Univ.Upgrades){
+		Univ.Upgrades[i].bought = 0;
+	}
+	
+	Univ.Items['qfoam'].available_number = 10;
+	Univ.Items['qfoam'].total_number = 10;
+}
+
 Univ.Loop = function(){
 	Univ.catchupLogic = 0;
  	Univ.Logic();
@@ -356,26 +393,6 @@ Univ.Loop = function(){
 		if (canSave) Univ.WriteSave();						// from Cookie Clicker
 	}
 	Univ.T++; // In case we don't want to run certain parts of code every frame	// from Cookie Clicker
-}
-
-Univ.Reset = function(){
-	for(var g in Univ.Objects){
-		var obj = Univ.Objects[g];
-		Univ.Objects[g].number = 0;
-		Univ.Objects[g].targetactivity = 100;
-	}
-	
-	for(var i in Univ.Items){
-		Univ.Items[i].available_number = 0;
-		Univ.Items[i].total_number = 0;
-	}
-	
-	for(var i in Univ.Upgrades){
-		Univ.Upgrades[i].bought = 0;
-	}
-	
-	Univ.Items['qfoam'].available_number = 10;
-	Univ.Items['qfoam'].total_number = 10;
 }
 
 Univ.Logic = function(){
@@ -644,11 +661,11 @@ Univ.UpdateItemDisplay = function(){
 				// UPDATE INCOME/SPENDING
 				productionHTML = [];
 				if (item.available_number > 0) {
-					var netproduction = round((item.production + item.consumption),2);
+					var netproduction = prettify((item.production + item.consumption));
 					if (netproduction > 0) {
 						productionHTML = '+';
 					}
-					productionHTML += netproduction + ' per sec (+' + round(item.production,1) + '/' + round(item.consumption,1) +')'; 
+					productionHTML += netproduction + ' per sec (+' + prettify(item.production) + '/' + prettify(item.consumption) +')'; 
 				}
 				lookup(i + '_production').innerHTML = productionHTML;
 				lookup(i + '_button').classList.remove('invisible');
@@ -910,6 +927,10 @@ Univ.GeneratorMenuHTML = function() {
 	}
 }
 
+
+/**=====================================
+Game start!
+=====================================**/
 window.onload = function(){
 	Univ.LoadMenus();	
 	Univ.LoadItems();
@@ -918,6 +939,7 @@ window.onload = function(){
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	Univ.format = new numberformat.Formatter({format: 'standard', sigfigs: 4, maxSmall: 1000})
 	
 	// Latency stuff
 	Univ.accumulatedDelay = 0;

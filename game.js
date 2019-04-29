@@ -1,4 +1,4 @@
-var version = 0.019;
+var version = 0.020;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -771,7 +771,11 @@ Univ.UpdateGeneratorDisplay = function(){
 			} else {
 				lookup(generator.id + '_title').innerHTML = generator.plural;
 			}
-		
+			
+			// UPDATE progress toward next burst of production
+			var progress = 210 * (generator.ticks_since_production) / (generator.interval() * Univ.FPS);
+			lookup(generator.id + '_progress').style.width = progress + 'px';
+			
 			// UPDATE COST of 1 ( in the future maybe have a way to make more at once
 			var costHTML = 'Cost: ';			
 			for (var item in generator.Costs(1)) {
@@ -792,8 +796,17 @@ Univ.UpdateGeneratorDisplay = function(){
 			
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');
+				lookup(generator.id + '_buyprogress').style.width = '0px';
 			} else {
 				lookup(generator.id + '_buyone').classList.remove('affordable');
+				var notenough = [];
+				for (var item in generator.Costs(1)) {
+					if (round(generator.Costs(1)[item], Univ.precision) > round(Univ.Items[item].available_number, Univ.precision)) {
+						notenough.push(round(Univ.Items[item].available_number, Univ.precision) / round(generator.Costs(1)[item], Univ.precision));
+					}
+				}
+				progress = 30 - 30 * Math.max(notenough);
+				lookup(generator.id + '_buyprogress').style.width = progress + 'px';
 			}
 			if (generator.isAffordable(generator.midAffordable) && generator.midAffordable > 0) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
@@ -941,6 +954,8 @@ Univ.GeneratorMenuHTML = function() {
 		generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">1</div>';
 		generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">80</div>';
 		generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">1000</div>';
+		generatortable += '<div id="' + generator.id + '_buyprogress" class="generatorbuyprogress"></div>';
+		generatortable += '<div id="' + generator.id + '_progress" class="generatorprogress"></div>';
  		generatortable += '</div>';
  	}
  	

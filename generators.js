@@ -6,7 +6,7 @@ Univ.LoadObjects = function(){
 			return 1;
 		},
 		function(howmany){ // costs
-			var base = 1.05;
+			var base = 1.01;
 			var start = 10;
 			var price = 0;
 			for(var i = 0; i < howmany; i++){
@@ -50,7 +50,7 @@ Univ.LoadObjects = function(){
 			return Univ.Items['qfoam'].total_number >= 100 / 4;
 		},
 		function(howmany){ // costs
-			var base = 1.05;
+			var base = 1.01;
 			var start = 100;
 			var price = 0;
 			for(var i = 0; i < howmany; i++){
@@ -83,7 +83,7 @@ Univ.LoadObjects = function(){
 			return Univ.Items['qfoam'].total_number >= 1000 / 4;
 		},
 		function(howmany){ // costs
-			var base = 1.05;
+			var base = 1.01;
 			var start = 1000;
 			var price = 0;
 			for(var i = 0; i < howmany; i++){

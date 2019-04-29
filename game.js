@@ -118,28 +118,28 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			}
 		}
 		
-		var multiplier = 1;
-		for (var i in Univ.GeneratorUpgrades) {
-			var upgrade = Univ.GeneratorUpgrades[i];
-			if (upgrade.generator == this.id) {
-				if (Univ.upgradeBought(upgrade.id)){
-					if (upgrade.type == 'multiply') {
-						multiplier *= upgrade.multiplier; 
-						// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-					}
-				}
-			}
-		}
+// 		var multiplier = 1;
+// 		for (var i in Univ.GeneratorUpgrades) {
+// 			var upgrade = Univ.GeneratorUpgrades[i];
+// 			if (upgrade.generator == this.id) {
+// 				if (Univ.upgradeBought(upgrade.id)){
+// 					if (upgrade.type == 'multiply') {
+// 						multiplier *= upgrade.multiplier; 
+// 						// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+// 					}
+// 				}
+// 			}
+// 		}
 		
 		var productionTxt = [];
 		var consumptionTxt = [];
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * multiplier * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * multiplier * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * multiplier * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * multiplier * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -375,30 +375,25 @@ Univ.Logic = function(){
 			Univ.ActiveNumber(generator);
 			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
 				
-				var multiplier = 1;
-				var consMult = 1;
-				for (var i in Univ.GeneratorUpgrades) {
-					var upgrade = Univ.GeneratorUpgrades[i];
-					if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-						if (upgrade.type == 'multiply') {
-							multiplier *= upgrade.multiplier;
-							consMult *= upgrade.multiplier;
-							// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-						}
-						else if(upgrade.type == 'efficiency'){
-							consMult *= upgrade.multiplier;
-						}
-					}
-				}
+// 				var multiplier = 1;
+// 				for (var i in Univ.GeneratorUpgrades) {
+// 					var upgrade = Univ.GeneratorUpgrades[i];
+// 					if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+// 						if (upgrade.type == 'multiply') {
+// 							multiplier *= upgrade.multiplier; 
+// 							// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+// 						}
+// 					}
+// 				}
 
 				for ( var item in generator.Production(1) ) {
-					itemproduction = round(generator.Production(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
+					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
 					Univ.Items[item].available_number += itemproduction;
 					Univ.Items[item].total_number += itemproduction;
 					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					itemconsumption = round(generator.Consumption(generator.activenumber)[item] * multiplier * consMult * Univ.Speedfactor, Univ.precision);
+					itemconsumption = generator.Consumption(generator.activenumber)[item] * Univ.Speedfactor;
 					Univ.Items[item].available_number -= itemconsumption;
 					generator.ticks_since_production = 0;
 				}
@@ -420,25 +415,25 @@ Univ.UpdateRates = function(){
 		if ( generator.number > 0 ) {
 			Univ.ActiveNumber(generator);
 			if ( generator.activenumber > 0 ) {
-				var multiplier = 1;
-				for (var i in Univ.GeneratorUpgrades) {
-					var upgrade = Univ.GeneratorUpgrades[i];
-					if (upgrade.generator == generator.id) {
-						if (Univ.upgradeBought(upgrade.id)){
-							if (upgrade.type == 'multiply') {
-								multiplier *= upgrade.multiplier; 
-								// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-							}
-						}
-					}
-				}
+// 				var multiplier = 1;
+// 				for (var i in Univ.GeneratorUpgrades) {
+// 					var upgrade = Univ.GeneratorUpgrades[i];
+// 					if (upgrade.generator == generator.id) {
+// 						if (Univ.upgradeBought(upgrade.id)){
+// 							if (upgrade.type == 'multiply') {
+// 								multiplier *= upgrade.multiplier; 
+// 								// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+// 							}
+// 						}
+// 					}
+// 				}
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item];
-					productionrates[item] += round(itemproduction * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
+					productionrates[item] += round(itemproduction / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 				for ( var item in generator.Consumption(1) ) {
 					itemconsumption = generator.Consumption(generator.activenumber)[item];
-					consumptionrates[item] -= round(itemconsumption * multiplier / generator.interval * Univ.Speedfactor, Univ.precision);
+					consumptionrates[item] -= round(itemconsumption / generator.interval * Univ.Speedfactor, Univ.precision);
 				}
 			}
 		} else { generator.activenumber = 0; }

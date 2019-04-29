@@ -44,7 +44,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,interval,ProductionFcn,ConsumptionFcn){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,IntervalFcn,ProductionFcn,ConsumptionFcn){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -86,7 +86,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
 			}
 			this.number += howmany;
-			if (this.number == 1) { this.ticks_since_production = this.interval - 1; } // for the first one, produce immediately instead of waiting the whole interval
+			if (this.number == 1) { this.ticks_since_production = this.interval() - 1; } // for the first one, produce immediately instead of waiting the whole interval
 			Univ.RefreshDisplay();
 			this.showPopup();
 		}
@@ -94,7 +94,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	
 	this.infoblurb = infoblurb;
 	this.targetactivity = 100; // percent of this generator chosen to be active
-	this.interval = interval;
+	this.interval = IntervalFcn;
 	this.Production = ProductionFcn;
 	this.Consumption = ConsumptionFcn;
 	this.ticks_since_production = 0;	
@@ -117,29 +117,16 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				}
 			}
 		}
-		
-// 		var multiplier = 1;
-// 		for (var i in Univ.GeneratorUpgrades) {
-// 			var upgrade = Univ.GeneratorUpgrades[i];
-// 			if (upgrade.generator == this.id) {
-// 				if (Univ.upgradeBought(upgrade.id)){
-// 					if (upgrade.type == 'multiply') {
-// 						multiplier *= upgrade.multiplier; 
-// 						// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-// 					}
-// 				}
-// 			}
-// 		}
-		
+
 		var productionTxt = [];
 		var consumptionTxt = [];
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval,2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -192,23 +179,47 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	return this;
 }
 
-Univ.GeneratorUpgrade = function(id,name,item,type,generator,factor,infoblurb,cost,VisibilityFcn) {
+Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb,CostFcn,VisibilityFcn) {
 	this.id = id;
 	this.name = name;
 	this.item = item;
 	this.type = type;
-	this.multiplier = factor;
+	this.magnitude = magnitude; // magnitude of effect: factor to multiply by, or amount to add, etc
 	this.generator = generator;
 	this.bought = 0;
 	this.infoblurb = infoblurb;
 	this.isVisible = VisibilityFcn;
-	this.cost = cost;
+	this.Costs = CostFcn;
 	this.isAffordable = function(){
-		return 1; // actually calculate this
+		var notenough = 0;
+		for (var item in this.Costs()) {
+			if (round(this.Costs()[item], Univ.precision) > round(Univ.Items[item].available_number, Univ.precision)) {
+				notenough++;
+			}
+		}
+		if (notenough == 0) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
+
 	this.Buy = function(){
-		this.bought = 1;
-		// possibly trigger other effects
+		if (this.isAffordable()) {
+			for (var item in this.Costs()) {
+				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs()[item], Univ.precision);
+			}
+			this.bought = 1;
+		}
+	}
+	
+	this.isClickable = function(){
+		if (this.isAffordable) {
+			// Check other conditions here
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 	
 	Univ.Upgrades[this.id] = this;
@@ -363,8 +374,8 @@ Univ.Reset = function(){
 		Univ.Upgrades[i].bought = 0;
 	}
 	
-	Univ.Items['qfoam'].available_number = 100;
-	Univ.Items['qfoam'].total_number = 100;
+	Univ.Items['qfoam'].available_number = 10;
+	Univ.Items['qfoam'].total_number = 10;
 }
 
 Univ.Logic = function(){
@@ -373,19 +384,7 @@ Univ.Logic = function(){
 		if ( generator.number > 0 ) {
 			generator.ticks_since_production++;
 			Univ.ActiveNumber(generator);
-			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
-				
-// 				var multiplier = 1;
-// 				for (var i in Univ.GeneratorUpgrades) {
-// 					var upgrade = Univ.GeneratorUpgrades[i];
-// 					if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-// 						if (upgrade.type == 'multiply') {
-// 							multiplier *= upgrade.multiplier; 
-// 							// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-// 						}
-// 					}
-// 				}
-
+			if ( generator.ticks_since_production >= (generator.interval() * Univ.FPS) && generator.activenumber > 0) {
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item] * Univ.Speedfactor;
 					Univ.Items[item].available_number += itemproduction;
@@ -415,25 +414,13 @@ Univ.UpdateRates = function(){
 		if ( generator.number > 0 ) {
 			Univ.ActiveNumber(generator);
 			if ( generator.activenumber > 0 ) {
-// 				var multiplier = 1;
-// 				for (var i in Univ.GeneratorUpgrades) {
-// 					var upgrade = Univ.GeneratorUpgrades[i];
-// 					if (upgrade.generator == generator.id) {
-// 						if (Univ.upgradeBought(upgrade.id)){
-// 							if (upgrade.type == 'multiply') {
-// 								multiplier *= upgrade.multiplier; 
-// 								// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
-// 							}
-// 						}
-// 					}
-// 				}
 				for ( var item in generator.Production(1) ) {
 					itemproduction = generator.Production(generator.activenumber)[item];
-					productionrates[item] += round(itemproduction / generator.interval * Univ.Speedfactor, Univ.precision);
+					productionrates[item] += round(itemproduction / generator.interval() * Univ.Speedfactor, Univ.precision);
 				}
 				for ( var item in generator.Consumption(1) ) {
 					itemconsumption = generator.Consumption(generator.activenumber)[item];
-					consumptionrates[item] -= round(itemconsumption / generator.interval * Univ.Speedfactor, Univ.precision);
+					consumptionrates[item] -= round(itemconsumption / generator.interval() * Univ.Speedfactor, Univ.precision);
 				}
 			}
 		} else { generator.activenumber = 0; }
@@ -455,17 +442,17 @@ Univ.ActiveNumber = function(generator){
 	
 	// Take into account upgrades and Speedfactor
 	var multiplier = Univ.Speedfactor;
-	for (var i in Univ.GeneratorUpgrades) {
-		var upgrade = Univ.GeneratorUpgrades[i];
-		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-			if (upgrade.type == 'multiply') {
-				multiplier *= upgrade.multiplier; 
-			}
-			else if (upgrade.type == 'efficiency') {
-				multiplier *= upgrade.multiplier; 
-			}
-		}
-	}
+// 	for (var i in Univ.GeneratorUpgrades) {
+// 		var upgrade = Univ.GeneratorUpgrades[i];
+// 		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+// 			if (upgrade.type == 'multiply') {
+// 				multiplier *= upgrade.multiplier; 
+// 			}
+// 			else if (upgrade.type == 'efficiency') {
+// 				multiplier *= upgrade.multiplier; 
+// 			}
+// 		}
+// 	}
 	
 	while(tooHigh){
 		// Linear consumption functions will be satisfied here
@@ -513,15 +500,15 @@ Univ.GetMaxAffordable = function(generator){
 	var step = 1;
 	
 	var multiplier = 1;
-	for (var i in Univ.GeneratorUpgrades) {
-		var upgrade = Univ.GeneratorUpgrades[i];
-		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-			if (upgrade.type == 'costMult') {
-				multiplier *= upgrade.multiplier; 
-			}
-		}
-	}
-	
+// 	for (var i in Univ.GeneratorUpgrades) {
+// 		var upgrade = Univ.GeneratorUpgrades[i];
+// 		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
+// 			if (upgrade.type == 'costMult') {
+// 				multiplier *= upgrade.multiplier; 
+// 			}
+// 		}
+// 	}
+
 	// Linear cost functions first
 	for(var item in cost){
 		if(item != 'undefined'){
@@ -568,17 +555,9 @@ Univ.GetMidAffordable = function(generator){
 	var step = 1;
 	
 	var multiplier = Univ.Speedfactor;
-	for (var i in Univ.GeneratorUpgrades) {
-		var upgrade = Univ.GeneratorUpgrades[i];
-		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-			if (upgrade.type == 'multiply' || upgrade.type == 'efficiency') {
-				multiplier *= upgrade.multiplier; 
-			}
-		}
-	}
-	
+
 	for(var item in consumption){
-		consumption[item] *= multiplier / generator.interval;
+		consumption[item] *= multiplier / generator.interval();
 		wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
 		if(wiggleRoom[item] <= 0){alreadyNegative = true; break;}
 	}
@@ -596,7 +575,7 @@ Univ.GetMidAffordable = function(generator){
 		var tooHigh = false;
 		for(var item in consumption){
 			if(item != 'undefined'){
-				if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval, Univ.precision)) tooHigh = true;
+				if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval(), Univ.precision)) tooHigh = true;
 			}
 		}
 		
@@ -611,7 +590,7 @@ Univ.GetMidAffordable = function(generator){
 				cost = generator.Consumption(generator.number + ret);
 				for(var item in cost){
 					if(item != 'undefined'){
-						if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval, Univ.precision)) tooHigh = true;
+						if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval(), Univ.precision)) tooHigh = true;
 					}
 				}
 			}
@@ -633,6 +612,7 @@ Univ.RefreshDisplay = function(){
 	Univ.UpdateRates();
 	Univ.UpdateItemDisplay();
 	Univ.UpdateGeneratorDisplay();
+	Univ.UpdateUpgradeDisplay();
 }
 
 Univ.UpdateItemDisplay = function(){
@@ -765,6 +745,17 @@ Univ.UpdateGeneratorDisplay = function(){
 	}
 }
 
+Univ.UpdateUpgradeDisplay = function(){
+	for (var upgrade in Univ.GeneratorUpgrades) {
+		var upgrade = Univ.GeneratorUpgrades[upgrade];
+		if( upgrade.isAffordable() == 1){
+			lookup(upgrade.id + '_button').classList.add('clickableupgrade');
+		} else {
+			lookup(upgrade.id + '_button').classList.remove('clickableupgrade');
+		}
+	}
+}
+
 Univ.updateSlider = function(generatorid) {
 	var sliderid = generatorid + '_slider';
 	var slidervalue = lookup(sliderid).value;
@@ -834,7 +825,6 @@ Univ.GeneratorMenuHTML = function() {
 	generatortable += '<div id="versionbox" class="optionsButton menubutton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
 	generatortable += '<div id="savebutton" class="optionsButton menubutton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
 	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
-	
 	generatortable += '</div>';
 	
 	
@@ -856,7 +846,8 @@ Univ.GeneratorMenuHTML = function() {
  		var upgrade = Univ.GeneratorUpgrades[i];
  		generatortable += '<div id="' + upgrade.id + '_button" class="upgradebutton" style="display:none;">';
  		generatortable += '<div id="' + upgrade.id + '_title" class="upgradetitle">' + upgrade.name + '</div>';
-		generatortable += '<div id="' + upgrade.id + '_title" class="upgradetext">' + upgrade.infoblurb + '</div>';
+		generatortable += '<div id="' + upgrade.id + '_text" class="upgradetext">' + upgrade.infoblurb + '</div>';
+		generatortable += '<div id="' + upgrade.id + '_cost" class="upgradecost"></div>';
  		generatortable += '</div>';
  	}
  	
@@ -893,7 +884,18 @@ Univ.GeneratorMenuHTML = function() {
 	for (var k in Univ.GeneratorUpgrades) {
 		try{throw Univ.GeneratorUpgrades[k]}
 		catch(upgrade){
-			AddEvent(lookup(upgrade.id + '_button'),'click',function(what){return function(e){if(upgrade.isAffordable(1)) upgrade.Buy();};}());
+			AddEvent(lookup(upgrade.id + '_button'),'click',function(what){return function(e){if(upgrade.isAffordable()) upgrade.Buy();};}());
+		
+			var costHTML = 'Cost: ';			
+			for (var item in upgrade.Costs()) {
+				costHTML += upgrade.Costs()[item] + ' ';
+				if (upgrade.Costs()[item] == 1) {
+					costHTML += Univ.Items[item].singular;
+				} else {
+					costHTML += Univ.Items[item].plural;
+				}
+			}
+			lookup(upgrade.id + '_cost').innerHTML = costHTML;
 		}
 	}
 	

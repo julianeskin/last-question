@@ -83,7 +83,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.Buy = function(howmany){
 		if (this.isAffordable(howmany)) {
 			for (var item in this.Costs(howmany)) {
-				Univ.Items[item].available_number -= round(this.Costs(howmany)[item], Univ.precision);
+				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
 			}
 			this.number += howmany;
 			if (this.number == 1) { this.ticks_since_production = this.interval - 1; } // for the first one, produce immediately instead of waiting the whole interval
@@ -376,12 +376,17 @@ Univ.Logic = function(){
 			if ( generator.ticks_since_production >= (generator.interval * Univ.FPS) && generator.activenumber > 0) {
 				
 				var multiplier = 1;
+				var consMult = 1;
 				for (var i in Univ.GeneratorUpgrades) {
 					var upgrade = Univ.GeneratorUpgrades[i];
 					if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
 						if (upgrade.type == 'multiply') {
-							multiplier *= upgrade.multiplier; 
+							multiplier *= upgrade.multiplier;
+							consMult *= upgrade.multiplier;
 							// mult*=(1+(typeof(me.power)=='function'?me.power(me):me.power)*0.01); // from Cookie Clicker
+						}
+						else if(upgrade.type == 'efficiency'){
+							consMult *= upgrade.multiplier;
 						}
 					}
 				}
@@ -393,7 +398,7 @@ Univ.Logic = function(){
 					generator.ticks_since_production = 0;
 				}
 				for ( var item in generator.Consumption(1) ) {
-					itemconsumption = round(generator.Consumption(generator.activenumber)[item] * multiplier * Univ.Speedfactor, Univ.precision);
+					itemconsumption = round(generator.Consumption(generator.activenumber)[item] * multiplier * consMult * Univ.Speedfactor, Univ.precision);
 					Univ.Items[item].available_number -= itemconsumption;
 					generator.ticks_since_production = 0;
 				}
@@ -451,7 +456,7 @@ Univ.ActiveNumber = function(generator){
 	var active = chosenMax;
 	var capable;
 	var tooHigh = true;
-	var step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(chosenMax)) - 4));
+	var step = 1;
 	
 	// Take into account upgrades and Speedfactor
 	var multiplier = Univ.Speedfactor;
@@ -490,7 +495,7 @@ Univ.ActiveNumber = function(generator){
 	
 	// Above linear growth, not likely to have so many it causes lag
 	chosenMax = Math.round(generator.number * generator.targetactivity / 100);
-	for(;active <= chosenMax; active += step){
+	while(active <= chosenMax){
 		consumption = generator.Consumption(active);
 		tooHigh = false;
 		for(var item in consumption){
@@ -499,6 +504,8 @@ Univ.ActiveNumber = function(generator){
 			}
 		}
 		if(tooHigh) break;
+		step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(active)) - 4));
+		active += step;
 	}
 	
 	generator.activenumber = Math.max(0, active - step);
@@ -508,7 +515,7 @@ Univ.GetMaxAffordable = function(generator){
 	var cost = generator.Costs(1);
 	var ret = -1;
 	var tooHigh = false;
-	var step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(generator.number)) - 4));
+	var step = 1;
 	
 	var multiplier = 1;
 	for (var i in Univ.GeneratorUpgrades) {
@@ -540,6 +547,7 @@ Univ.GetMaxAffordable = function(generator){
 		ret = 0;
 		tooHigh = false;
 		while(!tooHigh){
+			step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(ret)) - 3));
 			ret += step;
 			cost = generator.Costs(ret);
 			for(var item in cost){
@@ -562,12 +570,13 @@ Univ.GetMidAffordable = function(generator){
 	var wiggleRoom = {};
 	var ret = -1;
 	var alreadyNegative = false;
+	var step = 1;
 	
 	var multiplier = Univ.Speedfactor;
 	for (var i in Univ.GeneratorUpgrades) {
 		var upgrade = Univ.GeneratorUpgrades[i];
 		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-			if (upgrade.type == 'costMult') {
+			if (upgrade.type == 'multiply' || upgrade.type == 'efficiency') {
 				multiplier *= upgrade.multiplier; 
 			}
 		}
@@ -576,7 +585,7 @@ Univ.GetMidAffordable = function(generator){
 	for(var item in consumption){
 		consumption[item] *= multiplier / generator.interval;
 		wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
-		if(wiggleRoom[item] <= 0){alreadyNegative = true;break;}
+		if(wiggleRoom[item] <= 0){alreadyNegative = true; break;}
 	}
 	
 	if(!alreadyNegative){
@@ -585,6 +594,36 @@ Univ.GetMidAffordable = function(generator){
 			if(item != 'undefined'){
 				ret = ret == -1 ? Math.floor(wiggleRoom[item] / (consumption[item])) : Math.min(ret, Math.floor(wiggleRoom[item] / (consumption[item])));
 			}
+		}
+		
+		consumption = generator.Consumption(generator.number + ret);
+		var cons2 = generator.Consumption(generator.number);
+		var tooHigh = false;
+		for(var item in consumption){
+			if(item != 'undefined'){
+				if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval, Univ.precision)) tooHigh = true;
+			}
+		}
+		
+		if(tooHigh){
+			// Above linear consumption (exponential or polynomial)
+			// Just have to iterate through and hope for the best
+			ret = 0;
+			tooHigh = false;
+			while(!tooHigh){
+				step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(ret)) - 3));
+				ret += step;
+				cost = generator.Consumption(generator.number + ret);
+				for(var item in cost){
+					if(item != 'undefined'){
+						if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval, Univ.precision)) tooHigh = true;
+					}
+				}
+			}
+			ret -= step;
+		}
+		else{
+			// Linear or below. Leave ret as is for now
 		}
 	}
 	

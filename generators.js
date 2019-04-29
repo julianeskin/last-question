@@ -13,8 +13,13 @@ Univ.LoadObjects = function(){
 		},
 		1/Univ.FPS, 	// interval in seconds (So 1/Univ.FPS = 1 game tick, the fastest possible rate)
 		function(number){ // production
+			var multiplier = 1;
+			var upgrade = Univ.Upgrades['qfoam_upgrade_1'];
+			if (Univ.upgradeBought(upgrade.id)){
+				multiplier *= upgrade.multiplier; 
+			}
 			var production = {
-				qfoam: 1 * number	// each makes 1 qfoam every 1 second
+				qfoam: 1 * number * multiplier	// each makes 1 qfoam every 1 second
 			}
 			return production;
 		},

@@ -72,7 +72,7 @@ body{
 	text-align:center;
 	color:grey;
 	line-height:16px;
-	z-index:3;
+	z-index:4;
 	border-left-style:solid;
 	border-bottom-style:solid;
 	border-left-width:1px;
@@ -90,7 +90,7 @@ body{
 	right:0px;
 	color:grey;
 	line-height:16px;
-	z-index:2;
+	z-index:3;
 	text-align:center;
 	border-left-style:solid;
 	border-bottom-style:solid;
@@ -109,7 +109,7 @@ body{
 	right:0px;
 	color:grey;
 	line-height:16px;
-	z-index:1;
+	z-index:2;
 	text-align:center;
 	border-left-style:solid;
 	border-top-style:solid;
@@ -117,6 +117,14 @@ body{
 	border-top-width:1px;
 	border-left-color:grey;
 	border-top-color:grey;
+}
+
+.generatorbuyprogress{
+	position:absolute;
+	width:15px;
+	height:16px;
+	z-index:1;
+	background-color:light grey;
 }
 
 .affordable{
@@ -377,13 +385,13 @@ body{
 	position:relative;
 	width:180px;
 	left:30px;
-	height:60px;
+	height:70px;
 	margin:5px;
-	cursor:pointer;
 	border-radius:5px;
 	text-align:center;
 	user-select:none;
-	border:2px solid black;
+	color:grey;
+	border:2px solid grey;
 }
 
 .upgradetitle{
@@ -397,7 +405,22 @@ body{
 .upgradetext{
 	position:absolute;
 	font-size:10px;
-	top:20px;
+	line-height:11px;
+	top:22px;
 	left:0px;
 	right:0px;
+}
+
+.upgradecost{
+	position:absolute;
+	font-size:8px;
+	top:60px;
+	left:0px;
+	right:0px;
+}
+
+.clickableupgrade{
+	border:2px solid black;
+	color:black;
+	cursor:pointer;
 }

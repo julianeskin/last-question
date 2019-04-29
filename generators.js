@@ -6,8 +6,16 @@ Univ.LoadObjects = function(){
 			return 1;
 		},
 		function(howmany){ // costs
+			/* We can use this for exponential growth of costs
+			var base = 1.1;
+			var start = 10;
+			var price = 0;
+			for(var i = 0; i < howmany; i++){
+				price += start * Math.pow(base, this.number + i);
+			} */
+			var price = 10 * howmany;
 			var prices = {
-				qfoam: 10 * howmany
+				qfoam: price
 			}
 			return prices;
 		},

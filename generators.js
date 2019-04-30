@@ -1,22 +1,16 @@
 Univ.LoadObjects = function(){
-//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, Cost Fcn, Interval, Production Fcn, Consumption Fcn
+//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Interval, ProductionEquation, ConsumptionEquation
  	new Univ.Object('qfoam1','qfoam','Quantum Field Equation','Quantum Field Equations',0,
  		'Quantum Field Equations are the most basic production unit. Use them to generate Quantum Foam out of nothing.',
 		function(){ // isVisible
 			return 1;
 		},
-		function(howmany){ // costs
-			var base = 1.01;
-			var start = 10;
-			var price = 0;
-			for(var i = 0; i < howmany; i++){
-				price += start * Math.pow(base, this.number + i);
+		{ // CostEquation
+			qfoam: {
+				type: 'exp',
+				base: 1.01,
+				start: 10
 			}
-			price = Math.floor(price);
-			var prices = {
-				qfoam: price
-			}
-			return prices;
 		},
 		function(){
 			var interval = 4;
@@ -28,72 +22,56 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var multiplier = 1;
-			if (Univ.upgradeBought('qfoam_rateupgrade_1')){ multiplier *= Univ.Upgrades['qfoam_rateupgrade_1'].magnitude; }
-			if (Univ.upgradeBought('qfoam_rateupgrade_2')){ multiplier *= Univ.Upgrades['qfoam_rateupgrade_2'].magnitude; }
-			if (Univ.upgradeBought('qfoam_rateupgrade_3')){ multiplier *= Univ.Upgrades['qfoam_rateupgrade_3'].magnitude; }
-			if (Univ.upgradeBought('qfoam_rateupgrade_4')){ multiplier *= Univ.Upgrades['qfoam_rateupgrade_4'].magnitude; }
-			if (Univ.upgradeBought('qfoam_rateupgrade_5')){ multiplier *= Univ.Upgrades['qfoam_rateupgrade_5'].magnitude; }
-			var production = {
-				qfoam: Math.floor(1 * number * multiplier)
-			}
-			return production;
+		{ // ProductionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 1
+			},
+			upgrades: [ 'qfoam_rateupgrade_1',
+						'qfoam_rateupgrade_2',
+						'qfoam_rateupgrade_3',
+						'qfoam_rateupgrade_4',
+						'qfoam_rateupgrade_5' ]
 		},
-		function(){ // consumption
-			var consumption = {}
-			return consumption;
-		});
+		{}
+	);
 	new Univ.Object('qfoam2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
 			return Univ.Items['qfoam'].total_number >= 100 / 4;
 		},
-		function(howmany){ // costs
-			var base = 1.01;
-			var start = 100;
-			var price = 0;
-			for(var i = 0; i < howmany; i++){
-				price += start * Math.pow(base, this.number + i);
+		{ // CostEquation
+			qfoam: {
+				type: 'exp',
+				base: 1.01,
+				start: 100
 			}
-			price = Math.floor(price);
-			var prices = {
-				qfoam: price
-			}
-			return prices;
 		},
 		function(){
 			var interval = 4;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
-		},		function(number){ // production
-			var production = {
-				qfoam: 12 * number
-			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {}
-			return consumption;
-		});
+		{ // ProductionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 12
+			}
+		},
+		{}
+	);
 	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
 			return Univ.Items['qfoam'].total_number >= 1000 / 4;
 		},
-		function(howmany){ // costs
-			var base = 1.01;
-			var start = 1000;
-			var price = 0;
-			for(var i = 0; i < howmany; i++){
-				price += start * Math.pow(base, this.number + i);
+		{ // CostEquation
+			qfoam: {
+				type: 'exp',
+				base: 1.01,
+				start: 1000
 			}
-			price = Math.floor(price);
-			var prices = {
-				qfoam: price
-			}
-			return prices;
 		},
 		function(){ // interval
 			var interval = 10;
@@ -101,26 +79,24 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				qfoam: 150 * number // 150 qfoam every 10 seconds
+		{ // ProductionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 150
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {}
-			return consumption;
-		});
+		{}
+	);
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['qfoam'].total_number >= 5000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				qfoam: 5000 * howmany
+		{ // CostEquation
+			qfoam: {
+				type: 'lin',
+				slope: 5000
 			}
-			return prices;
 		},
 		function(){ // interval
 			var interval = 5;
@@ -128,28 +104,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				elementary: 25 * number
+		{ // ProductionEquation
+			elementary: {
+				type: 'lin',
+				slope: 25
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				qfoam: 100 * number
+		{ // ConsumptionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 100
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['qfoam'].total_number >= 20000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				qfoam: 20000 * howmany
+		{ // CostEquation
+			qfoam: {
+				type: 'lin',
+				slope: 20000
 			}
-			return prices;
 		},
 		function(){ // interval
 			var interval = 5;
@@ -157,28 +134,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				elementary: 124 * number
+		{ // ProductionEquation
+			elementary: {
+				type: 'lin',
+				slope: 124
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				qfoam: 248 * number
+		{ // ConsumptionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 248
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['qfoam'].total_number >= 80000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				qfoam: 80000 * howmany
+		{ // CostEquation
+			qfoam: {
+				type: 'lin',
+				slope: 80000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 5;
@@ -186,20 +164,20 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-
-		function(number){ // production
-			var production = {
-				elementary: 625 * number
+		{ // ProductionEquation
+			elementary: {
+				type: 'lin',
+				slope: 625
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				qfoam: 625 * number
+		{ // ConsumptionEquation
+			qfoam: {
+				type: 'lin',
+				slope: 625
 			}
-			return consumption;
-		});
-	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
+		}
+	);
+	/*new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['elementary'].total_number >= 555 / 4;
@@ -778,5 +756,5 @@ Univ.LoadObjects = function(){
 				star: 12000 * number
 			}
 			return consumption;
-		});
+		});*/
 }

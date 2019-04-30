@@ -305,7 +305,7 @@ Univ.LoadObjects = function(){
 		{ // CostEquation
 			subatomic: {
 				type: 'lin',
-				slope: 180000
+				slope: 18000
 			}
 		},
 		function(){

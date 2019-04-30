@@ -177,16 +177,16 @@ Univ.LoadObjects = function(){
 			}
 		}
 	);
-	/*new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
+	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['elementary'].total_number >= 555 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				elementary: 555 * howmany
+		{ // CostEquation
+			elementary: {
+				type: 'lin',
+				slope: 555
 			}
-			return prices;
 		},
 		function(){
 			var interval = 10;
@@ -194,28 +194,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				subatomic: 2 * number
+		{ // ProductionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 2
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				elementary: 5 * number
+		{ // ConsumptionEquation
+			elementary: {
+				type: 'lin',
+				slope: 5
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['elementary'].total_number >= 5555 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				elementary: 5555 * howmany
+		{ // CostEquation
+			elementary: {
+				type: 'lin',
+				slope: 5555
 			}
-			return prices;
 		},
 		function(){
 			var interval = 1.5;
@@ -223,28 +224,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				subatomic: 2 * number
+		{ // ProductionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 2
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				elementary: 4 * number
+		{ // ConsumptionEquation
+			elementary: {
+				type: 'lin',
+				slope: 4
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['elementary'].total_number >= 55555 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				elementary: 55555 * howmany
+		{ // CostEquation
+			elementary: {
+				type: 'lin',
+				slope: 55555
 			}
-			return prices;
 		},
 		function(){
 			var interval = 2;
@@ -252,28 +254,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				subatomic: 20 * number
+		{ // ProductionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 20
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				elementary: 35 * number
+		{ // ConsumptionEquation
+			elementary: {
+				type: 'lin',
+				slope: 35
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['subatomic'].total_number >= 900 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				subatomic: 900 * howmany
+		{ // CostEquation
+			subatomic: {
+				type: 'lin',
+				slope: 900
 			}
-			return prices;
 		},
 		function(){
 			var interval = 14;
@@ -281,28 +284,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				atom: 1 * number
+		{ // ProductionEquation
+			atom: {
+				type: 'lin',
+				slope: 1
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				subatomic: 1 * number // 1 proton per hydrogen
+		{ // ConsumptionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 1
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['subatomic'].total_number >= 18000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				subatomic: 18000 * howmany
+		{ // CostEquation
+			subatomic: {
+				type: 'lin',
+				slope: 180000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 12;
@@ -310,28 +314,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				atom: 17.5 * number
+		{ // ProductionEquation
+			atom: {
+				type: 'lin',
+				slope: 17.5
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				subatomic: 25 * number
+		{ // ConsumptionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 25
 			}
-			return consumption;
-		});
+		}
+	);
 	new Univ.Object('atom3','atom','Quantum Degenerator','Quantum Degenerators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['subatomic'].total_number >= 36000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				subatomic: 36000 * howmany
+		{ // CostEquation
+			subatomic: {
+				type: 'lin',
+				slope: 36000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 10;
@@ -339,28 +344,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				atom: 350 * number
+		{ // ProductionEquation
+			atom: {
+				type: 'lin',
+				slope: 350
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				subatomic: 500 * number
+		{ // ConsumptionEquation
+			subatomic: {
+				type: 'lin',
+				slope: 500
 			}
-			return consumption;
-		});
-		new Univ.Object('gascloud1','gascloud','Interstellar Medium','Interstellar Medium',0,
-		'Some say it can predict the future.',
+		}
+	);
+	new Univ.Object('gascloud1','gascloud','Interstellar Medium','Interstellar Medium',0,
+	'Some say it can predict the future.',
 		function(){ // isVisible
 			return Univ.Items['atom'].total_number >= 1000000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				atom: 1000000 * howmany
+		{ // CostEquation
+			atom: {
+				type: 'lin',
+				slope: 1000000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 60;
@@ -368,28 +374,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				gascloud: 1 * number
+		{ // ProductionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 1
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 1500000 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 1500000
 			}
-			return consumption;
-		});
-		new Univ.Object('gascloud2','gascloud','Interstellar Large','Interstellar Large',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('gascloud2','gascloud','Interstellar Large','Interstellar Large',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['atom'].total_number >= 4000000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				atom: 4000000 * howmany
+		{ // CostEquation
+			atom: {
+				type: 'lin',
+				slope: 4000000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 60;
@@ -397,28 +404,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				gascloud: 3 * number
+		{ // ProductionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 3
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 1500000 * 2.5 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 1500000 * 2.5
 			}
-			return consumption;
-		});
-		new Univ.Object('gascloud3','gascloud','Interstellar XL','Interstellar XL',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('gascloud3','gascloud','Interstellar XL','Interstellar XL',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['atom'].total_number >= 16000000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				atom: 16000000 * howmany
+		{ // CostEquation
+			atom: {
+				type: 'lin',
+				slope: 16000000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 60;
@@ -426,28 +434,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				gascloud: 9 * number
+		{ // ProductionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 9
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 1500000 * 7 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 1500000 * 7
 			}
-			return consumption;
-		});
-		new Univ.Object('nebula1','nebula','Nebulizer','Nebulizers',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('nebula1','nebula','Nebulizer','Nebulizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['gascloud'].total_number >= 200 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				gascloud: 200 * howmany
+		{ // CostEquation
+			gascloud: {
+				type: 'lin',
+				slope: 200
 			}
-			return prices;
 		},
 		function(){
 			var interval = 90;
@@ -455,28 +464,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				nebula: 1 * number
+		{ // ProductionEquation
+			nebula: {
+				type: 'lin',
+				slope: 1
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				gascloud: 10 * number
+		{ // ConsumptionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 10
 			}
-			return consumption;
-		});
-		new Univ.Object('nebula2','nebula','Rosette Polarizer','Rosette Polarizers',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('nebula2','nebula','Rosette Polarizer','Rosette Polarizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['gascloud'].total_number >= 2000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				gascloud: 2000 * howmany
+		{ // CostEquation
+			gascloud: {
+				type: 'lin',
+				slope: 2000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 90;
@@ -484,28 +494,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				nebula: 12 * number
+		{ // ProductionEquation
+			nebula: {
+				type: 'lin',
+				slope: 12
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				gascloud: 100 * number
+		{ // ConsumptionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 100
 			}
-			return consumption;
-		});
-		new Univ.Object('nebula3','nebula','Orionizer','Orionizers',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('nebula3','nebula','Orionizer','Orionizers',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['gascloud'].total_number >= 20000 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				gascloud: 20000 * howmany
+		{ // CostEquation
+			gascloud: {
+				type: 'lin',
+				slope: 20000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 90;
@@ -513,28 +524,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				nebula: 150 * number
+		{ // ProductionEquation
+			nebula: {
+				type: 'lin',
+				slope: 150
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				gascloud: 1000 * number
+		{ // ConsumptionEquation
+			gascloud: {
+				type: 'lin',
+				slope: 1000
 			}
-			return consumption;
-		});
-		new Univ.Object('star1','star','Core Nucleator','Core Nucleators',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('star1','star','Core Nucleator','Core Nucleators',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['nebula'].total_number >= 123 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				nebula: 123 * howmany
+		{ // CostEquation
+			nebula: {
+				type: 'lin',
+				slope: 123
 			}
-			return prices;
 		},
 		function(){
 			var interval = 45;
@@ -542,28 +554,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				star: 10 * number
+		{ // ProductionEquation
+			star: {
+				type: 'lin',
+				slope: 10
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				nebula: 10 * number
+		{ // ConsumptionEquation
+			nebula: {
+				type: 'lin',
+				slope: 10
 			}
-			return consumption;
-		});
-		new Univ.Object('star2','star','Bok Globule','Bok Globules',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('star2','star','Bok Globule','Bok Globules',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['nebula'].total_number >= 1234 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				nebula: 1234 * howmany
+		{ // CostEquation
+			nebula: {
+				type: 'lin',
+				slope: 1234
 			}
-			return prices;
 		},
 		function(){
 			var interval = 30;
@@ -571,28 +584,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				star: 120 * number
+		{ // ProductionEquation
+			star: {
+				type: 'lin',
+				slope: 120
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				nebula: 100 * number
+		{ // ConsumptionEquation
+			nebula: {
+				type: 'lin',
+				slope: 100
 			}
-			return consumption;
-		});
-		new Univ.Object('star3','star','Stellar Nursery','Stellar Nurseries',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('star3','star','Stellar Nursery','Stellar Nurseries',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return Univ.Items['nebula'].total_number >= 12345 / 4;
 		},
-		function(howmany){ // costs
-			var prices = {
-				nebula: 12345 * howmany
+		{ // CostEquation
+			nebula: {
+				type: 'lin',
+				slope: 12345
 			}
-			return prices;
 		},
 		function(){
 			var interval = 20;
@@ -600,28 +614,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				star: 800 * number
+		{ // ProductionEquation
+			star: {
+				type: 'lin',
+				slope: 800
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				nebula: 600 * number
+		{ // ConsumptionEquation
+			nebula: {
+				type: 'lin',
+				slope: 600
 			}
-			return consumption;
-		});
-		new Univ.Object('lightatom1','atom','Primordial Spallation','Primordial Spallation',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('lightatom1','atom','Primordial Spallation','Primordial Spallation',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return (Univ.Items['qfoam'].total_number >= 10000000 / 4 && Univ.Items['atom'].total_number >= 10000000 / 4 );
 		},
-		function(howmany){ // costs
-			var prices = {
-				qfoam: 10000000 * howmany
+		{ // CostEquation
+			qfoam: {
+				type: 'lin',
+				slope: 10000000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 1;
@@ -629,28 +644,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				lightatom: 100000 * number
+		{ // ProductionEquation
+			lightatom: {
+				type: 'lin',
+				slope: 100000
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 300000 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 300000
 			}
-			return consumption;
-		});
-		new Univ.Object('mediumatom1','atom','Main Sequence Ignition','Main Sequence Ignition',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('mediumatom1','atom','Main Sequence Ignition','Main Sequence Ignition',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return (Univ.Items['star'].total_number >= 155 / 4 && Univ.Items['atom'].total_number >= 100000000 / 4 );
 		},
-		function(howmany){ // costs
-			var prices = {
-				star: 155 * howmany
+		{ // CostEquation
+			star: {
+				type: 'lin',
+				slope: 155
 			}
-			return prices;
 		},
 		function(){
 			var interval = 1;
@@ -658,28 +674,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				mediumatom: 900000 * number
+		{ // ProductionEquation
+			mediumatom: {
+				type: 'lin',
+				slope: 900000
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 9500000 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 9500000
 			}
-			return consumption;
-		});
-		new Univ.Object('mediumatom2','atom','Convection Zoning Law','Convection Zoning Laws',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('mediumatom2','atom','Convection Zoning Law','Convection Zoning Laws',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return (Univ.Items['star'].total_number >= 1777 / 4 && Univ.Items['atom'].total_number >= 100000000 / 4 );
 		},
-		function(howmany){ // costs
-			var prices = {
-				star: 1777 * howmany
+		{ // CostEquation
+			star: {
+				type: 'lin',
+				slope: 1777
 			}
-			return prices;
 		},
 		function(){
 			var interval = 4;
@@ -687,28 +704,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				mediumatom: 900000 * number
+		{ // ProductionEquation
+			mediumatom: {
+				type: 'lin',
+				slope: 900000
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				atom: 8500000 * number
+		{ // ConsumptionEquation
+			atom: {
+				type: 'lin',
+				slope: 8500000
 			}
-			return consumption;
-		});
-		new Univ.Object('heavyatom1','atom','Supernova Spark','Supernova Sparks',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('heavyatom1','atom','Supernova Spark','Supernova Sparks',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return (Univ.Items['star'].total_number >= 313 / 4 && Univ.Items['mediumatom'].total_number >= 100000000 / 4 );
 		},
-		function(howmany){ // costs
-			var prices = {
-				star: 313 * howmany
+		{ // CostEquation
+			star: {
+				type: 'lin',
+				slope: 313
 			}
-			return prices;
 		},
 		function(){
 			var interval = 300;
@@ -716,28 +734,29 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				heavyatom: 9000000 * number
+		{ // ProductionEquation
+			heavyatom: {
+				type: 'lin',
+				slope: 9000000
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				star: 10 * number
+		{ // ConsumptionEquation
+			star: {
+				type: 'lin',
+				slope: 10
 			}
-			return consumption;
-		});
-		new Univ.Object('galaxy1','galaxy','Accretion Disco','Accretion Discos',0,
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		}
+	);
+	new Univ.Object('galaxy1','galaxy','Accretion Disco','Accretion Discos',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
 			return (Univ.Items['star'].total_number >= 1000 / 4 );
 		},
-		function(howmany){ // costs
-			var prices = {
-				star: 1000 * howmany
+		{ // CostEquation
+			star: {
+				type: 'lin',
+				slope: 1000
 			}
-			return prices;
 		},
 		function(){
 			var interval = 900;
@@ -745,16 +764,17 @@ Univ.LoadObjects = function(){
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
-		function(number){ // production
-			var production = {
-				galaxy: 1 * number
+		{ // ProductionEquation
+			galaxy: {
+				type: 'lin',
+				slope: 1
 			}
-			return production;
 		},
-		function(number){ // consumption
-			var consumption = {
-				star: 12000 * number
+		{ // ConsumptionEquation
+			star: {
+				type: 'lin',
+				slope: 12000
 			}
-			return consumption;
-		});*/
+		}
+	);
 }

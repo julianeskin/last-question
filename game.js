@@ -1,4 +1,4 @@
-var version = 0.020;
+var version = 0.022;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -13,10 +13,14 @@ Univ.ItemsById = [];
 Univ.ObjectsById = [];
 Univ.precision = 10;
 
+
+/**=====================================
+Helper functions
+=====================================**/
 function lookup(object) {return document.getElementById(object);} // need to pick one function and then go thru everything
 
 function round(num, places){ 
-	if(Math.log10(num) < 10){
+	if(Math.log10(Math.abs(num)) < 10){
 		return +(Math.round(num + 'e+' + places)  + 'e-' + places);
 	}
 	else{
@@ -25,6 +29,40 @@ function round(num, places){
 	}
 }
 
+function prettify(num, formOverride){
+	if(!formOverride) formOverride = {};
+	
+	formOverride.flavor = Univ.prefs.shortsuffix ? 'short' : '';
+	switch(Univ.prefs.numberformat){
+		case 'Normal':
+			formOverride.format = 'standard';
+			break;
+		case 'Scientific':
+			formOverride.format = 'scientific';
+			break;
+		case 'Engineering':
+			formOverride.format = 'engineering';
+			break;
+		default:
+			formOverride.format = 'standard';
+	}
+	
+	return Univ.format.format(num, formOverride);
+}
+
+function AddEvent(object,event,fcn){
+	if(object.attachEvent) 
+		object.attachEvent('on' + event, function() {
+			fcn.call(object);
+		});
+	else if(object.addEventListener) 
+	object.addEventListener(event,fcn,false);
+}
+
+
+/**=====================================
+Creation functions
+=====================================**/
 Univ.Item = function(singular,plural,type,visibility,available_number,total_number,production,consumption){
  	this.singular = singular;
 	this.plural = plural;
@@ -123,10 +161,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		for (var item in Univ.Items) {
 			if (Univ.Items[item].visibility == 1) {
 				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += 'Generating ' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					productionTxt += 'Generating ' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 				}
 				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += 'Consuming ' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor,1) + ' ' + Univ.Items[item].plural + ' every ' + round(this.interval(),2) + ' sec (' + round(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber,1) + '&nbsp;each). ';
+					consumptionTxt += 'Consuming ' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 				}
 			}
 		}
@@ -230,22 +268,18 @@ Univ.upgradeBought = function(id){
 	return (Univ.Upgrades[id].bought);
 }
 
-function AddEvent(object,event,fcn){
-	if(object.attachEvent) 
-		object.attachEvent('on' + event, function() {
-			fcn.call(object);
-		});
-	else if(object.addEventListener) 
-	object.addEventListener(event,fcn,false);
-}
 
+/**=====================================
+Save functions
+=====================================**/
 Univ.WriteSave = function(mode){
 	var save = {
 		version: version,
 		ActiveItem: Univ.ActiveItem,
 		Objects: {},
 		Items: {},
-		Upgrades: {}
+		Upgrades: {},
+		prefs: {}
 	};
 	
 	for(var g in Univ.Objects){
@@ -263,6 +297,10 @@ Univ.WriteSave = function(mode){
 	for(var i in Univ.Upgrades){
 		save.Upgrades[i] = {};
 		save.Upgrades[i].bought = Univ.Upgrades[i].bought;
+	}
+		
+	for(var i in Univ.prefs){
+		save.prefs[i] = Univ.prefs[i];
 	}
 	
 	
@@ -324,10 +362,88 @@ Univ.LoadSave = function(data){
 				Univ.Upgrades[i].bought = save.Upgrades[i].bought;
 			}
 		}
+		
+		for(var i in save.prefs){
+			Univ.prefs[i] = save.prefs[i];
+		}
 	}
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
 
+Univ.Reset = function(){
+	for(var g in Univ.Objects){
+		var obj = Univ.Objects[g];
+		Univ.Objects[g].number = 0;
+		Univ.Objects[g].targetactivity = 100;
+	}
+	
+	for(var i in Univ.Items){
+		Univ.Items[i].available_number = 0;
+		Univ.Items[i].total_number = 0;
+	}
+	
+	for(var i in Univ.Upgrades){
+		Univ.Upgrades[i].bought = 0;
+	}
+	
+	Univ.RestoreDefaultPrefs();
+	
+	Univ.Items['qfoam'].available_number = 10;
+	Univ.Items['qfoam'].total_number = 10;
+}
+
+
+/**=====================================
+Preference functions
+=====================================**/
+Univ.RestoreDefaultPrefs = function(){
+	Univ.prefs = {};
+	
+	Univ.prefs.numberformat = 'Normal';
+	Univ.prefs.shortsuffix = 1;
+	
+}
+
+Univ.TogglePref = function(pref, on, off){
+	Univ.prefs[pref] = 1 - Univ.prefs[pref];
+	var l = lookup('option' + pref);
+	
+	if(Univ.prefs[pref]){
+		l.classList.add('optionOn');
+		l.classList.remove('optionOff');
+		l.innerHTML = on;
+	}
+	else{
+		l.classList.remove('optionOn');
+		l.classList.add('optionOff');
+		l.innerHTML = off;
+	}
+}
+
+Univ.CycleNumberFormat = function(){
+	var l = lookup('optionnumberformat');
+	
+	switch(Univ.prefs.numberformat){
+		case 'Normal':
+			Univ.prefs.numberformat = 'Scientific';
+			break;
+		case 'Scientific':
+			Univ.prefs.numberformat = 'Engineering';
+			break;
+		case 'Engineering':
+			Univ.prefs.numberformat = 'Normal';
+			break;
+		default:
+			Univ.prefs.numberformat = 'Normal';
+	}
+	
+	l.innerHTML = 'Number format : ' + Univ.prefs.numberformat;
+}
+
+
+/**=====================================
+Game functions
+=====================================**/
 Univ.Loop = function(){
 	Univ.catchupLogic = 0;
  	Univ.Logic();
@@ -356,26 +472,6 @@ Univ.Loop = function(){
 		if (canSave) Univ.WriteSave();						// from Cookie Clicker
 	}
 	Univ.T++; // In case we don't want to run certain parts of code every frame	// from Cookie Clicker
-}
-
-Univ.Reset = function(){
-	for(var g in Univ.Objects){
-		var obj = Univ.Objects[g];
-		Univ.Objects[g].number = 0;
-		Univ.Objects[g].targetactivity = 100;
-	}
-	
-	for(var i in Univ.Items){
-		Univ.Items[i].available_number = 0;
-		Univ.Items[i].total_number = 0;
-	}
-	
-	for(var i in Univ.Upgrades){
-		Univ.Upgrades[i].bought = 0;
-	}
-	
-	Univ.Items['qfoam'].available_number = 10;
-	Univ.Items['qfoam'].total_number = 10;
 }
 
 Univ.Logic = function(){
@@ -632,7 +728,7 @@ Univ.UpdateItemDisplay = function(){
 		if (Univ.Items[i].visibility == 1) {		
 			if(showItem){
 				// UPDATE NUMBER
-				lookup(item.type + '_number').innerHTML = Math.floor(item.available_number);
+				lookup(item.type + '_number').innerHTML = prettify(Math.floor(item.available_number), {maxSmall: 0, sigfigs: 6});
 				
 				// UPDATE TITLE
 				if (item.available_number == 1) {
@@ -644,11 +740,11 @@ Univ.UpdateItemDisplay = function(){
 				// UPDATE INCOME/SPENDING
 				productionHTML = [];
 				if (item.available_number > 0) {
-					var netproduction = round((item.production + item.consumption),2);
+					var netproduction = prettify((item.production + item.consumption));
 					if (netproduction > 0) {
 						productionHTML = '+';
 					}
-					productionHTML += netproduction + ' per sec (+' + round(item.production,1) + '/' + round(item.consumption,1) +')'; 
+					productionHTML += netproduction + ' per sec (+' + prettify(item.production) + '/' + prettify(item.consumption) +')'; 
 				}
 				lookup(i + '_production').innerHTML = productionHTML;
 				lookup(i + '_button').classList.remove('invisible');
@@ -831,13 +927,19 @@ Univ.ItemMenuHTML = function(){
 }
 
 Univ.GeneratorMenuHTML = function() {
+	function WriteButton(pref, text, callback, Class){
+		return '<div id="option' + pref + '" class="optionsButton menubutton' + (Class ? ' ' + Class: '') + '" style="background-color:#f7f7f7;" onmousedown="' + callback + '">' + text + '</div>';
+	}
+	
 	var generatortable = '';
 	
 	// Options menu. Set the entire div to none or block to hide or show
 	generatortable += '<div id="options_menu" style="display:none;">';
-	generatortable += '<div id="versionbox" class="optionsButton menubutton" style="background-color:#f7f7f7;">Version ' + version.toFixed(3) + '</div>';
+	generatortable += '<div id="versionbox" class="optionsButton" style="background-color:#f7f7f7;cursor:auto;">Version ' + version.toFixed(3) + '</div>';
 	generatortable += '<div id="savebutton" class="optionsButton menubutton" style="background-color:#c9ffd2;" onmousedown="Univ.WriteSave();">Save</div>';
-	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div>';
+	generatortable += '<div id="resetbutton" class="optionsButton menubutton" style="background-color:#ffd3dd;" onmousedown="Univ.Reset();Univ.WriteSave();">Reset (and wipe save)</div><hr>';
+	generatortable += WriteButton('numberformat', 'Number format : ' + Univ.prefs.numberformat, "Univ.CycleNumberFormat()");
+	generatortable += WriteButton('shortsuffix', (Univ.prefs.shortsuffix ? 'Short number suffix ON' : 'Short number suffix OFF'), "Univ.TogglePref('shortsuffix','Short number suffix ON','Short number suffix OFF')", (Univ.prefs.shortsuffix ? 'optionOn' : 'optionOff'));
 	generatortable += '</div>';
 	
 	
@@ -925,14 +1027,20 @@ Univ.GeneratorMenuHTML = function() {
 	}
 }
 
+
+/**=====================================
+Game start!
+=====================================**/
 window.onload = function(){
 	Univ.LoadMenus();	
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadUpgrades();
+	Univ.RestoreDefaultPrefs();
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	Univ.format = new numberformat.Formatter({format: 'standard', sigfigs: 4, maxSmall: 1000})
 	
 	// Latency stuff
 	Univ.accumulatedDelay = 0;

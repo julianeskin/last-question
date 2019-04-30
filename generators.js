@@ -26,7 +26,7 @@ Univ.LoadObjects = function(){
 			if (Univ.upgradeBought('qfoam_intervalupgrade_4')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_4'].magnitude; }
 			if (Univ.upgradeBought('qfoam_intervalupgrade_5')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_5'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var multiplier = 1;
@@ -66,7 +66,7 @@ Univ.LoadObjects = function(){
 			var interval = 4;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},		function(number){ // production
 			var production = {
 				qfoam: 12 * number
@@ -99,7 +99,7 @@ Univ.LoadObjects = function(){
 			var interval = 10;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -126,7 +126,7 @@ Univ.LoadObjects = function(){
 			var interval = 5;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -155,7 +155,7 @@ Univ.LoadObjects = function(){
 			var interval = 5;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -184,7 +184,7 @@ Univ.LoadObjects = function(){
 			var interval = 5;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 
 		function(number){ // production
@@ -214,7 +214,7 @@ Univ.LoadObjects = function(){
 			var interval = 10;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -243,7 +243,7 @@ Univ.LoadObjects = function(){
 			var interval = 1.5;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -272,7 +272,7 @@ Univ.LoadObjects = function(){
 			var interval = 2;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -301,7 +301,7 @@ Univ.LoadObjects = function(){
 			var interval = 14;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -330,7 +330,7 @@ Univ.LoadObjects = function(){
 			var interval = 12;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -359,7 +359,7 @@ Univ.LoadObjects = function(){
 			var interval = 10;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -388,7 +388,7 @@ Univ.LoadObjects = function(){
 			var interval = 60;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -417,7 +417,7 @@ Univ.LoadObjects = function(){
 			var interval = 60;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -446,7 +446,7 @@ Univ.LoadObjects = function(){
 			var interval = 60;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -475,7 +475,7 @@ Univ.LoadObjects = function(){
 			var interval = 90;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -504,7 +504,7 @@ Univ.LoadObjects = function(){
 			var interval = 90;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -533,7 +533,7 @@ Univ.LoadObjects = function(){
 			var interval = 90;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -562,7 +562,7 @@ Univ.LoadObjects = function(){
 			var interval = 45;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -591,7 +591,7 @@ Univ.LoadObjects = function(){
 			var interval = 30;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -620,7 +620,7 @@ Univ.LoadObjects = function(){
 			var interval = 20;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -649,7 +649,7 @@ Univ.LoadObjects = function(){
 			var interval = 1;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -678,7 +678,7 @@ Univ.LoadObjects = function(){
 			var interval = 1;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -707,7 +707,7 @@ Univ.LoadObjects = function(){
 			var interval = 4;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -736,7 +736,7 @@ Univ.LoadObjects = function(){
 			var interval = 300;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {
@@ -765,7 +765,7 @@ Univ.LoadObjects = function(){
 			var interval = 900;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			return interval;
+			//return interval;
 		},
 		function(number){ // production
 			var production = {

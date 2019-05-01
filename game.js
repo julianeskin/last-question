@@ -301,7 +301,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalproduction = 0;
 		var production = this.Production(this.activenumber);
 		for (var item in production) {
-			if (production[item] > 0 && this.ProductionEquation[item].visible == 1) {
+			if (production[item] > 0 && this.ProductionEquation()[item].visible == 1) {
 				if (totalproduction == 0) { productionTxt += '<span class="blacktext">Generating</span> ';}
 				totalproduction++;
 				productionTxt += prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
@@ -312,7 +312,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalconsumption = 0;
 		var consumption = this.Consumption(this.activenumber);
 		for (var item in consumption) {
-			if (consumption[item] > 0 && this.ConsumptionEquation[item].visible == 1) {
+			if (consumption[item] > 0 && this.ConsumptionEquation()[item].visible == 1) {
 				if (totalconsumption == 0) { consumptionTxt += '<span class="redtext">Consuming</span> ';}
 				totalconsumption++;
 				consumptionTxt += prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';

@@ -8,6 +8,7 @@ TYPES:
 	'add'			: Adds magnitude to Cost, Production, and Consumption before multiplying. Magnitude can be a function.
 	'efficiency'	: Multiplies Consumption by factor
 	'costMult'		: Multiplies Costs by factor
+	'action'		: Does something when checked. Magnitude must be a function. If we want to pass arguments, we can add them in.
 
 **/
 

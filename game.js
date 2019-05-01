@@ -1,4 +1,4 @@
-var version = 0.024;
+var version = 0.025;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -488,7 +488,7 @@ Univ.WriteSave = function(mode){
 		return JSON.stringify(save, null, 2);
 	}
 	else{
-		localStorage.setItem(Univ.SaveTo, JSON.stringify(save));
+		store.set(Univ.SaveTo, JSON.stringify(save));
 	}
 	var today = new Date();
 	var hour = today.getHours();
@@ -510,7 +510,7 @@ Univ.LoadSave = function(data){
 	if(data){
 		str = data;
 	}else{
-		if(localStorage.getItem(Univ.SaveTo)) str = localStorage.getItem(Univ.SaveTo);
+		if(store.get(Univ.SaveTo)) str = store.get(Univ.SaveTo);
 	}
 		
 	if(str != ''){

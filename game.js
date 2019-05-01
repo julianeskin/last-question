@@ -1,4 +1,4 @@
-var version = 0.022;
+var version = 0.023;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -59,6 +59,8 @@ function AddEvent(object,event,fcn){
 	object.addEventListener(event,fcn,false);
 }
 
+function quickExp(base, exponent){return (1 - Math.pow(base, exponent)) / (1 - base)}
+
 
 /**=====================================
 Creation functions
@@ -82,7 +84,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostFcn,IntervalFcn,ProductionFcn,ConsumptionFcn){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -106,7 +108,29 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		}
 	}
 
-	this.Costs = CostFcn;
+	this.CostEquation = CostEquation;
+	this.Costs = function(howmany){
+		var cost = {};
+		var multiplier = 1;
+		for(var i in this.CostEquation.upgrades){
+			var upgrade = this.CostEquation.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		}
+		
+		for(var item in this.CostEquation){
+			if(this.CostEquation[item].type == 'lin'){
+				cost[item] = multiplier * this.CostEquation[item].slope * howmany;
+			}
+			else if(this.CostEquation[item].type == 'exp'){
+				cost[item] = multiplier * this.CostEquation[item].start * (quickExp(this.CostEquation[item].base, howmany + this.number) - quickExp(this.CostEquation[item].base, this.number));
+			}
+			else if(item != 'upgrades'){ // Custom function
+				cost[item] = multiplier * this.CostEquation[item].fcn(howmany);
+			}
+		}
+		return cost;
+	}
+	this.NextCost = this.Costs(1);
 	
 	this.isVisible = VisibilityFcn;
 	this.isClickable = function(){ // eventually this will check both if it's affordable, and if other conditions are met
@@ -128,13 +152,59 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			Univ.RefreshDisplay();
 			this.showPopup('stay');
 		}
+		this.NextCost = this.Costs(1);
 	}
 	
 	this.infoblurb = infoblurb;
 	this.targetactivity = 100; // percent of this generator chosen to be active
 	this.interval = IntervalFcn;
-	this.Production = ProductionFcn;
-	this.Consumption = ConsumptionFcn;
+	
+	this.ProductionEquation = ProductionEquation;
+	this.Production = function(number){
+		var production = {};
+		var multiplier = 1;
+		for(var i in this.ProductionEquation.upgrades){
+			var upgrade = this.ProductionEquation.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		}
+		
+		for(var item in this.ProductionEquation){
+			if(this.ProductionEquation[item].type == 'lin'){
+				production[item] = multiplier * this.ProductionEquation[item].slope * number;
+			}
+			else if(this.ProductionEquation[item].type == 'exp'){
+				production[item] = multiplier * this.ProductionEquation[item].start * quickExp(this.ProductionEquation[item].base, number);
+			}
+			else if(item != 'upgrades'){ // Custom function
+				production[item] = multiplier * this.ProductionEquation[item].fcn(number);
+			}
+		}
+		return production;
+	}
+	
+	this.ConsumptionEquation = ConsumptionEquation;
+	this.Consumption = function(number){
+		var consumption = {};
+		var multiplier = 1;
+		for(var i in this.ConsumptionEquation.upgrades){
+			var upgrade = this.ConsumptionEquation.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		}
+		
+		for(var item in this.ConsumptionEquation){
+			if(this.ConsumptionEquation[item].type == 'lin'){
+				consumption[item] = multiplier * this.ConsumptionEquation[item].slope * number;
+			}
+			else if(this.ConsumptionEquation[item].type == 'exp'){
+				consumption[item] = multiplier * this.ConsumptionEquation[item].start * quickExp(this.ConsumptionEquation[item].base, number);
+			}
+			else if(item != 'upgrades'){ // Custom function
+				consumption[item] = multiplier * this.ConsumptionEquation[item].fcn(number);
+			}
+		}
+		return consumption;
+	}
+	
 	this.ticks_since_production = 0;	
 
 	this.showPopup = function(type) {
@@ -171,6 +241,10 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 
 
 			lookup(this.id + '_slider').value = this.targetactivity;
+			try{throw this.id}
+			catch(generator){
+				lookup(this.id + '_slider').oninput = function(){Univ.updateSlider(generator);};
+			}
 			Univ.updateSlider(this.id);
 			if ( this.number > 0 ) {
 				lookup(this.id + '_slidercontainer').style.display = 'block';
@@ -193,7 +267,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 				if (type == 1) {
 					buying_info = 'Make one.';
 					for (var item in this.Costs(1)) {
-						costHTML += this.Costs(1)[item] + ' ';
+						costHTML += prettify(this.Costs(1)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
 						if (this.Costs(1)[item] == 1) {
 							costHTML += Univ.Items[item].singular;
 						} else {
@@ -205,7 +279,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 					var midaff = Univ.GetMidAffordable(this);
 					if (midaff > 0) {
 						for (var item in this.Costs(midaff)) {
-							costHTML += this.Costs(midaff)[item] + ' ';
+							costHTML += prettify(this.Costs(midaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
 							if (this.Costs(midaff)[item] == 1) {
 								costHTML += Univ.Items[item].singular;
 							} else {
@@ -222,7 +296,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 					var maxaff = Univ.GetMaxAffordable(this);
 					if (maxaff > 0) {
 						for (var item in this.Costs(maxaff)) {
-							costHTML += this.Costs(maxaff)[item] + ' ';
+							costHTML += prettify(this.Costs(maxaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
 							if (this.Costs(maxaff)[item] == 1) {
 								costHTML += Univ.Items[item].singular;
 							} else {
@@ -301,6 +375,7 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 }
 
 Univ.upgradeBought = function(id){
+	//console.log(id);
 	return (Univ.Upgrades[id].bought);
 }
 
@@ -566,9 +641,9 @@ Univ.UpdateRates = function(){
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
-	var consumption = generator.Consumption(chosenMax);
+	//var consumption = generator.Consumption(chosenMax);
 	var active = chosenMax;
-	var capable;
+	//var capable;
 	var tooHigh = true;
 	var step = 1;
 	
@@ -586,47 +661,55 @@ Univ.ActiveNumber = function(generator){
 // 		}
 // 	}
 	
-	while(tooHigh){
-		// Linear consumption functions will be satisfied here
-		for(var item in consumption){
-			if(item != 'undefined'){
-				capable = Math.floor(Math.min(Univ.Items[item].available_number / (consumption[item] * multiplier), 1) * chosenMax);
-				active = Math.min(capable, active);
+	for(var item in generator.ConsumptionEquation){
+		var ce = generator.ConsumptionEquation[item];
+		var amt = 0;
+		
+		if(ce.type == 'lin'){
+			amt = Math.floor(Univ.Items[item].available_number / (ce.slope * multiplier));
+		}
+		else if(ce.type == 'exp'){
+			var currentcost = quickExp(ce.base, generator.number) * (ce.start * multiplier);
+			var totalcost = (Univ.Items[item].available_number + currentcost) / (ce.start * multiplier);
+			var divisor = 1 - ce.base;
+			var exponent = Math.log(1 - totalcost * divisor) / Math.log(ce.base);
+			amt = Math.floor(exponent - generator.number);
+		}
+		else if(item != 'upgrades'){ // Custom function
+			// No guarantees
+			// Try at 100% first
+			tooHigh = false;
+			var consumption = generator.Consumption(active);
+			for(var item in consumption){
+				if(item != 'undefined'){
+					if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item], Univ.precision)) tooHigh = true;
+				}
+			}
+			
+			if(toohigh){
+				amt = 0;
+				tooHigh = false;
+				while(!tooHigh && amt < active){
+					step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(amt)) - 3)); // step gets bigger and bigger to cut down on time at the cost of precision
+					amt += step;
+					consumption = generator.Consumption(amt);
+					for(var item in consumption){
+						if(item != 'undefined'){
+							if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item], Univ.precision)) tooHigh = true;
+						}
+					}
+				}
+				active -= step;
 			}
 		}
 		
-		// Detect for less than linear growth
-		chosenMax = active;
-		consumption = generator.Consumption(chosenMax);
-		tooHigh = false;
-		for(var item in consumption){
-			if(item != 'undefined'){
-				if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
-			}
-		}
-		if(active <= 0) tooHigh = false;
+		active = Math.min(active, amt);
 	}
 	
-	// Above linear growth, not likely to have so many it causes lag
-	chosenMax = Math.round(generator.number * generator.targetactivity / 100);
-	while(active <= chosenMax){
-		consumption = generator.Consumption(active);
-		tooHigh = false;
-		for(var item in consumption){
-			if(item != 'undefined'){
-				if(round(Univ.Items[item].available_number, Univ.precision) < round(consumption[item] * multiplier, Univ.precision)) tooHigh = true;
-			}
-		}
-		if(tooHigh) break;
-		step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(active)) - 4));
-		active += step;
-	}
-	
-	generator.activenumber = Math.max(0, active - step);
+	generator.activenumber = Math.max(0, active);
 }
 
 Univ.GetMaxAffordable = function(generator){
-	var cost = generator.Costs(1);
 	var ret = -1;
 	var tooHigh = false;
 	var step = 1;
@@ -640,97 +723,97 @@ Univ.GetMaxAffordable = function(generator){
 // 			}
 // 		}
 // 	}
-
-	// Linear cost functions first
-	for(var item in cost){
-		if(item != 'undefined'){
-			ret = ret == -1 ? Math.floor(Univ.Items[item].available_number / (cost[item] * multiplier)) : Math.min(ret, Math.floor(Univ.Items[item].available_number / (cost[item] * multiplier)));
-		}
-	}
 	
-	cost = generator.Costs(ret);
-	for(var item in cost){
-		if(item != 'undefined'){
-			if(round(Univ.Items[item].available_number, Univ.precision) < round(cost[item] * multiplier, Univ.precision)) tooHigh = true;
+	for(var item in generator.CostEquation){
+		var ce = generator.CostEquation[item];
+		var amt = 0;
+		
+		if(ce.type == 'lin'){
+			amt = Math.floor(Univ.Items[item].available_number / (ce.slope * multiplier));
 		}
-	}
-	
-	if(tooHigh){
-		// Above linear cost (exponential or polynomial)
-		// Just have to iterate through and hope for the best
-		ret = 0;
-		tooHigh = false;
-		while(!tooHigh){
-			step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(ret)) - 3));
-			ret += step;
-			cost = generator.Costs(ret);
-			for(var item in cost){
-				if(item != 'undefined'){
-					if(round(Univ.Items[item].available_number, Univ.precision) < round(cost[item] * multiplier, Univ.precision)) tooHigh = true;
+		else if(ce.type == 'exp'){
+			var currentcost = quickExp(ce.base, generator.number) * (ce.start * multiplier);
+			var totalcost = (Univ.Items[item].available_number + currentcost) / (ce.start * multiplier);
+			var divisor = 1 - ce.base;
+			var exponent = Math.log(1 - totalcost * divisor) / Math.log(ce.base);
+			amt = Math.floor(exponent - generator.number);
+		}
+		else if(item != 'upgrades'){ // Custom function
+			// No guarantees
+			amt = 0;
+			tooHigh = false;
+			while(!tooHigh){
+				step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(amt)) - 3)); // step gets bigger and bigger to cut down on time at the cost of precision
+				amt += step;
+				cost = generator.Costs(amt);
+				for(var item in cost){
+					if(item != 'undefined'){
+						if(round(Univ.Items[item].available_number, Univ.precision) < round(cost[item], Univ.precision)) tooHigh = true;
+					}
 				}
 			}
+			amt -= step;
 		}
-		ret -= step;
-	}
-	else{
-		// Linear or below. Leave ret as is for now
+		
+		ret = ret == -1 ? amt : Math.min(ret, amt);
 	}
 	
 	return Math.max(ret, 0);
 }
 
 Univ.GetMidAffordable = function(generator){
-	var consumption = generator.Consumption(1);
+	var consumption = generator.ConsumptionEquation;
 	var wiggleRoom = {};
 	var ret = -1;
 	var alreadyNegative = false;
 	var step = 1;
 	
 	var multiplier = Univ.Speedfactor;
-
+	
 	for(var item in consumption){
-		consumption[item] *= multiplier / generator.interval();
-		wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
-		if(wiggleRoom[item] <= 0){alreadyNegative = true; break;}
+		if(item != 'upgrades'){
+			//consumption[item] *= multiplier / generator.interval();
+			wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
+			if(wiggleRoom[item] <= 0){alreadyNegative = true; break;}
+		}
 	}
 	
 	if(!alreadyNegative){
-		// Linear cost functions first
-		for(var item in consumption){
-			if(item != 'undefined'){
-				ret = ret == -1 ? Math.floor(wiggleRoom[item] / (consumption[item])) : Math.min(ret, Math.floor(wiggleRoom[item] / (consumption[item])));
-			}
-		}
 		
-		consumption = generator.Consumption(generator.number + ret);
-		var cons2 = generator.Consumption(generator.number);
-		var tooHigh = false;
-		for(var item in consumption){
-			if(item != 'undefined'){
-				if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval(), Univ.precision)) tooHigh = true;
+		for(var item in generator.ConsumptionEquation){
+			var ce = generator.ConsumptionEquation[item];
+			var amt = 0;
+			
+			if(ce.type == 'lin'){
+				amt = Math.floor(wiggleRoom[item] / (ce.slope * multiplier));
 			}
-		}
-		
-		if(tooHigh){
-			// Above linear consumption (exponential or polynomial)
-			// Just have to iterate through and hope for the best
-			ret = 0;
-			tooHigh = false;
-			while(!tooHigh){
-				step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(ret)) - 3));
-				ret += step;
-				cost = generator.Consumption(generator.number + ret);
-				for(var item in cost){
-					if(item != 'undefined'){
-						if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval(), Univ.precision)) tooHigh = true;
+			else if(ce.type == 'exp'){
+				var currentcost = quickExp(ce.base, generator.number) * (ce.start * multiplier);
+				var totalcost = (wiggleRoom[item] + currentcost) / (ce.start * multiplier);
+				var divisor = 1 - ce.base;
+				var exponent = Math.log(1 - totalcost * divisor) / Math.log(ce.base);
+				amt = Math.floor(exponent - generator.number);
+			}
+			else if(item != 'upgrades'){ // Custom function
+				// No guarantees
+				ret = 0;
+				tooHigh = false;
+				while(!tooHigh){
+					step = Math.pow(10, Math.max(0, Math.ceil(Math.log10(ret)) - 3)); // step gets bigger and bigger to cut down on time at the cost of precision
+					ret += step;
+					cost = generator.Consumption(generator.number + ret);
+					for(var item in cost){
+						if(item != 'undefined'){
+							if(round(wiggleRoom[item], Univ.precision) < round((consumption[item] - cons2[item]) * multiplier / generator.interval(), Univ.precision)) tooHigh = true;
+						}
 					}
 				}
+				ret -= step;
 			}
-			ret -= step;
+			
+			ret = ret == -1 ? amt : Math.min(ret, amt);
 		}
-		else{
-			// Linear or below. Leave ret as is for now
-		}
+		
 	}
 	
 	return Math.min(Math.max(ret, 0), generator.maxAffordable);

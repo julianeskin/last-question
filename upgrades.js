@@ -4,7 +4,8 @@ Univ.LoadUpgrades = function(){
 /**
 TYPES:
 	'speed'			: Changes the production interval of a generator
-	'multiply'		: Multiplies Production and Consumption by factor
+	'multiply'		: Multiplies Cost, Production, and Consumption by magnitude. Magnitude can be a function.
+	'add'			: Adds magnitude to Cost, Production, and Consumption before multiplying. Magnitude can be a function.
 	'efficiency'	: Multiplies Consumption by factor
 	'costMult'		: Multiplies Costs by factor
 

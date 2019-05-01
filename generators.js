@@ -20,18 +20,17 @@ Univ.LoadObjects = function(){
 			if (Univ.upgradeBought('qfoam_intervalupgrade_4')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_4'].magnitude; }
 			if (Univ.upgradeBought('qfoam_intervalupgrade_5')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_5'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			//return interval;
 		},
 		{ // ProductionEquation
 			qfoam: {
 				type: 'lin',
 				slope: 1
 			},
-			upgrades: [ 'qfoam_rateupgrade_1',
+			upgrades:  ['qfoam_rateupgrade_1',
 						'qfoam_rateupgrade_2',
 						'qfoam_rateupgrade_3',
 						'qfoam_rateupgrade_4',
-						'qfoam_rateupgrade_5' ]
+						'qfoam_rateupgrade_5']
 		},
 		{}
 	);
@@ -51,7 +50,6 @@ Univ.LoadObjects = function(){
 			var interval = 4;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
-			//return interval;
 		},
 		{ // ProductionEquation
 			qfoam: {

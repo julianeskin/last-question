@@ -72,11 +72,8 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	this.visibility = visibility;
  	this.available_number = available_number;
  	this.total_number = total_number;
-	this.production = production; 	// this might be a function in the future,
-	// to allow for nonlinear effects, or to trigger events when certain items get produced
-	
-	this.consumption = consumption; // this might be a function in the future,
-	// to allow for nonlinear effects, or to trigger events when certain items get consumed
+	this.production = production;
+	this.consumption = consumption;
 	
 	Univ.Items[this.type] = this;
 	this.num = Univ.ItemsById.length;
@@ -84,7 +81,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation,buyfunction){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -163,29 +160,23 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		
 		return cost;
 	}
-	this.NextCost = this.Costs(1);
 	
 	this.isVisible = VisibilityFcn;
-	this.isClickable = function(){ // eventually this will check both if it's affordable, and if other conditions are met
-		if (this.isAffordable) {
-			// Check other conditions here
-			return 1;
-		} else {
-			return 0;
-		}
-	}
 	
-	this.Buy = function(howmany){
-		if (this.isAffordable(howmany)) {
-			for (var item in this.Costs(howmany)) {
-				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
+	if (typeof buyfunction == 'function') {
+		this.Buy = buyfunction;
+	} else {
+		this.Buy = function(howmany){
+			if (this.isAffordable(howmany)) {
+				for (var item in this.Costs(howmany)) {
+					Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
+				}
+				this.number += howmany;
+				if (howmany == 1 && this.number == 1) { this.ticks_since_production = this.interval() - 1; } // the first one will produce immediately instead of waiting a whole interval
+				Univ.RefreshDisplay();
+				this.showPopup();
 			}
-			this.number += howmany;
-			if (this.number == 1) { this.ticks_since_production = this.interval() - 1; } // for the first one, produce immediately instead of waiting the whole interval
-			Univ.RefreshDisplay();
-			this.showPopup('stay');
 		}
-		this.NextCost = this.Costs(1);
 	}
 	
 	this.infoblurb = infoblurb;
@@ -301,118 +292,111 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	
 	this.ticks_since_production = 0;	
 
-	this.showPopup = function(type) {
-		if (type == 0) {
-			lookup(this.id + '_popupcontainer').style.visibility = 'hidden';
-		} else {
-			var totalproduction = 0;
-			var totalconsumption = 0;
-			for (var item in Univ.Items) {
-				if (Univ.Items[item].visibility == 1) {
-					if ( typeof this.Production(this.activenumber)[item] !== 'undefined' && this.Production(this.activenumber)[item] > 0 ) {
-						totalproduction++;
-					}
-					if ( typeof this.Consumption(this.activenumber)[item] !== 'undefined' && this.Consumption(this.activenumber)[item] > 0 ) {
-						totalconsumption++;
-					}
-				}
+	this.pupuptype = 1; //(1,'mid', or 'max')
+	this.hidePopup = function() {
+		lookup(this.id + '_popupcontainer').style.visibility = 'hidden';
+	}
+	this.showPopup = function() {
+ 		var productionTxt = [];
+		var totalproduction = 0;
+		var production = this.Production(this.activenumber);
+		for (var item in production) {
+			if (production[item] > 0 && this.ProductionEquation[item].visible == 1) {
+				if (totalproduction == 0) { productionTxt += '<span class="blacktext">Generating</span> ';}
+				totalproduction++;
+				productionTxt += prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 			}
-			var productionTxt = [];
-			var consumptionTxt = [];
-			for (var item in Univ.Items) {
-				if (Univ.Items[item].visibility == 1) {
-					if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-						productionTxt += '<span class="blacktext">Generating</span> ' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
-					}
-					if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-						consumptionTxt += '<span class="redtext">Consuming</span> ' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
-					}
-				}
-			}
-			lookup(this.id + '_popup_production').innerHTML = productionTxt; 
-			lookup(this.id + '_popup_consumption').innerHTML = consumptionTxt;
-			
-
-
-			lookup(this.id + '_slider').value = this.targetactivity;
-			try{throw this.id}
-			catch(generator){
-				lookup(this.id + '_slider').oninput = function(){Univ.updateSlider(generator);};
-			}
-			Univ.updateSlider(this.id);
-			if ( this.number > 0 ) {
-				lookup(this.id + '_slidercontainer').style.display = 'block';
-			}
-			
-			if (type != 'stay') {
-				var costHTML = '<span class="blacktext">Cost:</span> ';		
-				var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
-				var buttonTop = buttonposition.top + window.scrollY;
-				var buttonBot = buttonposition.bottom + window.scrollY;
-				var buttonY = (buttonTop + buttonBot) / 2;
-		
-				var buttonLeft = buttonposition.left + window.scrollX;
-				var buttonLeft = buttonposition.left + window.scrollX;
-		
-				var PopupTop = Math.max(0, buttonY - 101);
-				var PopupLeft = buttonLeft + buttonposition.width - 6;
-				var ArrowTop = lookup(this.id + '_popupcontainer').getBoundingClientRect().height - 123;
-				var buying_info = [];
-				if (type == 1) {
-					buying_info = 'Make one.';
-					for (var item in this.Costs(1)) {
-						costHTML += prettify(this.Costs(1)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-						if (this.Costs(1)[item] == 1) {
-							costHTML += Univ.Items[item].singular;
-						} else {
-							costHTML += Univ.Items[item].plural;
-						}
-					}
-				} else if (type == 'mid') {
-					ArrowTop += 16;
-					var midaff = Univ.GetMidAffordable(this);
-					if (midaff > 0) {
-						for (var item in this.Costs(midaff)) {
-							costHTML += prettify(this.Costs(midaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-							if (this.Costs(midaff)[item] == 1) {
-								costHTML += Univ.Items[item].singular;
-							} else {
-								costHTML += Univ.Items[item].plural;
-							}
-						}
-						buying_info = 'Make maximum without causing negative income (currently ' + midaff + ').';
-					} else { 
-						costHTML = [];
-						buying_info = 'Make maximum without causing negative income (currently 0).';
-					}
-				} else if (type == 'max') {
-					ArrowTop += 32;
-					var maxaff = Univ.GetMaxAffordable(this);
-					if (maxaff > 0) {
-						for (var item in this.Costs(maxaff)) {
-							costHTML += prettify(this.Costs(maxaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-							if (this.Costs(maxaff)[item] == 1) {
-								costHTML += Univ.Items[item].singular;
-							} else {
-								costHTML += Univ.Items[item].plural;
-							}
-						}
-						buying_info = 'Make maximum (currently ' + maxaff + ').';
-					} else {
-						costHTML = [];
-						buying_info = 'Make maximum (currently 0).';
-					}
-				}
-				lookup(this.id + '_costs').innerHTML = costHTML;
-				lookup(this.id + '_buying_info').innerHTML = buying_info;
-				lookup(this.id + '_popupcontainer').style.top = PopupTop + 'px';
-				lookup(this.id + '_popupcontainer').style.left = PopupLeft + 'px';
-				lookup(this.id + '_left_arrow_black').style.top = ArrowTop - 30 + 'px';
-				lookup(this.id + '_left_arrow_background').style.top = lookup(this.id + '_left_arrow_black').style.top;
-			}				
-	// eventually also modify width and height of the popup if they need to be bigger than the default for some things...
-			lookup(this.id + '_popupcontainer').style.visibility = 'visible';
 		}
+		
+  		var consumptionTxt = [];		
+		var totalconsumption = 0;
+		var consumption = this.Consumption(this.activenumber);
+		for (var item in consumption) {
+			if (consumption[item] > 0 && this.ConsumptionEquation[item].visible == 1) {
+				if (totalconsumption == 0) { consumptionTxt += '<span class="redtext">Consuming</span> ';}
+				totalconsumption++;
+				consumptionTxt += prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
+			}
+		}
+
+		lookup(this.id + '_popup_production').innerHTML = productionTxt; 
+		lookup(this.id + '_popup_consumption').innerHTML = consumptionTxt;
+
+		lookup(this.id + '_slider').value = this.targetactivity;
+		Univ.updateSlider(this.id);
+		if ( this.number > 0 ) {
+			lookup(this.id + '_slidercontainer').style.display = 'block';
+		}
+					
+		var costHTML = '<span class="blacktext">Cost:</span> ';		
+		var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
+		var buttonTop = buttonposition.top + window.scrollY;
+		var buttonBot = buttonposition.bottom + window.scrollY;
+		var buttonY = (buttonTop + buttonBot) / 2;
+
+		var buttonLeft = buttonposition.left + window.scrollX;
+		var buttonLeft = buttonposition.left + window.scrollX;
+
+		var PopupTop = Math.max(0, buttonY - 101);
+		var PopupLeft = buttonLeft + buttonposition.width - 6;
+		var ArrowTop = lookup(this.id + '_popupcontainer').getBoundingClientRect().height - 123;
+
+		var buying_info = [];
+		if (this.pupuptype == 1) {
+			buying_info = 'Make one.';
+			for (var item in this.Costs(1)) {
+				costHTML += prettify(this.Costs(1)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+				if (this.Costs(1)[item] == 1) {
+					costHTML += Univ.Items[item].singular;
+				} else {
+					costHTML += Univ.Items[item].plural;
+				}
+			}
+		} else if (this.pupuptype == 'mid') {
+			ArrowTop += 16;
+			var midaff = Univ.GetMidAffordable(this);
+			if (midaff > 0) {
+				for (var item in this.Costs(midaff)) {
+					costHTML += prettify(this.Costs(midaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+					if (this.Costs(midaff)[item] == 1) {
+						costHTML += Univ.Items[item].singular;
+					} else {
+						costHTML += Univ.Items[item].plural;
+					}
+				}
+				buying_info = 'Make maximum without causing negative income (currently ' + midaff + ').';
+			} else { 
+				costHTML = [];
+				buying_info = 'Make maximum without causing negative income (currently 0).';
+			}
+		} else if (this.pupuptype == 'max') {
+			ArrowTop += 32;
+			var maxaff = Univ.GetMaxAffordable(this);
+			if (maxaff > 0) {
+				for (var item in this.Costs(maxaff)) {
+					costHTML += prettify(this.Costs(maxaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+					if (this.Costs(maxaff)[item] == 1) {
+						costHTML += Univ.Items[item].singular;
+					} else {
+						costHTML += Univ.Items[item].plural;
+					}
+				}
+				buying_info = 'Make maximum (currently ' + maxaff + ').';
+			} else {
+				costHTML = [];
+				buying_info = 'Make maximum (currently 0).';
+			}
+		}
+
+		lookup(this.id + '_costs').innerHTML = costHTML;
+		lookup(this.id + '_buying_info').innerHTML = buying_info;
+		lookup(this.id + '_popupcontainer').style.top = PopupTop + 'px';
+		lookup(this.id + '_popupcontainer').style.left = PopupLeft + 'px';
+		lookup(this.id + '_left_arrow_black').style.top = ArrowTop - 30 + 'px';
+		lookup(this.id + '_left_arrow_background').style.top = lookup(this.id + '_left_arrow_black').style.top;
+					
+// eventually also modify width and height of the popup if they need to be bigger than the default for some things...
+		lookup(this.id + '_popupcontainer').style.visibility = 'visible';
 	}
 	
 	Univ.Objects[this.id] = this;
@@ -452,15 +436,6 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs()[item], Univ.precision);
 			}
 			this.bought = 1;
-		}
-	}
-	
-	this.isClickable = function(){
-		if (this.isAffordable) {
-			// Check other conditions here
-			return 1;
-		} else {
-			return 0;
 		}
 	}
 	
@@ -578,8 +553,9 @@ Univ.LoadSave = function(data){
 Univ.Reset = function(){
 	for(var g in Univ.Objects){
 		var obj = Univ.Objects[g];
-		Univ.Objects[g].number = 0;
-		Univ.Objects[g].targetactivity = 100;
+		obj.number = 0;
+		obj.targetactivity = 100;
+		obj.ticks_since_production = 0;
 	}
 	
 	for(var i in Univ.Items){
@@ -966,26 +942,11 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
 			
 			// UPDATE progress toward next burst of production
-			var progress = Math.min(210, 210 * (generator.ticks_since_production) / (generator.interval() * Univ.FPS));
+			var progress = Math.min(160, 160 * (generator.ticks_since_production) / (generator.interval() * Univ.FPS));
 			lookup(generator.id + '_progress').style.width = progress + 'px';
-			
-// 			// UPDATE COST of 1 ( in the future maybe have a way to make more at once
-// 			var costHTML = 'Cost: ';			
-// 			for (var item in generator.Costs(1)) {
-// 				costHTML += generator.Costs(1)[item] + ' ';
-// 				if (generator.Costs(1)[item] == 1) {
-// 					costHTML += Univ.Items[item].singular;
-// 				} else {
-// 					costHTML += Univ.Items[item].plural;
-// 				}
-// 			}
-//			lookup(generator.id + '_cost').innerHTML = costHTML;
 			
 			generator.maxAffordable = Univ.GetMaxAffordable(generator);  // should be the maximum affordable
 			generator.midAffordable = Univ.GetMidAffordable(generator);  // should be the maximum that wouldn't result in any negative incomes
-			
-// 			lookup(generator.id + '_buymid').innerHTML = generator.midAffordable;
-// 			lookup(generator.id + '_buymax').innerHTML = generator.maxAffordable;
 			
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');
@@ -998,11 +959,16 @@ Univ.UpdateGeneratorDisplay = function(){
 						notenough.push(round(Univ.Items[item].available_number, Univ.precision) / round(generator.Costs(1)[item], Univ.precision));
 					}
 				}
-				progress = 30 - 30 * Math.max(notenough);
+				progress = 30 * Math.max(notenough);
 				lookup(generator.id + '_buyprogress').style.width = progress + 'px';
 			}
 			if (generator.isAffordable(generator.midAffordable) && generator.midAffordable > 0) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
+				if (generator.midAffordable == generator.maxAffordable) {
+					lookup(generator.id + '_buymid').innerHTML = '+++';
+				} else {
+					lookup(generator.id + '_buymid').innerHTML = '++';
+				}
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
 			}
@@ -1013,6 +979,9 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
       
 			lookup(generator.id + '_button').style = 'display:block;';
+			if (lookup(generator.id + '_popupcontainer').style.visibility == 'visible') {
+				generator.showPopup();
+			}
 		} else {
 			lookup(generator.id + '_button').style = 'display:none;';
 		}
@@ -1142,8 +1111,9 @@ Univ.GeneratorMenuHTML = function() {
  		
  		generatortable += '<div id="' + generator.id + '_button" class="generatorbutton clickablegenerator" style="display:none;">';
 			generatortable += '<div id="' + generator.id + '_hoverzone" class="generatorhoverzone"></div>';
-			generatortable += '<div id="' + generator.id + '_number" class="generatornumber"></div>';
+			generatortable += '<img src="icons/ICON.png" class="generatoricon">';
 			generatortable += '<div id="' + generator.id + '_title" class="generatortitle">' + generator.plural + '</div>';
+			generatortable += '<div id="' + generator.id + '_number" class="generatornumber"></div>';
 			generatortable += '<div id="' + generator.id + '_buyone" class="generatorbuyone">+</div>';
 			generatortable += '<div id="' + generator.id + '_buymid" class="generatorbuymid">++</div>';
 			generatortable += '<div id="' + generator.id + '_buymax" class="generatorbuymax">+++</div>';
@@ -1191,14 +1161,14 @@ Univ.GeneratorMenuHTML = function() {
 		catch(generator){
 			
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
-			AddEvent(lookup(generator.id + '_buyone'),'mouseover',function(what){return function(e){generator.showPopup(1);};}());
-			AddEvent(lookup(generator.id + '_buyone'),'mouseout',function(what){return function(e){generator.showPopup(0);};}());
+			AddEvent(lookup(generator.id + '_buyone'),'mouseover',function(what){return function(e){generator.pupuptype=1;generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_buyone'),'mouseout',function(what){return function(e){generator.hidePopup();};}());
 			AddEvent(lookup(generator.id + '_buymid'),'click',function(what){return function(e){if(generator.isAffordable(generator.midAffordable)) generator.Buy(generator.midAffordable);};}());
-			AddEvent(lookup(generator.id + '_buymid'),'mouseover',function(what){return function(e){generator.showPopup('mid');};}());
-			AddEvent(lookup(generator.id + '_buymid'),'mouseout',function(what){return function(e){generator.showPopup(0);};}());
+			AddEvent(lookup(generator.id + '_buymid'),'mouseover',function(what){return function(e){generator.pupuptype='mid';generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_buymid'),'mouseout',function(what){return function(e){generator.hidePopup();};}());
 			AddEvent(lookup(generator.id + '_buymax'),'click',function(what){return function(e){if(generator.isAffordable(generator.maxAffordable)) generator.Buy(generator.maxAffordable);};}());
-			AddEvent(lookup(generator.id + '_buymax'),'mouseover',function(what){return function(e){generator.showPopup('max');};}());
-			AddEvent(lookup(generator.id + '_buymax'),'mouseout',function(what){return function(e){generator.showPopup(0);};}());
+			AddEvent(lookup(generator.id + '_buymax'),'mouseover',function(what){return function(e){generator.pupuptype='max';generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_buymax'),'mouseout',function(what){return function(e){generator.hidePopup();};}());
 
 			if (generator.isAffordable(1)) {
 				lookup(generator.id + '_buyone').classList.add('affordable');
@@ -1215,10 +1185,10 @@ Univ.GeneratorMenuHTML = function() {
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');
 			}
-			AddEvent(lookup(generator.id + '_hoverzone'),'mouseover',function(){return function(){generator.showPopup(1);};}());
-			AddEvent(lookup(generator.id + '_hoverzone'),'mouseout',function(){return function(){generator.showPopup(0);};}());
-			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseover',function(){return function(){generator.showPopup('stay');};}());
-			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseout',function(){return function(){generator.showPopup(0);};}());
+			AddEvent(lookup(generator.id + '_hoverzone'),'mouseover',function(){return function(){generator.pupuptype=1;generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_hoverzone'),'mouseout',function(){return function(){generator.hidePopup();};}());
+			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseover',function(){return function(){generator.showPopup();};}());
+			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseout',function(){return function(){generator.hidePopup();};}());
 		}
 	}
 	

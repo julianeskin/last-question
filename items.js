@@ -6,10 +6,12 @@ Univ.LoadItems = function(){
 	new Univ.Item('Quantum Foam','Quantum Foam','qfoam',1,10,10,0,0);	// start with 100 Quantum Foam for testing
 	new Univ.Item('Elementary Particle','Elementary Particles','elementary',1,0,0,0,0);
 	new Univ.Item('Subatomic Particle','Subatomic Particles','subatomic',1,0,0,0,0);
-	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0); 		// Atomic Numbers 1-2
-	new Univ.Item('Atom','Atoms','lightatom',0,0,0,0,0);	// Atomic Numbers 3-5
-	new Univ.Item('Atom','Atoms','mediumatom',0,0,0,0,0);	// Atomic Numbers 6-26
-	new Univ.Item('Atom','Atoms','heavyatom',0,0,0,0,0);	// Atomic Numbers 27+
+	new Univ.Item('Atom','Atoms','atom',1,0,0,0,0); 					// Display to represent all elements
+	new Univ.Item('Simple Atom','Simple Atoms','simpleatom',0,0,0,0,0);	// Atomic Numbers 1-2  // initial atoms created
+	new Univ.Item('Light Atom','Light Atoms','lightatom',0,0,0,0,0);	// Atomic Numbers 3-5  // created by spallation (cosmic rays + simple atoms) 
+																							   // maybe merge the above two categories depending on realism desired
+	new Univ.Item('Medium Atom','Medium Atoms','mediumatom',0,0,0,0,0);	// Atomic Numbers 6-26 // created in stars (consume simple+light atoms to produce these)
+	new Univ.Item('Heavy Atom','Heavy Atoms','heavyatom',0,0,0,0,0);	// Atomic Numbers 27+  // created by supernovas (consume stars + simple atoms to produce these)
 	new Univ.Item('Gas Cloud','Gas Clouds','gascloud',1,0,0,0,0);
 	new Univ.Item('Nebula','Nebulae','nebula',1,0,0,0,0);
 	new Univ.Item('Star','Stars','star',1,0,0,0,0);

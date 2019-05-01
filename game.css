@@ -75,6 +75,34 @@ body{
 	border-bottom-left-radius:3px;
 }
 
+.generatoricon{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:50px;
+	height:50px;
+}
+
+.generatortitle{
+	position:absolute;
+	font-size:15px;
+	line-height:13px;
+	top:2px;
+	left:50px;
+	right:35px;
+	text-align:center;
+}
+
+.generatornumber{
+	position:absolute;
+	top:26px;
+	left:55px;
+	right:35px;
+	text-align:center;
+	font-size:20px;
+	z-index:3;
+}
+
 .generatorbuyone{
 	position:absolute;
 	width:30px;
@@ -133,20 +161,18 @@ body{
 
 .generatorprogress{
 	position:absolute;
-	left:0px;
+	left:50px;
 	bottom:0px;
 	height:3px;
 	width:0px;
-	border-bottom-left-radius:3px;
 	background-color:#cccccc;
 }
 
 .generatorbuyprogress{
 	position:absolute;
-	right:0px;
+	left:210px;
 	height:16px;
 	width:0px;
-	border-top-right-radius:3px;
 	background-color:#dddddd;
 }
 
@@ -388,29 +414,6 @@ body{
     
 .invisible{
 	display:none;
-}
-
-.generatornumber{
-	position:absolute;
-	top:0px;
-	left:5px;
-	text-align:left;
-	font-size:30px;
-}
-
-.generatortitle{
-	position:absolute;
-	font-size:15px;
-	top:0px;
-	left:80px;
-	right:30px;
-}
-
-.generatorcost{
-	position:absolute;
-	font-size:8px;
-	top:37px;
-	left:6px;
 }
 
 .menuTitle{

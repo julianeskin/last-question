@@ -72,11 +72,8 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	this.visibility = visibility;
  	this.available_number = available_number;
  	this.total_number = total_number;
-	this.production = production; 	// this might be a function in the future,
-	// to allow for nonlinear effects, or to trigger events when certain items get produced
-	
-	this.consumption = consumption; // this might be a function in the future,
-	// to allow for nonlinear effects, or to trigger events when certain items get consumed
+	this.production = production;
+	this.consumption = consumption;
 	
 	Univ.Items[this.type] = this;
 	this.num = Univ.ItemsById.length;
@@ -84,7 +81,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation,buyfunction){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -130,29 +127,23 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		}
 		return cost;
 	}
-	this.NextCost = this.Costs(1);
 	
 	this.isVisible = VisibilityFcn;
-	this.isClickable = function(){ // eventually this will check both if it's affordable, and if other conditions are met
-		if (this.isAffordable) {
-			// Check other conditions here
-			return 1;
-		} else {
-			return 0;
-		}
-	}
 	
-	this.Buy = function(howmany){
-		if (this.isAffordable(howmany)) {
-			for (var item in this.Costs(howmany)) {
-				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
+	if (typeof buyfunction == 'function') {
+		this.Buy = buyfunction;
+	} else {
+		this.Buy = function(howmany){
+			if (this.isAffordable(howmany)) {
+				for (var item in this.Costs(howmany)) {
+					Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs(howmany)[item], Univ.precision);
+				}
+				this.number += howmany;
+				if (howmany == 1 && this.number == 1) { this.ticks_since_production = this.interval() - 1; } // the first one will produce immediately instead of waiting a whole interval
+				Univ.RefreshDisplay();
+				this.showPopup();
 			}
-			this.number += howmany;
-			if (howmany == 1 && this.number == 1) { this.ticks_since_production = this.interval() - 1; } // the first one will produce immediately instead of waiting a whole interval
-			Univ.RefreshDisplay();
-			this.showPopup();
 		}
-		this.NextCost = this.Costs(1);
 	}
 	
 	this.infoblurb = infoblurb;
@@ -212,30 +203,28 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		lookup(this.id + '_popupcontainer').style.visibility = 'hidden';
 	}
 	this.showPopup = function() {
+ 		var productionTxt = [];
 		var totalproduction = 0;
+		var production = this.Production(this.activenumber);
+		for (var item in production) {
+			if (production[item] > 0 && this.ProductionEquation[item].visible == 1) {
+				if (totalproduction == 0) { productionTxt += '<span class="blacktext">Generating</span> ';}
+				totalproduction++;
+				productionTxt += prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
+			}
+		}
+		
+  		var consumptionTxt = [];		
 		var totalconsumption = 0;
-		for (var item in Univ.Items) {
-			if (Univ.Items[item].visibility == 1) {
-				if ( typeof this.Production(this.activenumber)[item] !== 'undefined' && this.Production(this.activenumber)[item] > 0 ) {
-					totalproduction++;
-				}
-				if ( typeof this.Consumption(this.activenumber)[item] !== 'undefined' && this.Consumption(this.activenumber)[item] > 0 ) {
-					totalconsumption++;
-				}
+		var consumption = this.Consumption(this.activenumber);
+		for (var item in consumption) {
+			if (consumption[item] > 0 && this.ConsumptionEquation[item].visible == 1) {
+				if (totalconsumption == 0) { consumptionTxt += '<span class="redtext">Consuming</span> ';}
+				totalconsumption++;
+				consumptionTxt += prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
 			}
 		}
-		var productionTxt = [];
-		var consumptionTxt = [];
-		for (var item in Univ.Items) {
-			if (Univ.Items[item].visibility == 1) {
-				if (totalproduction > 0 && typeof this.Production(this.activenumber)[item] !== 'undefined') {
-					productionTxt += '<span class="blacktext">Generating</span> ' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
-				}
-				if (totalconsumption > 0 && typeof this.Consumption(this.activenumber)[item] !== 'undefined') {
-					consumptionTxt += '<span class="redtext">Consuming</span> ' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
-				}
-			}
-		}
+
 		lookup(this.id + '_popup_production').innerHTML = productionTxt; 
 		lookup(this.id + '_popup_consumption').innerHTML = consumptionTxt;
 
@@ -353,15 +342,6 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs()[item], Univ.precision);
 			}
 			this.bought = 1;
-		}
-	}
-	
-	this.isClickable = function(){
-		if (this.isAffordable) {
-			// Check other conditions here
-			return 1;
-		} else {
-			return 0;
 		}
 	}
 	

@@ -1,5 +1,5 @@
 Univ.LoadObjects = function(){
-//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Interval, ProductionEquation, ConsumptionEquation
+//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Interval, ProductionEquation, ConsumptionEquation, BuyFunction
  	new Univ.Object('qfoam1','qfoam','Quantum Field Equation','Quantum Field Equations',0,
  		'Quantum Field Equations are the most basic production unit. Use them to generate Quantum Foam out of nothing.',
 		function(){ // isVisible
@@ -7,6 +7,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'exp',
 				base: 1.01,
 				start: 10
@@ -23,6 +24,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			},
@@ -41,6 +43,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'exp',
 				base: 1.01,
 				start: 100
@@ -53,11 +56,13 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 12
 			}
 		},
-		{}
+		{},
+		0 // no special Buy Function
 	);
 	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
@@ -66,6 +71,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'exp',
 				base: 1.01,
 				start: 1000
@@ -79,11 +85,13 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 150
 			}
 		},
-		{}
+		{},
+		0 // no special Buy Function
 	);
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -92,6 +100,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 5000
 			}
@@ -104,16 +113,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 25
 			}
 		},
 		{ // ConsumptionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 100
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -122,6 +134,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 20000
 			}
@@ -134,12 +147,14 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 124
 			}
 		},
 		{ // ConsumptionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 248
 			}
@@ -152,6 +167,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 80000
 			}
@@ -164,16 +180,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 625
 			}
 		},
 		{ // ConsumptionEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 625
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('subatomic1','subatomic','Spin Operator','Spin Operators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -182,6 +201,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 555
 			}
@@ -194,16 +214,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 2
 			}
 		},
 		{ // ConsumptionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 5
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('subatomic2','subatomic','Strong Interaction','Strong Interactions',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -212,6 +235,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 5555
 			}
@@ -224,16 +248,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 2
 			}
 		},
 		{ // ConsumptionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 4
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('subatomic3','subatomic','Relativistic Renormalizer','Relativistic Renormalizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -242,6 +269,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 55555
 			}
@@ -254,16 +282,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 20
 			}
 		},
 		{ // ConsumptionEquation
 			elementary: {
+				visible: 1,
 				type: 'lin',
 				slope: 35
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('atom1','atom','Hydrogen Condenser','Hydrogen Condensers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -272,6 +303,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 900
 			}
@@ -284,16 +316,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('atom2','atom','Isotope Organizer','Isotope Organizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -302,6 +337,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 18000
 			}
@@ -314,16 +350,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 17.5
 			}
 		},
 		{ // ConsumptionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 25
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('atom3','atom','Quantum Degenerator','Quantum Degenerators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -332,6 +371,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 36000
 			}
@@ -344,16 +384,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 350
 			}
 		},
 		{ // ConsumptionEquation
 			subatomic: {
+				visible: 1,
 				type: 'lin',
 				slope: 500
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('gascloud1','gascloud','Interstellar Medium','Interstellar Medium',0,
 	'Some say it can predict the future.',
@@ -361,8 +404,9 @@ Univ.LoadObjects = function(){
 			return Univ.Items['atom'].total_number >= 1000000 / 4;
 		},
 		{ // CostEquation
-			atom: {
+			atom: {	 // if this gets edited, make sure the BuyFunction below still works
 				type: 'lin',
+				visible: 1,
 				slope: 1000000
 			}
 		},
@@ -374,16 +418,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 1500000
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('gascloud2','gascloud','Interstellar Large','Interstellar Large',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -392,6 +439,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 4000000
 			}
@@ -404,16 +452,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 3
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 2.5
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('gascloud3','gascloud','Interstellar XL','Interstellar XL',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -422,6 +473,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 16000000
 			}
@@ -434,16 +486,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 9
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 7
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('nebula1','nebula','Nebulizer','Nebulizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -452,6 +507,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 200
 			}
@@ -464,16 +520,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 10
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('nebula2','nebula','Rosette Polarizer','Rosette Polarizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -482,6 +541,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 2000
 			}
@@ -494,16 +554,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 12
 			}
 		},
 		{ // ConsumptionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 100
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('nebula3','nebula','Orionizer','Orionizers',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -512,6 +575,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 20000
 			}
@@ -524,16 +588,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 150
 			}
 		},
 		{ // ConsumptionEquation
 			gascloud: {
+				visible: 1,
 				type: 'lin',
 				slope: 1000
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('star1','star','Core Nucleator','Core Nucleators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -542,6 +609,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 123
 			}
@@ -554,16 +622,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 10
 			}
 		},
 		{ // ConsumptionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 10
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('star2','star','Bok Globule','Bok Globules',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -572,6 +643,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 1234
 			}
@@ -584,16 +656,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 120
 			}
 		},
 		{ // ConsumptionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 100
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('star3','star','Stellar Nursery','Stellar Nurseries',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -602,6 +677,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 12345
 			}
@@ -614,16 +690,19 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 800
 			}
 		},
 		{ // ConsumptionEquation
 			nebula: {
+				visible: 1,
 				type: 'lin',
 				slope: 600
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('lightatom1','atom','Primordial Spallation','Primordial Spallation',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -632,6 +711,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			qfoam: {
+				visible: 1,
 				type: 'lin',
 				slope: 10000000
 			}
@@ -644,16 +724,24 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			lightatom: {
+				visible: 1,
 				type: 'lin',
-				slope: 100000
+				slope: 1
+			},
+			atom: {
+				visible: 0,
+				type: 'lin',
+				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
-				slope: 300000
+				slope: 3
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('mediumatom1','atom','Main Sequence Ignition','Main Sequence Ignition',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -662,28 +750,37 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 155
 			}
 		},
 		function(){
-			var interval = 1;
+			var interval = 300;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
 		{ // ProductionEquation
 			mediumatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 900000
+			},
+			atom: {
+				visible: 0,
 				type: 'lin',
 				slope: 900000
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 9500000
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('mediumatom2','atom','Convection Zoning Law','Convection Zoning Laws',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -692,28 +789,37 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 1777
 			}
 		},
 		function(){
-			var interval = 4;
+			var interval = 240;
 //			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
 			return Math.max(interval,1/Univ.FPS);
 			//return interval;
 		},
 		{ // ProductionEquation
 			mediumatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 900000
+			},
+			atom: {
+				visible: 0,
 				type: 'lin',
 				slope: 900000
 			}
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
 				type: 'lin',
 				slope: 8500000
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('heavyatom1','atom','Supernova Spark','Supernova Sparks',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -722,6 +828,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 313
 			}
@@ -734,16 +841,24 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			heavyatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 9000000
+			},
+			atom: {
+				visible: 0,
 				type: 'lin',
 				slope: 9000000
 			}
 		},
 		{ // ConsumptionEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 10
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 	new Univ.Object('galaxy1','galaxy','Accretion Disco','Accretion Discos',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -752,6 +867,7 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 1000
 			}
@@ -764,15 +880,18 @@ Univ.LoadObjects = function(){
 		},
 		{ // ProductionEquation
 			galaxy: {
+				visible: 1,
 				type: 'lin',
 				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
 			star: {
+				visible: 1,
 				type: 'lin',
 				slope: 12000
 			}
-		}
+		},
+		0 // no special Buy Function
 	);
 }

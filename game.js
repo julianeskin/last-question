@@ -1,4 +1,4 @@
-var version = 0.023;
+var version = 0.024;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -104,27 +104,60 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			return 0;
 		}
 	}
-
-	this.CostEquation = CostEquation;
+	
+	if(CostEquation == 'function'){
+		this.CostEquation = CostEquation
+	} else {
+		this.CostEquation = function(){ return CostEquation; }
+	}
 	this.Costs = function(howmany){
 		var cost = {};
+		var ce = this.CostEquation();
+		
+		var adder = 0;
 		var multiplier = 1;
-		for(var i in this.CostEquation.upgrades){
-			var upgrade = this.CostEquation.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		var adderFunctions = [];
+		var multFunctions = [];
+		
+		for(var i in ce.upgrades){
+			var upgrade = ce.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){
+				
+				switch(Univ.Upgrades[upgrade].type){
+					case 'multiply':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						break;
+						
+					case 'add':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else adder += Univ.Upgrades[upgrade].magnitude;
+						break;
+				}
+			}
 		}
 		
-		for(var item in this.CostEquation){
-			if(this.CostEquation[item].type == 'lin'){
-				cost[item] = multiplier * this.CostEquation[item].slope * howmany;
-			}
-			else if(this.CostEquation[item].type == 'exp'){
-				cost[item] = multiplier * this.CostEquation[item].start * (quickExp(this.CostEquation[item].base, howmany + this.number) - quickExp(this.CostEquation[item].base, this.number));
-			}
-			else if(item != 'upgrades'){ // Custom function
-				cost[item] = multiplier * this.CostEquation[item].fcn(howmany);
+		for(var item in ce){
+			if(item != 'upgrades'){
+				if(ce[item].type == 'lin'){
+					cost[item] = ce[item].slope * howmany;
+				}
+				else if(ce[item].type == 'exp'){
+					cost[item] = ce[item].start * (quickExp(ce[item].base, howmany + this.number) - quickExp(ce[item].base, this.number));
+				}
+				else{ // Custom function
+					cost[item] = ce[item].fcn(howmany);
+				}
+				
+				cost[item] += adder;
+				for(var i in adderFunctions) cost[item] += adderFunctions[i](item, this, cost, howmany);
+				cost[item] *= multiplier;
+				for(var i in multFunctions) cost[item] *= multFunctions[i](item, this, cost, howmany);
+				
+				cost[item] = Math.round(cost[item]); // Whole number to match display
 			}
 		}
+		
 		return cost;
 	}
 	
@@ -150,47 +183,108 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.targetactivity = 100; // percent of this generator chosen to be active
 	this.interval = IntervalFcn;
 	
-	this.ProductionEquation = ProductionEquation;
+	if(ProductionEquation == 'function'){
+		this.ProductionEquation = ProductionEquation
+	} else {
+		this.ProductionEquation = function(){ return ProductionEquation; }
+	}
 	this.Production = function(number){
 		var production = {};
+		var pe = this.ProductionEquation();
+		
+		var adder = 0;
 		var multiplier = 1;
-		for(var i in this.ProductionEquation.upgrades){
-			var upgrade = this.ProductionEquation.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		var adderFunctions = [];
+		var multFunctions = [];
+		
+		for(var i in pe.upgrades){
+			var upgrade = pe.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){
+				
+				switch(Univ.Upgrades[upgrade].type){
+					case 'multiply':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						break;
+						
+					case 'add':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else adder += Univ.Upgrades[upgrade].magnitude;
+						break;
+				}
+			}
 		}
 		
-		for(var item in this.ProductionEquation){
-			if(this.ProductionEquation[item].type == 'lin'){
-				production[item] = multiplier * this.ProductionEquation[item].slope * number;
-			}
-			else if(this.ProductionEquation[item].type == 'exp'){
-				production[item] = multiplier * this.ProductionEquation[item].start * quickExp(this.ProductionEquation[item].base, number);
-			}
-			else if(item != 'upgrades'){ // Custom function
-				production[item] = multiplier * this.ProductionEquation[item].fcn(number);
+		for(var item in pe){
+			if(item != 'upgrades'){
+				if(pe[item].type == 'lin'){
+					production[item] = pe[item].slope * number;
+				}
+				else if(pe[item].type == 'exp'){
+					production[item] = pe[item].start * quickExp(pe[item].base, number);
+				}
+				else{ // Custom function
+					production[item] = pe[item].fcn(number);
+				}
+				
+				production[item] += adder;
+				for(var i in adderFunctions) production[item] += adderFunctions[i](item, this, production, number);
+				production[item] *= multiplier;
+				for(var i in multFunctions) production[item] *= multFunctions[i](item, this, production, number);
 			}
 		}
+		
 		return production;
 	}
 	
-	this.ConsumptionEquation = ConsumptionEquation;
+	if(ConsumptionEquation == 'function'){
+		this.ConsumptionEquation = ConsumptionEquation
+	} else {
+		this.ConsumptionEquation = function(){ return ConsumptionEquation; }
+	}
 	this.Consumption = function(number){
 		var consumption = {};
+		var ce = this.ConsumptionEquation();
+		
+		var adder = 0;
 		var multiplier = 1;
-		for(var i in this.ConsumptionEquation.upgrades){
-			var upgrade = this.ConsumptionEquation.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){ multiplier *= Univ.Upgrades[upgrade].magnitude; }
+		var adderFunctions = [];
+		var multFunctions = [];
+		
+		for(var i in ce.upgrades){
+			var upgrade = ce.upgrades[i];
+			if (Univ.upgradeBought(upgrade)){
+				
+				switch(Univ.Upgrades[upgrade].type){
+					case 'multiply':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						break;
+						
+					case 'add':
+						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
+						else adder += Univ.Upgrades[upgrade].magnitude;
+						break;
+				}
+			}
 		}
 		
-		for(var item in this.ConsumptionEquation){
-			if(this.ConsumptionEquation[item].type == 'lin'){
-				consumption[item] = multiplier * this.ConsumptionEquation[item].slope * number;
-			}
-			else if(this.ConsumptionEquation[item].type == 'exp'){
-				consumption[item] = multiplier * this.ConsumptionEquation[item].start * quickExp(this.ConsumptionEquation[item].base, number);
-			}
-			else if(item != 'upgrades'){ // Custom function
-				consumption[item] = multiplier * this.ConsumptionEquation[item].fcn(number);
+		for(var item in ce){
+			if(item != 'upgrades'){
+				if(ce[item].type == 'lin'){
+					consumption[item] = ce[item].slope * number;
+				}
+				else if(ce[item].type == 'exp'){
+					consumption[item] = ce[item].start * quickExp(ce[item].base, number);
+				}
+				else{ // Custom function
+					consumption[item] = ce[item].fcn(number);
+				}
+				
+				consumption[item] += adder;
+				for(var i in adderFunctions) consumption[item] += adderFunctions[i](item, this, consumption, number);
+				consumption[item] *= multiplier;
+				for(var i in multFunctions) consumption[item] *= multFunctions[i](item, this, consumption, number);
 			}
 		}
 		return consumption;
@@ -207,7 +301,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalproduction = 0;
 		var production = this.Production(this.activenumber);
 		for (var item in production) {
-			if (production[item] > 0 && this.ProductionEquation[item].visible == 1) {
+			if (production[item] > 0 && this.ProductionEquation()[item].visible == 1) {
 				if (totalproduction == 0) { productionTxt += '<span class="blacktext">Generating</span> ';}
 				totalproduction++;
 				productionTxt += prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Production(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
@@ -218,7 +312,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var totalconsumption = 0;
 		var consumption = this.Consumption(this.activenumber);
 		for (var item in consumption) {
-			if (consumption[item] > 0 && this.ConsumptionEquation[item].visible == 1) {
+			if (consumption[item] > 0 && this.ConsumptionEquation()[item].visible == 1) {
 				if (totalconsumption == 0) { consumptionTxt += '<span class="redtext">Consuming</span> ';}
 				totalconsumption++;
 				consumptionTxt += prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor) + ' ' + Univ.Items[item].plural + ' every ' + prettify(this.interval()) + ' sec (' + prettify(this.Consumption(this.activenumber)[item] * Univ.Speedfactor / this.activenumber) + '&nbsp;each). ';
@@ -617,28 +711,16 @@ Univ.UpdateRates = function(){
 Univ.ActiveNumber = function(generator){
 // Find the number of a Generator that can run (by checking their consumption needs)
 	var chosenMax = Math.round(generator.number * generator.targetactivity / 100);
-	//var consumption = generator.Consumption(chosenMax);
 	var active = chosenMax;
-	//var capable;
 	var tooHigh = true;
 	var step = 1;
+	var gce = generator.ConsumptionEquation();
 	
 	// Take into account upgrades and Speedfactor
 	var multiplier = Univ.Speedfactor;
-// 	for (var i in Univ.GeneratorUpgrades) {
-// 		var upgrade = Univ.GeneratorUpgrades[i];
-// 		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-// 			if (upgrade.type == 'multiply') {
-// 				multiplier *= upgrade.multiplier; 
-// 			}
-// 			else if (upgrade.type == 'efficiency') {
-// 				multiplier *= upgrade.multiplier; 
-// 			}
-// 		}
-// 	}
 	
-	for(var item in generator.ConsumptionEquation){
-		var ce = generator.ConsumptionEquation[item];
+	for(var item in gce){
+		var ce = gce[item];
 		var amt = 0;
 		
 		if(ce.type == 'lin'){
@@ -689,19 +771,12 @@ Univ.GetMaxAffordable = function(generator){
 	var ret = -1;
 	var tooHigh = false;
 	var step = 1;
+	var gce = generator.CostEquation();
 	
 	var multiplier = 1;
-// 	for (var i in Univ.GeneratorUpgrades) {
-// 		var upgrade = Univ.GeneratorUpgrades[i];
-// 		if (Univ.upgradeBought(upgrade.id) && upgrade.generator == generator.id ){
-// 			if (upgrade.type == 'costMult') {
-// 				multiplier *= upgrade.multiplier; 
-// 			}
-// 		}
-// 	}
 	
-	for(var item in generator.CostEquation){
-		var ce = generator.CostEquation[item];
+	for(var item in gce){
+		var ce = gce[item];
 		var amt = 0;
 		
 		if(ce.type == 'lin'){
@@ -738,7 +813,7 @@ Univ.GetMaxAffordable = function(generator){
 }
 
 Univ.GetMidAffordable = function(generator){
-	var consumption = generator.ConsumptionEquation;
+	var gce = generator.ConsumptionEquation();
 	var wiggleRoom = {};
 	var ret = -1;
 	var alreadyNegative = false;
@@ -746,18 +821,17 @@ Univ.GetMidAffordable = function(generator){
 	
 	var multiplier = Univ.Speedfactor;
 	
-	for(var item in consumption){
+	for(var item in gce){
 		if(item != 'upgrades'){
-			//consumption[item] *= multiplier / generator.interval();
-			wiggleRoom[item] = Univ.Items[item].production + Univ.Items[item].consumption;
+			wiggleRoom[item] = (Univ.Items[item].production + Univ.Items[item].consumption) * generator.interval();
 			if(wiggleRoom[item] <= 0){alreadyNegative = true; break;}
 		}
 	}
 	
 	if(!alreadyNegative){
 		
-		for(var item in generator.ConsumptionEquation){
-			var ce = generator.ConsumptionEquation[item];
+		for(var item in gce){
+			var ce = gce[item];
 			var amt = 0;
 			
 			if(ce.type == 'lin'){

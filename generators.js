@@ -1,5 +1,5 @@
 Univ.LoadObjects = function(){
-//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Interval, ProductionEquation, ConsumptionEquation, BuyFunction
+//	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Base Interval, ProductionEquation, ConsumptionEquation, BuyFunction
  	new Univ.Object('qfoam1','qfoam','Quantum Field Equation','Quantum Field Equations',0,
  		'Quantum Field Equations are the most basic production unit. Use them to generate Quantum Foam out of nothing.',
 		function(){ // isVisible
@@ -13,26 +13,13 @@ Univ.LoadObjects = function(){
 				start: 10
 			}
 		},
-		function(){
-			var interval = 4;
-			if (Univ.upgradeBought('qfoam_intervalupgrade_1')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_1'].magnitude; }
-			if (Univ.upgradeBought('qfoam_intervalupgrade_2')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_2'].magnitude; }
-			if (Univ.upgradeBought('qfoam_intervalupgrade_3')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_3'].magnitude; }
-			if (Univ.upgradeBought('qfoam_intervalupgrade_4')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_4'].magnitude; }
-			if (Univ.upgradeBought('qfoam_intervalupgrade_5')){ interval -= Univ.Upgrades['qfoam_intervalupgrade_5'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-		},
+		4, // Base Interval
 		{ // ProductionEquation
 			qfoam: {
 				visible: 1,
 				type: 'lin',
 				slope: 1
-			},
-			upgrades:  ['qfoam_rateupgrade_1',
-						'qfoam_rateupgrade_2',
-						'qfoam_rateupgrade_3',
-						'qfoam_rateupgrade_4',
-						'qfoam_rateupgrade_5']
+			}
 		},
 		{}
 	);
@@ -49,11 +36,7 @@ Univ.LoadObjects = function(){
 				start: 100
 			}
 		},
-		function(){
-			var interval = 4;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-		},
+		4, // Base Interval
 		{ // ProductionEquation
 			qfoam: {
 				visible: 1,
@@ -77,12 +60,7 @@ Univ.LoadObjects = function(){
 				start: 1000
 			}
 		},
-		function(){ // interval
-			var interval = 10;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		10, // Base Interval
 		{ // ProductionEquation
 			qfoam: {
 				visible: 1,
@@ -105,12 +83,7 @@ Univ.LoadObjects = function(){
 				slope: 5000
 			}
 		},
-		function(){ // interval
-			var interval = 5;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		5, // Base Interval
 		{ // ProductionEquation
 			elementary: {
 				visible: 1,
@@ -139,12 +112,7 @@ Univ.LoadObjects = function(){
 				slope: 20000
 			}
 		},
-		function(){ // interval
-			var interval = 5;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		5, // Base Interval
 		{ // ProductionEquation
 			elementary: {
 				visible: 1,
@@ -172,12 +140,7 @@ Univ.LoadObjects = function(){
 				slope: 80000
 			}
 		},
-		function(){
-			var interval = 5;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		5, // Base Interval
 		{ // ProductionEquation
 			elementary: {
 				visible: 1,
@@ -206,12 +169,7 @@ Univ.LoadObjects = function(){
 				slope: 555
 			}
 		},
-		function(){
-			var interval = 10;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		10, // Base Interval
 		{ // ProductionEquation
 			subatomic: {
 				visible: 1,
@@ -240,12 +198,7 @@ Univ.LoadObjects = function(){
 				slope: 5555
 			}
 		},
-		function(){
-			var interval = 1.5;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		1.5, // Base Interval
 		{ // ProductionEquation
 			subatomic: {
 				visible: 1,
@@ -274,12 +227,7 @@ Univ.LoadObjects = function(){
 				slope: 55555
 			}
 		},
-		function(){
-			var interval = 2;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		2, // Base Interval
 		{ // ProductionEquation
 			subatomic: {
 				visible: 1,
@@ -308,12 +256,7 @@ Univ.LoadObjects = function(){
 				slope: 900
 			}
 		},
-		function(){
-			var interval = 14;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		14, // Base Interval
 		{ // ProductionEquation
 			atom: {
 				visible: 1,
@@ -347,12 +290,7 @@ Univ.LoadObjects = function(){
 				slope: 18000
 			}
 		},
-		function(){
-			var interval = 12;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		12, // Base Interval
 		{ // ProductionEquation
 			atom: {
 				visible: 1,
@@ -386,12 +324,7 @@ Univ.LoadObjects = function(){
 				slope: 36000
 			}
 		},
-		function(){
-			var interval = 10;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		10, // Base Interval
 		{ // ProductionEquation
 			atom: {
 				visible: 1,
@@ -431,12 +364,7 @@ Univ.LoadObjects = function(){
 			}
 			
 		},
-		function(){
-			var interval = 60;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		60, // Base Interval
 		{ // ProductionEquation
 			gascloud: {
 				visible: 1,
@@ -470,12 +398,7 @@ Univ.LoadObjects = function(){
 				slope: 4000000
 			}
 		},
-		function(){
-			var interval = 60;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		60, // Base Interval
 		{ // ProductionEquation
 			gascloud: {
 				visible: 1,
@@ -504,12 +427,7 @@ Univ.LoadObjects = function(){
 				slope: 16000000
 			}
 		},
-		function(){
-			var interval = 60;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		60, // Base Interval
 		{ // ProductionEquation
 			gascloud: {
 				visible: 1,
@@ -538,12 +456,7 @@ Univ.LoadObjects = function(){
 				slope: 200
 			}
 		},
-		function(){
-			var interval = 90;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		90, // Base Interval
 		{ // ProductionEquation
 			nebula: {
 				visible: 1,
@@ -572,12 +485,7 @@ Univ.LoadObjects = function(){
 				slope: 2000
 			}
 		},
-		function(){
-			var interval = 90;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		90, // Base Interval
 		{ // ProductionEquation
 			nebula: {
 				visible: 1,
@@ -606,12 +514,7 @@ Univ.LoadObjects = function(){
 				slope: 20000
 			}
 		},
-		function(){
-			var interval = 90;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		90, // Base Interval
 		{ // ProductionEquation
 			nebula: {
 				visible: 1,
@@ -640,12 +543,7 @@ Univ.LoadObjects = function(){
 				slope: 123
 			}
 		},
-		function(){
-			var interval = 45;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		45, // Base Interval
 		{ // ProductionEquation
 			star: {
 				visible: 1,
@@ -674,12 +572,7 @@ Univ.LoadObjects = function(){
 				slope: 1234
 			}
 		},
-		function(){
-			var interval = 30;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		30, // Base Interval
 		{ // ProductionEquation
 			star: {
 				visible: 1,
@@ -708,12 +601,7 @@ Univ.LoadObjects = function(){
 				slope: 12345
 			}
 		},
-		function(){
-			var interval = 20;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		20, // Base Interval
 		{ // ProductionEquation
 			star: {
 				visible: 1,
@@ -742,12 +630,7 @@ Univ.LoadObjects = function(){
 				slope: 10000000
 			}
 		},
-		function(){
-			var interval = 1;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		1, // Base Interval
 		{ // ProductionEquation
 			lightatom: {
 				visible: 1,
@@ -781,12 +664,7 @@ Univ.LoadObjects = function(){
 				slope: 155
 			}
 		},
-		function(){
-			var interval = 300;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		300, // Base Interval
 		{ // ProductionEquation
 			mediumatom: {
 				visible: 1,
@@ -820,12 +698,7 @@ Univ.LoadObjects = function(){
 				slope: 1777
 			}
 		},
-		function(){
-			var interval = 240;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		240, // Base Interval
 		{ // ProductionEquation
 			mediumatom: {
 				visible: 1,
@@ -859,12 +732,7 @@ Univ.LoadObjects = function(){
 				slope: 313
 			}
 		},
-		function(){
-			var interval = 300;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		300, // Base Interval
 		{ // ProductionEquation
 			heavyatom: {
 				visible: 1,
@@ -898,12 +766,7 @@ Univ.LoadObjects = function(){
 				slope: 1000
 			}
 		},
-		function(){
-			var interval = 900;
-//			if (Univ.upgradeBought('upgradeID'){ interval -= Univ.Upgrades['upgradeID'].magnitude; }
-			return Math.max(interval,1/Univ.FPS);
-			//return interval;
-		},
+		900, // Base Interval
 		{ // ProductionEquation
 			galaxy: {
 				visible: 1,

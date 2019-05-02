@@ -10,9 +10,11 @@ TYPES:
 	'costMult'		: Multiplies Costs by factor
 	'action'		: Does something when checked. Magnitude must be a function. If we want to pass arguments, we can add them in.
 
+Types should be in the format of {affected function}|{upgrade type}
+	e.g. 'production|multiply' would multiply the production of the chosen generator by magnitude
 **/
 
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade 1','qfoam','multiply','qfoam1',1.1,
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade 1','qfoam','production|multiply','qfoam1',1.1,
 	'Increases the Quantum Foam production of Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -27,7 +29,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade 1','qfoam','multiply','
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_2','Upgrade 2','qfoam','multiply','qfoam1',1.1,
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_2','Upgrade 2','qfoam','production|multiply','qfoam1',1.1,
 	'Increases the Quantum Foam production of Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -42,7 +44,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_2','Upgrade 2','qfoam','multiply','
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','multiply','qfoam1',1.1,
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','production|multiply','qfoam1',1.1,
 	'Increases the Quantum Foam production of Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -57,7 +59,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','multiply','
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','multiply','qfoam1',1.1,
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','production|multiply','qfoam1',1.1,
 	'Increases the Quantum Foam production of Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -72,7 +74,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','multiply','
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','multiply','qfoam1',1.1,
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','production|multiply','qfoam1',1.1,
 	'Increases the Quantum Foam production of Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -87,7 +89,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','multiply','
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_intervalupgrade_1','Upgrade 6','qfoam','speed','qfoam1',1/2,
+new Univ.GeneratorUpgrade('qfoam_intervalupgrade_1','Upgrade 6','qfoam','interval|add','qfoam1',-1/2,
 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -102,7 +104,7 @@ new Univ.GeneratorUpgrade('qfoam_intervalupgrade_1','Upgrade 6','qfoam','speed',
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_intervalupgrade_2','Upgrade 7','qfoam','speed','qfoam1',1/2,
+new Univ.GeneratorUpgrade('qfoam_intervalupgrade_2','Upgrade 7','qfoam','interval|add','qfoam1',-1/2,
 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -117,7 +119,7 @@ new Univ.GeneratorUpgrade('qfoam_intervalupgrade_2','Upgrade 7','qfoam','speed',
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_intervalupgrade_3','Upgrade 8','qfoam','speed','qfoam1',1/3,
+new Univ.GeneratorUpgrade('qfoam_intervalupgrade_3','Upgrade 8','qfoam','interval|add','qfoam1',-1/3,
 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -132,7 +134,7 @@ new Univ.GeneratorUpgrade('qfoam_intervalupgrade_3','Upgrade 8','qfoam','speed',
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_intervalupgrade_4','Upgrade 9','qfoam','speed','qfoam1',1/3,
+new Univ.GeneratorUpgrade('qfoam_intervalupgrade_4','Upgrade 9','qfoam','interval|add','qfoam1',-1/3,
 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {
@@ -147,7 +149,7 @@ new Univ.GeneratorUpgrade('qfoam_intervalupgrade_4','Upgrade 9','qfoam','speed',
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam_intervalupgrade_5','Upgrade 10','qfoam','speed','qfoam1',1/3,
+new Univ.GeneratorUpgrade('qfoam_intervalupgrade_5','Upgrade 10','qfoam','interval|add','qfoam1',-1/3,
 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 	function(){ // cost
 		var prices = {

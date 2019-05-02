@@ -1,4 +1,4 @@
-var version = 0.024;
+var version = 0.025;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -81,7 +81,7 @@ Univ.Item = function(singular,plural,type,visibility,available_number,total_numb
 	return this;
 }
 
-Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,IntervalFcn,ProductionEquation,ConsumptionEquation,buyfunction){
+Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,CostEquation,baseInterval,ProductionEquation,ConsumptionEquation,buyfunction){
 	this.id = id;
 	this.type = type;
     this.singular = singular;
@@ -90,6 +90,12 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
  	this.activenumber = number;
 	this.maxAffordable = 1000;
 	this.midAffordable = 80;
+	
+	// Upgrade arrays
+	this.costUpgrades = [];
+	this.intervalUpgrades = [];
+	this.productionUpgrades = [];
+	this.consumptionUpgrades = [];
 	
 	this.isAffordable = function(howmany){
 		var notenough = 0;
@@ -119,43 +125,41 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var adderFunctions = [];
 		var multFunctions = [];
 		
-		for(var i in ce.upgrades){
-			var upgrade = ce.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){
+		for(var i in this.costUpgrades){
+			var upgrade = this.costUpgrades[i];
+			if (Univ.upgradeBought(upgrade.id)){
 				
-				switch(Univ.Upgrades[upgrade].type){
+				switch(upgrade.type){
 					case 'multiply':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') multFunctions.push(upgrade.magnitude);
+						else multiplier *= upgrade.magnitude;
 						break;
 						
 					case 'add':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else adder += Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') adderFunctions.push(upgrade.magnitude);
+						else adder += upgrade.magnitude;
 						break;
 				}
 			}
 		}
 		
 		for(var item in ce){
-			if(item != 'upgrades'){
-				if(ce[item].type == 'lin'){
-					cost[item] = ce[item].slope * howmany;
-				}
-				else if(ce[item].type == 'exp'){
-					cost[item] = ce[item].start * (quickExp(ce[item].base, howmany + this.number) - quickExp(ce[item].base, this.number));
-				}
-				else{ // Custom function
-					cost[item] = ce[item].fcn(howmany);
-				}
-				
-				cost[item] += adder;
-				for(var i in adderFunctions) cost[item] += adderFunctions[i](item, this, cost, howmany);
-				cost[item] *= multiplier;
-				for(var i in multFunctions) cost[item] *= multFunctions[i](item, this, cost, howmany);
-				
-				cost[item] = Math.round(cost[item]); // Whole number to match display
+			if(ce[item].type == 'lin'){
+				cost[item] = ce[item].slope * howmany;
 			}
+			else if(ce[item].type == 'exp'){
+				cost[item] = ce[item].start * (quickExp(ce[item].base, howmany + this.number) - quickExp(ce[item].base, this.number));
+			}
+			else{ // Custom function
+				cost[item] = ce[item].fcn(howmany);
+			}
+			
+			cost[item] += adder;
+			for(var i in adderFunctions) cost[item] += adderFunctions[i](item, this, cost, howmany);
+			cost[item] *= multiplier;
+			for(var i in multFunctions) cost[item] *= multFunctions[i](item, this, cost, howmany);
+			
+			cost[item] = Math.round(cost[item]); // Whole number to match display
 		}
 		
 		return cost;
@@ -181,7 +185,40 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	
 	this.infoblurb = infoblurb;
 	this.targetactivity = 100; // percent of this generator chosen to be active
-	this.interval = IntervalFcn;
+	this.baseInterval = baseInterval;
+	this.interval = function(){
+		var interval = this.baseInterval;
+		
+		var adder = 0;
+		var multiplier = 1;
+		var adderFunctions = [];
+		var multFunctions = [];
+		
+		for(var i in this.intervalUpgrades){
+			var upgrade = this.intervalUpgrades[i];
+			if (Univ.upgradeBought(upgrade.id)){
+				
+				switch(upgrade.type){
+					case 'multiply':
+						if(typeof upgrade.magnitude == 'function') multFunctions.push(upgrade.magnitude);
+						else multiplier *= upgrade.magnitude;
+						break;
+						
+					case 'add':
+						if(typeof upgrade.magnitude == 'function') adderFunctions.push(upgrade.magnitude);
+						else adder += upgrade.magnitude;
+						break;
+				}
+			}
+		}
+		
+		interval += adder;
+		for(var i in adderFunctions) interval += adderFunctions[i](this);
+		interval *= multiplier;
+		for(var i in multFunctions) interval *= multFunctions[i](this);
+		
+		return Math.max(interval, 1 / Univ.FPS);
+	}
 	
 	if(ProductionEquation == 'function'){
 		this.ProductionEquation = ProductionEquation
@@ -197,41 +234,39 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var adderFunctions = [];
 		var multFunctions = [];
 		
-		for(var i in pe.upgrades){
-			var upgrade = pe.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){
+		for(var i in this.productionUpgrades){
+			var upgrade = this.productionUpgrades[i];
+			if (Univ.upgradeBought(upgrade.id)){
 				
-				switch(Univ.Upgrades[upgrade].type){
+				switch(upgrade.type){
 					case 'multiply':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') multFunctions.push(upgrade.magnitude);
+						else multiplier *= upgrade.magnitude;
 						break;
 						
 					case 'add':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else adder += Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') adderFunctions.push(upgrade.magnitude);
+						else adder += upgrade.magnitude;
 						break;
 				}
 			}
 		}
 		
 		for(var item in pe){
-			if(item != 'upgrades'){
-				if(pe[item].type == 'lin'){
-					production[item] = pe[item].slope * number;
-				}
-				else if(pe[item].type == 'exp'){
-					production[item] = pe[item].start * quickExp(pe[item].base, number);
-				}
-				else{ // Custom function
-					production[item] = pe[item].fcn(number);
-				}
-				
-				production[item] += adder;
-				for(var i in adderFunctions) production[item] += adderFunctions[i](item, this, production, number);
-				production[item] *= multiplier;
-				for(var i in multFunctions) production[item] *= multFunctions[i](item, this, production, number);
+			if(pe[item].type == 'lin'){
+				production[item] = pe[item].slope * number;
 			}
+			else if(pe[item].type == 'exp'){
+				production[item] = pe[item].start * quickExp(pe[item].base, number);
+			}
+			else{ // Custom function
+				production[item] = pe[item].fcn(number);
+			}
+			
+			production[item] += adder;
+			for(var i in adderFunctions) production[item] += adderFunctions[i](item, this, production, number);
+			production[item] *= multiplier;
+			for(var i in multFunctions) production[item] *= multFunctions[i](item, this, production, number);
 		}
 		
 		return production;
@@ -251,41 +286,39 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var adderFunctions = [];
 		var multFunctions = [];
 		
-		for(var i in ce.upgrades){
-			var upgrade = ce.upgrades[i];
-			if (Univ.upgradeBought(upgrade)){
+		for(var i in this.consumptionUpgrades){
+			var upgrade = this.consumptionUpgrades[i];
+			if (Univ.upgradeBought(upgrade.id)){
 				
-				switch(Univ.Upgrades[upgrade].type){
+				switch(upgrade.type){
 					case 'multiply':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') multFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else multiplier *= Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') multFunctions.push(upgrade.magnitude);
+						else multiplier *= upgrade.magnitude;
 						break;
 						
 					case 'add':
-						if(typeof Univ.Upgrades[upgrade].magnitude == 'function') adderFunctions.push(Univ.Upgrades[upgrade].magnitude);
-						else adder += Univ.Upgrades[upgrade].magnitude;
+						if(typeof upgrade.magnitude == 'function') adderFunctions.push(upgrade.magnitude);
+						else adder += upgrade.magnitude;
 						break;
 				}
 			}
 		}
 		
 		for(var item in ce){
-			if(item != 'upgrades'){
-				if(ce[item].type == 'lin'){
-					consumption[item] = ce[item].slope * number;
-				}
-				else if(ce[item].type == 'exp'){
-					consumption[item] = ce[item].start * quickExp(ce[item].base, number);
-				}
-				else{ // Custom function
-					consumption[item] = ce[item].fcn(number);
-				}
-				
-				consumption[item] += adder;
-				for(var i in adderFunctions) consumption[item] += adderFunctions[i](item, this, consumption, number);
-				consumption[item] *= multiplier;
-				for(var i in multFunctions) consumption[item] *= multFunctions[i](item, this, consumption, number);
+			if(ce[item].type == 'lin'){
+				consumption[item] = ce[item].slope * number;
 			}
+			else if(ce[item].type == 'exp'){
+				consumption[item] = ce[item].start * quickExp(ce[item].base, number);
+			}
+			else{ // Custom function
+				consumption[item] = ce[item].fcn(number);
+			}
+			
+			consumption[item] += adder;
+			for(var i in adderFunctions) consumption[item] += adderFunctions[i](item, this, consumption, number);
+			consumption[item] *= multiplier;
+			for(var i in multFunctions) consumption[item] *= multFunctions[i](item, this, consumption, number);
 		}
 		return consumption;
 	}
@@ -409,7 +442,8 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 	this.id = id;
 	this.name = name;
 	this.item = item;
-	this.type = type;
+	var types = type.split('|');
+	this.type = types[1];
 	this.magnitude = magnitude; // magnitude of effect: factor to multiply by, or amount to add, etc
 	this.generator = generator;
 	this.bought = 0;
@@ -441,6 +475,7 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 	
 	Univ.Upgrades[this.id] = this;
 	Univ.GeneratorUpgrades[this.id] = this;
+	Univ.Objects[this.generator][types[0] + 'Upgrades'].push(this);
 }
 
 Univ.upgradeBought = function(id){
@@ -488,7 +523,7 @@ Univ.WriteSave = function(mode){
 		return JSON.stringify(save, null, 2);
 	}
 	else{
-		localStorage.setItem(Univ.SaveTo, JSON.stringify(save));
+		store.set(Univ.SaveTo, JSON.stringify(save));
 	}
 	var today = new Date();
 	var hour = today.getHours();
@@ -510,7 +545,7 @@ Univ.LoadSave = function(data){
 	if(data){
 		str = data;
 	}else{
-		if(localStorage.getItem(Univ.SaveTo)) str = localStorage.getItem(Univ.SaveTo);
+		if(store.get(Univ.SaveTo)) str = store.get(Univ.SaveTo);
 	}
 		
 	if(str != ''){

@@ -10,6 +10,8 @@ TYPES:
 	'costMult'		: Multiplies Costs by factor
 	'action'		: Does something when checked. Magnitude must be a function. If we want to pass arguments, we can add them in.
 
+Types should be in the format of {affected function}|{upgrade type}
+	e.g. 'production|multiply' would multiply the production of the chosen generator by magnitude
 **/
 
 new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade 1','qfoam','production|multiply','qfoam1',1.1,

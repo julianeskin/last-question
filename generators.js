@@ -262,6 +262,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 1
+			},
+			simpleatom: {
+				visible: 0,
+				type: 'lin',
+				slope: 1
 			}
 		},
 		{ // ConsumptionEquation
@@ -289,6 +294,11 @@ Univ.LoadObjects = function(){
 		{ // ProductionEquation
 			atom: {
 				visible: 1,
+				type: 'lin',
+				slope: 17.5
+			},			
+			simpleatom: {
+				visible: 0,
 				type: 'lin',
 				slope: 17.5
 			}
@@ -320,6 +330,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 350
+			},
+			simpleatom: {
+				visible: 0,
+				type: 'lin',
+				slope: 350
 			}
 		},
 		{ // ConsumptionEquation
@@ -337,11 +352,17 @@ Univ.LoadObjects = function(){
 			return Univ.Items['atom'].total_number >= 1000000 / 4;
 		},
 		{ // CostEquation
-			atom: {	 // if this gets edited, make sure the BuyFunction below still works
+			atom: {
 				type: 'lin',
 				visible: 1,
 				slope: 1000000
+			},
+			simpleatom: {
+				visible: 0,
+				type: 'lin',
+				slope: 1000000
 			}
+			
 		},
 		60, // Base Interval
 		{ // ProductionEquation
@@ -356,6 +377,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 1500000
+			},
+			simpleatom: {
+				visible: 0,
+				type: 'lin',
+				slope: 1500000
 			}
 		},
 		0 // no special Buy Function
@@ -367,6 +393,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 4000000
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 4000000
@@ -385,6 +416,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 2.5
+			},
+			simpleatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 1500000 * 2.5
 			}
 		},
 		0 // no special Buy Function
@@ -396,6 +432,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // CostEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 16000000
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 16000000
@@ -411,6 +452,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 1500000 * 7
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 7
@@ -619,6 +665,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 0,
+				type: 'lin',
+				slope: 3
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 3
@@ -656,6 +707,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 9500000
+			},
+			simpleatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 9500000
 			}
 		},
 		0 // no special Buy Function
@@ -687,6 +743,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 8500000
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 8500000

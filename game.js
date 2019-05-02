@@ -9,6 +9,8 @@ Univ.GeneratorUpgrades = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
+Univ.Age = 1e-43;
+Univ.Temp = Math.pow(10,32);
 Univ.ItemsById = [];
 Univ.ObjectsById = [];
 Univ.precision = 10;
@@ -360,7 +362,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		if ( this.number > 0 ) {
 			lookup(this.id + '_slidercontainer').style.display = 'block';
 		}
-					
+		
 		var costHTML = '<span class="blacktext">Cost:</span> ';		
 		var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
 		var buttonTop = buttonposition.top + window.scrollY;
@@ -378,11 +380,13 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		if (this.pupuptype == 1) {
 			buying_info = 'Make one.';
 			for (var item in this.Costs(1)) {
-				costHTML += prettify(this.Costs(1)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-				if (this.Costs(1)[item] == 1) {
-					costHTML += Univ.Items[item].singular;
-				} else {
-					costHTML += Univ.Items[item].plural;
+				if (this.CostEquation()[item].visible == 1) {
+					costHTML += prettify(this.Costs(1)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+					if (this.Costs(1)[item] == 1) {
+						costHTML += Univ.Items[item].singular;
+					} else {
+						costHTML += Univ.Items[item].plural;
+					}
 				}
 			}
 		} else if (this.pupuptype == 'mid') {
@@ -390,11 +394,13 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			var midaff = Univ.GetMidAffordable(this);
 			if (midaff > 0) {
 				for (var item in this.Costs(midaff)) {
-					costHTML += prettify(this.Costs(midaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-					if (this.Costs(midaff)[item] == 1) {
-						costHTML += Univ.Items[item].singular;
-					} else {
-						costHTML += Univ.Items[item].plural;
+					if (this.CostEquation()[item].visible == 1) {
+						costHTML += prettify(this.Costs(midaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+						if (this.Costs(midaff)[item] == 1) {
+							costHTML += Univ.Items[item].singular;
+						} else {
+							costHTML += Univ.Items[item].plural;
+						}
 					}
 				}
 				buying_info = 'Make maximum without causing negative income (currently ' + midaff + ').';
@@ -407,11 +413,13 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			var maxaff = Univ.GetMaxAffordable(this);
 			if (maxaff > 0) {
 				for (var item in this.Costs(maxaff)) {
-					costHTML += prettify(this.Costs(maxaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
-					if (this.Costs(maxaff)[item] == 1) {
-						costHTML += Univ.Items[item].singular;
-					} else {
-						costHTML += Univ.Items[item].plural;
+					if (this.CostEquation()[item].visible == 1) {
+						costHTML += prettify(this.Costs(maxaff)[item], {maxSmall: 0, sigfigs: 6}) + ' ';
+						if (this.Costs(maxaff)[item] == 1) {
+							costHTML += Univ.Items[item].singular;
+						} else {
+							costHTML += Univ.Items[item].plural;
+						}
 					}
 				}
 				buying_info = 'Make maximum (currently ' + maxaff + ').';
@@ -687,6 +695,7 @@ Univ.Loop = function(){
 
 	if (Univ.T % (Univ.FPS / 4) == 0 ) {
 		Univ.RefreshDisplay();
+		Univ.UpdateTimeTemp();
 	}
 	setTimeout(Univ.Loop,1000/Univ.FPS);
 	
@@ -748,6 +757,14 @@ Univ.UpdateRates = function(){
 		Univ.Items[item].production = round(productionrates[item], Univ.precision);
 		Univ.Items[item].consumption = round(consumptionrates[item], Univ.precision);
 	}
+}
+
+Univ.UpdateTimeTemp = function(){
+	Univ.Age =	1e-113 * Univ.Items['qfoam'].total_number +
+				1e-93 * Univ.Items['elementary'].total_number +
+				2e-87 * Univ.Items['subatomic'].total_number +
+				6e-81 * Univ.Items['atom'].total_number;
+	Univ.Temp = 10000000000 * Math.pow(Univ.Age,-0.513);
 }
 
 Univ.ActiveNumber = function(generator){
@@ -920,6 +937,9 @@ Univ.RefreshDisplay = function(){
 	Univ.UpdateItemDisplay();
 	Univ.UpdateGeneratorDisplay();
 	Univ.UpdateUpgradeDisplay();
+	
+	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, 'scientific') + ' seconds';
+	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, 'scientific') + ' Kelvin';
 }
 
 Univ.UpdateItemDisplay = function(){
@@ -1006,18 +1026,31 @@ Univ.UpdateGeneratorDisplay = function(){
 			}
 			if (generator.isAffordable(generator.midAffordable) && generator.midAffordable > 0) {
 				lookup(generator.id + '_buymid').classList.add('affordable');
-				if (generator.midAffordable == generator.maxAffordable) {
+				if (generator.midAffordable == 1) {
+					lookup(generator.id + '_buymid').innerHTML = '+';
+				} else if (generator.midAffordable == 2) {
+					lookup(generator.id + '_buymid').innerHTML = '++';
+				} else if (generator.midAffordable != 2 && generator.midAffordable == generator.maxAffordable) {
 					lookup(generator.id + '_buymid').innerHTML = '+++';
 				} else {
 					lookup(generator.id + '_buymid').innerHTML = '++';
 				}
 			} else {
 				lookup(generator.id + '_buymid').classList.remove('affordable');
+				lookup(generator.id + '_buymid').innerHTML = '++';
 			}
 			if (generator.isAffordable(generator.maxAffordable) && generator.maxAffordable > 0) {
 				lookup(generator.id + '_buymax').classList.add('affordable');
+				if (generator.maxAffordable == 1){
+					lookup(generator.id + '_buymax').innerHTML = '+';
+				} else if (generator.maxAffordable == 2){
+					lookup(generator.id + '_buymax').innerHTML = '++';
+				} else {
+					lookup(generator.id + '_buymax').innerHTML = '+++';
+				}
 			} else {
 				lookup(generator.id + '_buymax').classList.remove('affordable');
+				lookup(generator.id + '_buymax').innerHTML = '+++';
 			}
       
 			lookup(generator.id + '_button').style = 'display:block;';
@@ -1074,30 +1107,13 @@ Univ.updateSlider = function(generatorid) {
 	var slidervalue = lookup(sliderid).value;
 	generator = Univ.Objects[generatorid];
 	generator.targetactivity = slidervalue;
-	
 	lookup(generatorid + '_sliderlabel').style.left = 90 + Math.round(slidervalue * 0.6) + 'px';
 	lookup(generatorid + '_sliderlabel').innerHTML = slidervalue + '%';
 	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
 
-make_speedslider = function() { // delete for release
-	slider_HTML = [];
-	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
-	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
-	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="100" value="1" class="speedslider" id="speedslider"></div>';
-	lookup('topbar').innerHTML += slider_HTML;
-	lookup('speedslider').oninput = function(){update_speedslider();};
-}
-update_speedslider = function() { // delete for release
-	var slidervalue = lookup('speedslider').value;
-	Univ.Speedfactor = slidervalue;
-	Univ.UpdateRates();
-	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 1.6) + 'px';
-	lookup('speedslider_label').innerHTML = slidervalue + 'x';
-}
-
 Univ.LoadMenus = function() {
-	make_speedslider(); // delete for release
+	// 	maybe eventually
 }
 
 Univ.ItemMenuHTML = function(){
@@ -1231,6 +1247,8 @@ Univ.GeneratorMenuHTML = function() {
 			AddEvent(lookup(generator.id + '_hoverzone'),'mouseout',function(){return function(){generator.hidePopup();};}());
 			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseover',function(){return function(){generator.showPopup();};}());
 			AddEvent(lookup(generator.id + '_popupcontainer'),'mouseout',function(){return function(){generator.hidePopup();};}());
+			
+			lookup(generator.id + '_slider').oninput = function(){Univ.updateSlider(generator.id);};
 		}
 	}
 	
@@ -1260,6 +1278,27 @@ Univ.GeneratorMenuHTML = function() {
 	}
 }
 
+make_speedslider = function() { // delete for release
+	slider_HTML = [];
+	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
+	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
+	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="100" value="1" class="speedslider" id="speedslider"></div>';
+	lookup('topbar').innerHTML += slider_HTML;
+	lookup('speedslider').oninput = function(){update_speedslider();};
+}
+update_speedslider = function() { // delete for release
+	var slidervalue = lookup('speedslider').value;
+	Univ.Speedfactor = slidervalue;
+	Univ.UpdateRates();
+	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 1.6) + 'px';
+	lookup('speedslider_label').innerHTML = slidervalue + 'x';
+}
+
+Univ.LoadMenus = function() {
+ 	lookup('topbar').innerHTML += '<span id="age" style="position:absolute;top:5px;left:5px"></span>';
+ 	lookup('topbar').innerHTML += '<span id="temp" style="position:absolute;top:25px;left:5px"></span>';
+	make_speedslider(); // delete for release
+}
 
 /**=====================================
 Game start!

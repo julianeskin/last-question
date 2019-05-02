@@ -9,6 +9,8 @@ Univ.GeneratorUpgrades = [];
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
+Univ.Age = 1e-43;
+Univ.Temp = Math.pow(10,32);
 Univ.ItemsById = [];
 Univ.ObjectsById = [];
 Univ.precision = 10;
@@ -693,6 +695,7 @@ Univ.Loop = function(){
 
 	if (Univ.T % (Univ.FPS / 4) == 0 ) {
 		Univ.RefreshDisplay();
+		Univ.UpdateTimeTemp();
 	}
 	setTimeout(Univ.Loop,1000/Univ.FPS);
 	
@@ -754,6 +757,14 @@ Univ.UpdateRates = function(){
 		Univ.Items[item].production = round(productionrates[item], Univ.precision);
 		Univ.Items[item].consumption = round(consumptionrates[item], Univ.precision);
 	}
+}
+
+Univ.UpdateTimeTemp = function(){
+	Univ.Age =	1e-113 * Univ.Items['qfoam'].total_number +
+				1e-93 * Univ.Items['elementary'].total_number +
+				2e-87 * Univ.Items['subatomic'].total_number +
+				6e-81 * Univ.Items['atom'].total_number;
+	Univ.Temp = 10000000000 * Math.pow(Univ.Age,-0.513);
 }
 
 Univ.ActiveNumber = function(generator){
@@ -926,6 +937,9 @@ Univ.RefreshDisplay = function(){
 	Univ.UpdateItemDisplay();
 	Univ.UpdateGeneratorDisplay();
 	Univ.UpdateUpgradeDisplay();
+	
+	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, 'scientific') + ' seconds';
+	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, 'scientific') + ' Kelvin';
 }
 
 Univ.UpdateItemDisplay = function(){
@@ -1098,7 +1112,6 @@ Univ.updateSlider = function(generatorid) {
 	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
 
-
 Univ.LoadMenus = function() {
 	// 	maybe eventually
 }
@@ -1265,12 +1278,33 @@ Univ.GeneratorMenuHTML = function() {
 	}
 }
 
+make_speedslider = function() { // delete for release
+	slider_HTML = [];
+	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
+	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
+	slider_HTML += 'Gamespeed Multiplier: <input type="range" min="1" max="100" value="1" class="speedslider" id="speedslider"></div>';
+	lookup('topbar').innerHTML += slider_HTML;
+	lookup('speedslider').oninput = function(){update_speedslider();};
+}
+update_speedslider = function() { // delete for release
+	var slidervalue = lookup('speedslider').value;
+	Univ.Speedfactor = slidervalue;
+	Univ.UpdateRates();
+	lookup('speedslider_label').style.left = 132 + Math.round(slidervalue * 1.6) + 'px';
+	lookup('speedslider_label').innerHTML = slidervalue + 'x';
+}
+
+Univ.LoadMenus = function() {
+ 	lookup('topbar').innerHTML += '<span id="age" style="position:absolute;top:5px;left:5px"></span>';
+ 	lookup('topbar').innerHTML += '<span id="temp" style="position:absolute;top:25px;left:5px"></span>';
+	make_speedslider(); // delete for release
+}
 
 /**=====================================
 Game start!
 =====================================**/
 window.onload = function(){
-//	Univ.LoadMenus();	
+	Univ.LoadMenus();	
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadUpgrades();

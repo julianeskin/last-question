@@ -1,4 +1,4 @@
-var version = 0.025;
+var version = 0.026;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -32,24 +32,26 @@ function round(num, places){
 }
 
 function prettify(num, formOverride){
-	if(!formOverride) formOverride = {};
+	var pref = {};
 	
-	formOverride.flavor = Univ.prefs.shortsuffix ? 'short' : '';
+	pref.flavor = Univ.prefs.shortsuffix ? 'short' : '';
 	switch(Univ.prefs.numberformat){
 		case 'Normal':
-			formOverride.format = 'standard';
+			pref.format = 'standard';
 			break;
 		case 'Scientific':
-			formOverride.format = 'scientific';
+			pref.format = 'scientific';
 			break;
 		case 'Engineering':
-			formOverride.format = 'engineering';
+			pref.format = 'engineering';
 			break;
 		default:
-			formOverride.format = 'standard';
+			pref.format = 'standard';
 	}
 	
-	return Univ.format.format(num, formOverride);
+	if(formOverride) for(var key in formOverride) pref[key] = formOverride[key];
+	
+	return Univ.format.format(num, pref);
 }
 
 function AddEvent(object,event,fcn){
@@ -940,8 +942,8 @@ Univ.RefreshDisplay = function(){
 	Univ.UpdateGeneratorDisplay();
 	Univ.UpdateUpgradeDisplay();
 	
-	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, 'scientific') + ' seconds';
-	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, 'scientific') + ' Kelvin';
+	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, {format:'scientific'}) + ' seconds';
+	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, {format:'scientific'}) + ' Kelvin';
 }
 
 Univ.UpdateItemDisplay = function(){

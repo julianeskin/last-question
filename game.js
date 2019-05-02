@@ -539,49 +539,56 @@ Univ.WriteSave = function(mode){
 }
 
 Univ.LoadSave = function(data){
-	var save = null;
-	var str = '';
-	
-	if(data){
-		str = data;
-	}else{
-		if(store.get(Univ.SaveTo)) str = store.get(Univ.SaveTo);
-	}
+	try {
+		var save = null;
+		var str = '';
 		
-	if(str != ''){
-		save = JSON.parse(str);
-	}
-	
-	if(!save) return;
-	
-	
-	if(save.version >= 0.013){
-		Univ.ActiveItem = save.ActiveItem;
+		if(data){
+			str = data;
+		}else{
+			if(store.get(Univ.SaveTo)) str = store.get(Univ.SaveTo);
+		}
+			
+		if(str != ''){
+			save = JSON.parse(str);
+		}
 		
-		for(var g in save.Objects){
-			if(Univ.Objects[g]){
-				Univ.Objects[g].number = save.Objects[g].number;
-				Univ.Objects[g].targetactivity = save.Objects[g].targetactivity;
+		if(!save) return;
+		
+		
+		if(save.version >= 0.013){
+			Univ.ActiveItem = save.ActiveItem;
+			
+			for(var g in save.Objects){
+				if(Univ.Objects[g]){
+					Univ.Objects[g].number = save.Objects[g].number;
+					Univ.Objects[g].targetactivity = save.Objects[g].targetactivity;
+				}
+			}
+			
+			for(var i in save.Items){
+				if(Univ.Items[i]){
+					Univ.Items[i].available_number = save.Items[i].available_number;
+					Univ.Items[i].total_number = save.Items[i].total_number;
+				}
+			}
+			
+			for(var i in save.Upgrades){
+				if(Univ.Upgrades[i]){
+					Univ.Upgrades[i].bought = save.Upgrades[i].bought;
+				}
+			}
+			
+			for(var i in save.prefs){
+				Univ.prefs[i] = save.prefs[i];
 			}
 		}
-		
-		for(var i in save.Items){
-			if(Univ.Items[i]){
-				Univ.Items[i].available_number = save.Items[i].available_number;
-				Univ.Items[i].total_number = save.Items[i].total_number;
-			}
-		}
-		
-		for(var i in save.Upgrades){
-			if(Univ.Upgrades[i]){
-				Univ.Upgrades[i].bought = save.Upgrades[i].bought;
-			}
-		}
-		
-		for(var i in save.prefs){
-			Univ.prefs[i] = save.prefs[i];
-		}
 	}
+	catch(err) {
+		// Should also display a message saying why the save got erased
+		Univ.Reset();
+	}
+	
 	Univ.T = 0; // Frame counter starts over // from Cookie Clicker
 }
 

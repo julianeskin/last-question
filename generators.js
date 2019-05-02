@@ -396,6 +396,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 4000000
+			},
+			simpleatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 4000000
 			}
 		},
 		60, // Base Interval
@@ -408,6 +413,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 1500000 * 2.5
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 2.5
@@ -425,6 +435,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 16000000
+			},
+			simpleatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 16000000
 			}
 		},
 		60, // Base Interval
@@ -437,6 +452,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 1500000 * 7
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 1500000 * 7
@@ -645,6 +665,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 0,
+				type: 'lin',
+				slope: 3
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 3
@@ -682,6 +707,11 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'lin',
 				slope: 9500000
+			},
+			simpleatom: {
+				visible: 1,
+				type: 'lin',
+				slope: 9500000
 			}
 		},
 		0 // no special Buy Function
@@ -713,6 +743,11 @@ Univ.LoadObjects = function(){
 		},
 		{ // ConsumptionEquation
 			atom: {
+				visible: 1,
+				type: 'lin',
+				slope: 8500000
+			},
+			simpleatom: {
 				visible: 1,
 				type: 'lin',
 				slope: 8500000

@@ -14,12 +14,16 @@ Univ.LoadObjects = function(){
 			}
 		},
 		4, // Base Interval
-		{ // ProductionEquation
-			qfoam: {
-				visible: 1,
-				type: 'lin',
-				slope: 1
+		function(){ // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 1
+				}
 			}
+			return production;
 		},
 		{}
 	);
@@ -37,12 +41,16 @@ Univ.LoadObjects = function(){
 			}
 		},
 		4, // Base Interval
-		{ // ProductionEquation
-			qfoam: {
-				visible: 1,
-				type: 'lin',
-				slope: 12
+		function(){ // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 12
+				}
 			}
+			return production;
 		},
 		{},
 		0 // no special Buy Function
@@ -61,12 +69,44 @@ Univ.LoadObjects = function(){
 			}
 		},
 		10, // Base Interval
-		{ // ProductionEquation
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 150
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+	new Univ.Object('qfoam4','qfoam','Pym Particle Condenser','Pym Particle Condensers',0,
+	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1000000 / 4;
+		},
+		{ // CostEquation
 			qfoam: {
 				visible: 1,
-				type: 'lin',
-				slope: 150
+				type: 'exp',
+				base: 1.01,
+				start: 1000000
 			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 180000
+				}
+			}
+			return production;
 		},
 		{},
 		0 // no special Buy Function

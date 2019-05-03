@@ -1,4 +1,4 @@
-var version = 0.025;
+var version = 0.026;
 var Univ = {};
 Univ.FPS = 8;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
@@ -222,7 +222,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		return Math.max(interval, 1 / Univ.FPS);
 	}
 	
-	if(ProductionEquation == 'function'){
+	if(typeof ProductionEquation == 'function'){
 		this.ProductionEquation = ProductionEquation
 	} else {
 		this.ProductionEquation = function(){ return ProductionEquation; }
@@ -230,7 +230,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.Production = function(number){
 		var production = {};
 		var pe = this.ProductionEquation();
-		
+
 		var adder = 0;
 		var multiplier = 1;
 		var adderFunctions = [];
@@ -255,6 +255,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		}
 		
 		for(var item in pe){
+			
 			if(pe[item].type == 'lin'){
 				production[item] = pe[item].slope * number;
 			}
@@ -264,7 +265,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 			else{ // Custom function
 				production[item] = pe[item].fcn(number);
 			}
-			
+
 			production[item] += adder;
 			for(var i in adderFunctions) production[item] += adderFunctions[i](item, this, production, number);
 			production[item] *= multiplier;
@@ -274,7 +275,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		return production;
 	}
 	
-	if(ConsumptionEquation == 'function'){
+	if(typeof ConsumptionEquation == 'function'){
 		this.ConsumptionEquation = ConsumptionEquation
 	} else {
 		this.ConsumptionEquation = function(){ return ConsumptionEquation; }
@@ -761,7 +762,7 @@ Univ.UpdateRates = function(){
 
 Univ.UpdateTimeTemp = function(){
 	Univ.Age =	1e-113 * Univ.Items['qfoam'].total_number +
-				1e-93 * Univ.Items['elementary'].total_number +
+				1e-93 * Univ.Items['elementary'].total_number / (1 + Math.exp(2*(-Math.log10(Univ.Age)+30))) + // 30 = sigmoid midpoint (-log10), 2 = steepness
 				2e-87 * Univ.Items['subatomic'].total_number +
 				6e-81 * Univ.Items['atom'].total_number;
 	Univ.Temp = 10000000000 * Math.pow(Univ.Age,-0.513);

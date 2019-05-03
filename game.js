@@ -761,10 +761,12 @@ Univ.UpdateRates = function(){
 }
 
 Univ.UpdateTimeTemp = function(){
+	// this is an early "draft" of the formula, I have a better version in progress elsewhere
 	Univ.Age =	1e-113 * Univ.Items['qfoam'].total_number +
 				1e-93 * Univ.Items['elementary'].total_number / (1 + Math.exp(2*(-Math.log10(Univ.Age)+30))) + // 30 = sigmoid midpoint (-log10), 2 = steepness
 				2e-87 * Univ.Items['subatomic'].total_number +
 				6e-81 * Univ.Items['atom'].total_number;
+	
 	Univ.Temp = 10000000000 * Math.pow(Univ.Age,-0.513);
 }
 

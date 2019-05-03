@@ -113,7 +113,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		}
 	}
 	
-	if(CostEquation == 'function'){
+	if(typeof CostEquation == 'function'){
 		this.CostEquation = CostEquation
 	} else {
 		this.CostEquation = function(){ return CostEquation; }

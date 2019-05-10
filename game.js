@@ -1,19 +1,25 @@
+/**=====================================
+Definitions
+=====================================**/
 var version = 0.026;
 var Univ = {};
 Univ.FPS = 8;
+Univ.precision = 10;
 Univ.Speedfactor = 1; // Factor to speed up everything -- for testing.
+
 Univ.Items = [];
+Univ.ItemsById = [];
 Univ.Objects = [];
+Univ.ObjectsById = [];
 Univ.Upgrades = [];
 Univ.GeneratorUpgrades = [];
+Univ.Crystals = [];
+
+Univ.Age = 1e-43;
+Univ.Temp = Math.pow(10,32);
 Univ.T = 0;
 Univ.SaveTo = 'LastQuestion';
 Univ.ActiveItem = 'qfoam'; // possibly delete this line eventually, just makes testing faster
-Univ.Age = 1e-43;
-Univ.Temp = Math.pow(10,32);
-Univ.ItemsById = [];
-Univ.ObjectsById = [];
-Univ.precision = 10;
 
 
 /**=====================================
@@ -96,6 +102,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	this.midAffordable = 80;
 	
 	// Upgrade arrays
+	this.AllUpgrades = [];
 	this.costUpgrades = [];
 	this.intervalUpgrades = [];
 	this.productionUpgrades = [];
@@ -131,7 +138,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		
 		for(var i in this.costUpgrades){
 			var upgrade = this.costUpgrades[i];
-			if (Univ.upgradeBought(upgrade.id)){
+			if (Univ.GeneratorUpgrades[upgrade.id].generatorsactive[this.id]){
 				
 				switch(upgrade.type){
 					case 'multiply':
@@ -200,7 +207,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		
 		for(var i in this.intervalUpgrades){
 			var upgrade = this.intervalUpgrades[i];
-			if (Univ.upgradeBought(upgrade.id)){
+			if (Univ.GeneratorUpgrades[upgrade.id].generatorsactive[this.id]){
 				
 				switch(upgrade.type){
 					case 'multiply':
@@ -240,7 +247,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		
 		for(var i in this.productionUpgrades){
 			var upgrade = this.productionUpgrades[i];
-			if (Univ.upgradeBought(upgrade.id)){
+			if (Univ.GeneratorUpgrades[upgrade.id].generatorsactive[this.id]){
 				
 				switch(upgrade.type){
 					case 'multiply':
@@ -293,7 +300,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		
 		for(var i in this.consumptionUpgrades){
 			var upgrade = this.consumptionUpgrades[i];
-			if (Univ.upgradeBought(upgrade.id)){
+			if (Univ.GeneratorUpgrades[upgrade.id].generatorsactive[this.id]){
 				
 				switch(upgrade.type){
 					case 'multiply':
@@ -371,10 +378,7 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 		var buttonTop = buttonposition.top + window.scrollY;
 		var buttonBot = buttonposition.bottom + window.scrollY;
 		var buttonY = (buttonTop + buttonBot) / 2;
-
 		var buttonLeft = buttonposition.left + window.scrollX;
-		var buttonLeft = buttonposition.left + window.scrollX;
-
 		var PopupTop = Math.max(0, buttonY - 101);
 		var PopupLeft = buttonLeft + buttonposition.width - 6;
 		var ArrowTop = lookup(this.id + '_popupcontainer').getBoundingClientRect().height - 123;
@@ -449,19 +453,26 @@ Univ.Object = function(id,type,singular,plural,number,infoblurb,VisibilityFcn,Co
 	return this;
 }
 
-Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb,CostFcn,VisibilityFcn) {
+Univ.GeneratorUpgrade = function(id,name,item,type,generators,magnitude,infoblurb,CostFcn,crystals,VisibilityFcn){
 	this.id = id;
 	this.name = name;
 	this.item = item;
 	var types = type.split('|');
 	this.type = types[1];
 	this.magnitude = magnitude; // magnitude of effect: factor to multiply by, or amount to add, etc
-	this.generator = generator;
+	this.generators = generators.split('|');
+	this.generatorsactive = {};
+	for (var g in this.generators) {
+		this.generatorsactive[this.generators[g]] = 0;
+	}
 	this.bought = 0;
 	this.infoblurb = infoblurb;
 	this.isVisible = VisibilityFcn;
 	this.Costs = CostFcn;
-	this.isAffordable = function(){
+	this.Crystals = crystals;
+	this.warning = 'Note: You will also need to activate this upgrade on a generator after purchase.';
+
+	this.canBuy = function(){
 		var notenough = 0;
 		for (var item in this.Costs()) {
 			if (round(this.Costs()[item], Univ.precision) > round(Univ.Items[item].available_number, Univ.precision)) {
@@ -476,22 +487,118 @@ Univ.GeneratorUpgrade = function(id,name,item,type,generator,magnitude,infoblurb
 	}
 
 	this.Buy = function(){
-		if (this.isAffordable()) {
+		if (this.bought ==  0 && this.canBuy()) {
 			for (var item in this.Costs()) {
 				Univ.Items[item].available_number = round(Univ.Items[item].available_number, Univ.precision) - round(this.Costs()[item], Univ.precision);
 			}
 			this.bought = 1;
+			lookup(this.id + '_button').style.display = 'none';
+			
+			//auto-activate the upgrade if it doesn't require crystals
+			var num = 0;
+			for (var c in this.Crystals){
+				num++;
+			}
+			if (num == 0) {
+				for (var g in this.generators) {
+					generator = this.generators[g];
+					this.generatorsactive[generator] = 1;
+					lookup(generator + '_' + this.id + '_icon').style.animation = 'switchon 0s forwards';
+				}
+			}
 		}
 	}
 	
+	this.canActivate = function(){
+		var notenough = 0;
+		for (var crystal in this.Crystals) {
+			if (this.Crystals[crystal] > Univ.Crystals[crystal].available_number) {
+				notenough++;
+			}
+		}
+		if (notenough == 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	this.Toggle = function(generator){
+		if (this.generatorsactive[generator] == 1){ 
+			for (var c in this.Crystals) {
+				var num = 0;
+				Univ.Crystals[c].available_number += this.Crystals[c];
+				for (i = 1; i <= this.Crystals[c]; i++){
+					lookup(generator + '_' + this.id + '_crystal_' + c + num).innerHTML = '&#11046';
+					num++;
+				}
+			}
+			this.generatorsactive[generator] = 0;
+			lookup(generator + '_' + this.id + '_icon').style.animation = 'switchoff 0.2s forwards';
+		}
+		else if(this.canActivate()){
+			for (var c in this.Crystals){
+				var num = 0;
+				Univ.Crystals[c].available_number -= this.Crystals[c];
+				for (i = 1; i <= this.Crystals[c]; i++){
+					lookup(generator + '_' + this.id + '_crystal_' + c + num).innerHTML = '&#11045';
+					num++;
+				}
+			}
+			this.generatorsactive[generator] = 1;
+			lookup(generator + '_' + this.id + '_icon').style.animation = 'switchon 0.2s forwards';
+		}
+	}
+	
+	this.hidePopup = function(generatorID){
+		if (generatorID == 'button') {
+			lookup(this.id + '_popup').style.visibility = 'hidden';
+		} else {
+			lookup(generatorID + '_' + this.id + '_upgradepopup').style.visibility = 'hidden';
+		}
+	}
+
+	this.showPopup = function(generatorID){
+		if (generatorID == 'button') {
+			var buttonposition = lookup(this.id + '_button').getBoundingClientRect();
+			var PopupTop = buttonposition.bottom + window.scrollY - 3;
+			var PopupLeft = (buttonposition.left + buttonposition.right) / 2 + window.scrollX - 20;
+			lookup(this.id + '_popup').style.top = PopupTop + 5 + 'px';
+			lookup(this.id + '_popup').style.left = PopupLeft + 'px';
+			lookup(this.id + '_popup').style.visibility = 'visible';
+		} else {
+			var slotposition = lookup(generatorID + '_' + this.id + '_box').getBoundingClientRect();
+			var PopupTop = slotposition.bottom + window.scrollY;
+			var PopupLeft = (slotposition.left + slotposition.right) / 2 + window.scrollX - 25;
+			lookup(generatorID + '_' + this.id + '_upgradepopup').style.top = PopupTop + 'px';
+			lookup(generatorID + '_' + this.id + '_upgradepopup').style.left = PopupLeft + 'px';
+			lookup(generatorID + '_' + this.id + '_upgradepopup').style.visibility = 'visible';
+		}
+	}
+
 	Univ.Upgrades[this.id] = this;
 	Univ.GeneratorUpgrades[this.id] = this;
-	Univ.Objects[this.generator][types[0] + 'Upgrades'].push(this);
+	for (var g in this.generators) {
+		Univ.Objects[this.generators[g]][types[0] + 'Upgrades'].push(this);
+		Univ.Objects[this.generators[g]]['AllUpgrades'].push(this);
+	}
 }
 
 Univ.upgradeBought = function(id){
 	//console.log(id);
 	return (Univ.Upgrades[id].bought);
+}
+
+Univ.Crystal = function(type,names,color){
+	this.id = type;
+	var names = names.split('|');
+	this.singular = names[0];
+	this.plural = names[1];
+	this.color = color;
+	this.available_number = 10;	//edit to 0 for release
+	this.total_number = 10;		//edit to 0 for release
+	Univ.Crystals[this.id] = this;
+	return this;
 }
 
 
@@ -522,7 +629,7 @@ Univ.WriteSave = function(mode){
 		
 	for(var i in Univ.Upgrades){
 		save.Upgrades[i] = {};
-		save.Upgrades[i].bought = Univ.Upgrades[i].bought;
+		save.Upgrades[i].active = Univ.Upgrades[i].active;
 	}
 		
 	for(var i in Univ.prefs){
@@ -586,7 +693,7 @@ Univ.LoadSave = function(data){
 			
 			for(var i in save.Upgrades){
 				if(Univ.Upgrades[i]){
-					Univ.Upgrades[i].bought = save.Upgrades[i].bought;
+					Univ.Upgrades[i].active = save.Upgrades[i].active;
 				}
 			}
 			
@@ -617,7 +724,7 @@ Univ.Reset = function(){
 	}
 	
 	for(var i in Univ.Upgrades){
-		Univ.Upgrades[i].bought = 0;
+		Univ.Upgrades[i].active = 0;
 	}
 	
 	Univ.RestoreDefaultPrefs();
@@ -941,10 +1048,22 @@ Univ.RefreshDisplay = function(){
 	Univ.UpdateRates();
 	Univ.UpdateItemDisplay();
 	Univ.UpdateGeneratorDisplay();
-	Univ.UpdateUpgradeDisplay();
-	
-	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, {format:'scientific'}) + ' seconds';
-	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, {format:'scientific'}) + ' Kelvin';
+	Univ.UpdateTopBar();
+}
+
+Univ.UpdateTopBar = function(){
+//	Univ.Crystals['red'].available_number
+	lookup('age').innerHTML = '<b>Age of the Universe:</b> ' + prettify(Univ.Age, 'scientific') + ' seconds';
+	lookup('temp').innerHTML = '<b>Temperature:</b> ' + prettify(Univ.Temp, 'scientific') + ' Kelvin';
+	var num = 0;
+	var crystalHTML = [];
+	for (var c in Univ.Crystals) {
+		var crystal = Univ.Crystals[c];
+		crystalHTML += '<span style="color:' + crystal.color + ';font-size:20px;">&#11045</span>' + crystal.available_number;
+		num++;
+	}
+	if (num == 0) { crystalHTML = 'None available.';}
+	lookup('crystals').innerHTML = '<b>Crystals: </b>' + crystalHTML;
 }
 
 Univ.UpdateItemDisplay = function(){
@@ -1057,6 +1176,20 @@ Univ.UpdateGeneratorDisplay = function(){
 				lookup(generator.id + '_buymax').classList.remove('affordable');
 				lookup(generator.id + '_buymax').innerHTML = '+++';
 			}
+			
+			for (var u in generator.AllUpgrades) {
+				var upgrade = generator.AllUpgrades[u];
+				if (upgrade.bought) {
+					lookup(generator.id + '_' + upgrade.id + '_box').style.display = 'block';	
+					if (upgrade.generatorsactive[generator.id] == 1) {
+						lookup(generator.id + '_' + upgrade.id + '_icon').style.animation = 'switchon 0s forwards';
+					} else {
+						lookup(generator.id + '_' + upgrade.id + '_icon').style.animation = 'switchoff 0s forwards';						
+					}
+				} else {
+					lookup(generator.id + '_' + upgrade.id + '_box').style.display = 'none';
+				}
+			}
       
 			lookup(generator.id + '_button').style = 'display:block;';
 			if (lookup(generator.id + '_popupcontainer').style.visibility == 'visible') {
@@ -1067,10 +1200,16 @@ Univ.UpdateGeneratorDisplay = function(){
 		}
 	}
 	
-	for (var i in Univ.GeneratorUpgrades) {
+	for (var i in Univ.GeneratorUpgrades) { // show unpurchased Upgrade buttons below Generators
 		var upgrade = Univ.GeneratorUpgrades[i];
 		if (upgrade.item == Univ.ActiveItem && upgrade.isVisible()){
-			lookup(upgrade.id + '_button').style = 'display:block;';
+			if (upgrade.canBuy()){
+				lookup(upgrade.id + '_button').style = 'display:block;border:2px solid black;cursor:pointer;';
+				lookup(upgrade.id + '_icon').style = 'opacity:1;';
+			} else {
+				lookup(upgrade.id + '_button').style = 'display:block;border:2px solid grey;cursor:auto;';
+				lookup(upgrade.id + '_icon').style = 'opacity:.5;';
+			}
 		} else {
 			lookup(upgrade.id + '_button').style = 'display:none;';
 		}
@@ -1096,18 +1235,7 @@ Univ.UpdateGeneratorDisplay = function(){
 	}
 }
 
-Univ.UpdateUpgradeDisplay = function(){
-	for (var upgrade in Univ.GeneratorUpgrades) {
-		var upgrade = Univ.GeneratorUpgrades[upgrade];
-		if( upgrade.isAffordable() == 1){
-			lookup(upgrade.id + '_button').classList.add('clickableupgrade');
-		} else {
-			lookup(upgrade.id + '_button').classList.remove('clickableupgrade');
-		}
-	}
-}
-
-Univ.updateSlider = function(generatorid) {
+Univ.updateSlider = function(generatorid){
 	var sliderid = generatorid + '_slider';
 	var slidervalue = lookup(sliderid).value;
 	generator = Univ.Objects[generatorid];
@@ -1117,7 +1245,7 @@ Univ.updateSlider = function(generatorid) {
 	lookup(generatorid + '_currentlyactive').innerHTML = 'Currently active: ' + generator.activenumber + ' (' + Math.round(100 * generator.activenumber / generator.number) + '%)';
 }
 
-Univ.LoadMenus = function() {
+Univ.LoadMenus = function(){
 	// 	maybe eventually
 }
 
@@ -1152,7 +1280,7 @@ Univ.ItemMenuHTML = function(){
 
 }
 
-Univ.GeneratorMenuHTML = function() {
+Univ.GeneratorMenuHTML = function(){
 	function WriteButton(pref, text, callback, Class){
 		return '<div id="option' + pref + '" class="optionsButton menubutton' + (Class ? ' ' + Class: '') + '" style="background-color:#f7f7f7;" onmousedown="' + callback + '">' + text + '</div>';
 	}
@@ -1203,26 +1331,55 @@ Univ.GeneratorMenuHTML = function() {
 						generatortable += '<input id="' + generator.id + '_slider" type="range" min="0" max="100" value="100" class="slider">';
 						generatortable += '<div id="' + generator.id + '_currentlyactive" class="currentactive"></div>';
 					generatortable += '</div>';
+					generatortable += '<div id="' + generator.id + '_upgradecontainer" class="upgradecontainer">';
+						generatortable += '<span class="upgradestitle">Upgrades</span>';
+						generatortable += '<div id="' + generator.id + '_upgrades_grid" class="upgrades_grid">No Upgrades, or they didn\'t load</div>';
+					generatortable += '</div>';
 				generatortable += '</div>';
 			generatortable += '</div>';
  		generatortable += '</div>';
  	}
- 	
+
  	for (var i in Univ.GeneratorUpgrades) {
  		var upgrade = Univ.GeneratorUpgrades[i];
+ 		
+		var costHTML = 'Cost: ';			
+		for (var item in upgrade.Costs()) {
+			costHTML += upgrade.Costs()[item] + ' ';
+			if (upgrade.Costs()[item] == 1) {
+				costHTML += Univ.Items[item].singular;
+			} else {
+				costHTML += Univ.Items[item].plural;
+			}
+		}
+ 		
+ 		var crystalHTML = 'Crystals to activate: ';
+ 		for (var crystal in upgrade.Crystals) {
+ 			for (i = 0; i < upgrade.Crystals[crystal]; i++){
+				crystalHTML += '<span style="font-size:16px;color:' + Univ.Crystals[crystal].color + ';">&#11045</span>';
+			}
+		}
+ 		
  		generatortable += '<div id="' + upgrade.id + '_button" class="upgradebutton" style="display:none;">';
- 		generatortable += '<div id="' + upgrade.id + '_title" class="upgradetitle">' + upgrade.name + '</div>';
-		generatortable += '<div id="' + upgrade.id + '_text" class="upgradetext">' + upgrade.infoblurb + '</div>';
-		generatortable += '<div id="' + upgrade.id + '_cost" class="upgradecost"></div>';
+			generatortable += '<img id="' + upgrade.id + '_icon" src="icons/ICON.png" class="upgradebutton_icon">';
+			generatortable += '<div id="' + upgrade.id + '_popup" class="upgrade_popup">';
+				generatortable += '<div class="up_arrow_black"></div>';
+				generatortable += '<div class="up_arrow_background"></div>';
+				generatortable += '<div id="' + upgrade.id + '_title" class="upgrade_title">' + upgrade.name + '</div>';
+				generatortable += '<div id="' + upgrade.id + '_text" class="upgrade_text">' + upgrade.infoblurb + '</div>';
+				generatortable += '<div id="' + upgrade.id + '_cost" class="upgrade_cost">' + costHTML + '</div>';
+				generatortable += '<div id="' + upgrade.id + '_crystalinfo" class="upgrade_crystalinfo">' + crystalHTML + '</div>';
+				generatortable += '<div id="' + upgrade.id + '_warning" class="upgrade_warning">' + upgrade.warning + '</div>';
+			generatortable += '</div>';	
  		generatortable += '</div>';
  	}
- 	
- 	lookup('generators').innerHTML = generatortable;
- 	
+
+ 	lookup('generators').innerHTML = generatortable;	
+	
 	for (var k in Univ.Objects) {
 		try{throw Univ.Objects[k]}
 		catch(generator){
-			
+
 			AddEvent(lookup(generator.id + '_buyone'),'click',function(what){return function(e){if(generator.isAffordable(1)) generator.Buy(1);};}());
 			AddEvent(lookup(generator.id + '_buyone'),'mouseover',function(what){return function(e){generator.pupuptype=1;generator.showPopup();};}());
 			AddEvent(lookup(generator.id + '_buyone'),'mouseout',function(what){return function(e){generator.hidePopup();};}());
@@ -1257,23 +1414,26 @@ Univ.GeneratorMenuHTML = function() {
 		}
 	}
 	
-	for (var k in Univ.GeneratorUpgrades) {
+	for (var k in Univ.GeneratorUpgrades){
+		var num = 0;
+ 		for (var crystal in upgrade.Crystals) {
+ 			num++;
+		}
+		if (num == 0) {
+			lookup(upgrade.id + '_crystalinfo').style.visibility = 'hidden';
+			lookup(upgrade.id + '_warning').style.visibility = 'hidden';
+			lookup(upgrade.id + '_cost').style.bottom = '5px';
+		}
+	
 		try{throw Univ.GeneratorUpgrades[k]}
 		catch(upgrade){
-			AddEvent(lookup(upgrade.id + '_button'),'click',function(what){return function(e){if(upgrade.isAffordable()) upgrade.Buy();};}());
-		
-			var costHTML = 'Cost: ';			
-			for (var item in upgrade.Costs()) {
-				costHTML += upgrade.Costs()[item] + ' ';
-				if (upgrade.Costs()[item] == 1) {
-					costHTML += Univ.Items[item].singular;
-				} else {
-					costHTML += Univ.Items[item].plural;
-				}
-			}
-			lookup(upgrade.id + '_cost').innerHTML = costHTML;
+			AddEvent(lookup(upgrade.id + '_icon'),'click',function(){return function(){if(upgrade.canBuy()) upgrade.Buy();};}());
+			AddEvent(lookup(upgrade.id + '_button'),'mouseover',function(){return function(){upgrade.showPopup('button');};}());
+			AddEvent(lookup(upgrade.id + '_button'),'mouseout',function(){return function(){upgrade.hidePopup('button');};}());
 		}
 	}
+	
+	Univ.UpgradesHTML();
 	
 	var menubuttons = document.getElementsByClassName('menubutton');
 	for(var i in menubuttons){
@@ -1283,7 +1443,50 @@ Univ.GeneratorMenuHTML = function() {
 	}
 }
 
-make_speedslider = function() { // delete for release
+Univ.UpgradesHTML = function(){ // for making the upgrade slots inside generator popups -- upgrade buying buttons are made in GeneratorMenuHTML()
+		for (var i in Univ.Objects) {
+ 		var generator = Univ.Objects[i];
+		var upgradeHTML = [];
+		for (var u in generator.AllUpgrades) {
+			var upgrade = generator.AllUpgrades[u];
+			
+			upgradeHTML += '<div id="' + generator.id + '_' + upgrade.id + '_box" class="upgradebox">';
+			upgradeHTML += '<img id="' + generator.id + '_' + upgrade.id + '_icon" src="icons/ICON.png" class="upgradebox_icon">';
+
+			upgradeHTML += '<div id="' + generator.id + '_' + upgrade.id + '_upgradepopup" class="upgradeslot_popup">';
+				upgradeHTML += '<div class="up_arrow_black"></div>';
+				upgradeHTML += '<div class="up_arrow_background"></div>';
+				
+				upgradeHTML += '<div id="' + generator.id + '_' + upgrade.id + '_slots" class="upgrade_slots">';
+				for (var c in upgrade.Crystals) {
+					var num = 0;
+					for (i = 1; i <= upgrade.Crystals[c]; i++){
+						upgradeHTML += '<div class="upgrade_slot">';
+							upgradeHTML += '<span id="' + generator.id + '_' + upgrade.id + '_crystal_' + c + num + '" class="upgrade_crystalslot" style="color:' + Univ.Crystals[c].color + ';">&#11046</span>';
+						upgradeHTML += '</div>';
+						num++;
+					}
+				}
+				upgradeHTML += '<span id="' + generator.id + '_' + upgrade.id + '_activity" class="upgrade_activity"></span>';
+				upgradeHTML += '</div>';
+				upgradeHTML += '<div id="' + generator.id + '_' + upgrade.id + '_title" class="upgradeslot_title">' + upgrade.name + '</div>';
+				upgradeHTML += '<div id="' + generator.id + '_' + upgrade.id + '_text" class="upgradeslot_text">' + upgrade.infoblurb + '</div>';				
+			upgradeHTML += '</div></div>';
+		}
+		lookup(generator.id + '_upgrades_grid').innerHTML = upgradeHTML; 
+		
+		for (var u in generator.AllUpgrades){
+			try{throw [generator,generator.AllUpgrades[u]]}
+			catch([generator,upgrade]){
+ 				AddEvent(lookup(generator.id + '_' + upgrade.id + '_box'),'click',function(){return function(){upgrade.Toggle(generator.id);};}());
+ 				AddEvent(lookup(generator.id + '_' + upgrade.id + '_box'),'mouseover',function(){return function(){upgrade.showPopup(generator.id);};}());
+ 				AddEvent(lookup(generator.id + '_' + upgrade.id + '_box'),'mouseout',function(){return function(){upgrade.hidePopup(generator.id);};}());
+			}
+ 		}
+	}
+}
+
+make_speedslider = function(){ // delete for release
 	slider_HTML = [];
 	slider_HTML += '<div id="speedslider_container" class="speedslidercontainer">';
 	slider_HTML += '<div id="speedslider_label" class="speedsliderlabel">1x</div>';
@@ -1291,7 +1494,7 @@ make_speedslider = function() { // delete for release
 	lookup('topbar').innerHTML += slider_HTML;
 	lookup('speedslider').oninput = function(){update_speedslider();};
 }
-update_speedslider = function() { // delete for release
+update_speedslider = function(){ // delete for release
 	var slidervalue = lookup('speedslider').value;
 	Univ.Speedfactor = slidervalue;
 	Univ.UpdateRates();
@@ -1299,9 +1502,10 @@ update_speedslider = function() { // delete for release
 	lookup('speedslider_label').innerHTML = slidervalue + 'x';
 }
 
-Univ.LoadMenus = function() {
+Univ.TopBarHTML = function(){
  	lookup('topbar').innerHTML += '<span id="age" style="position:absolute;top:5px;left:5px"></span>';
  	lookup('topbar').innerHTML += '<span id="temp" style="position:absolute;top:25px;left:5px"></span>';
+ 	lookup('topbar').innerHTML += '<span id="crystals" style="position:absolute;top:45px;left:5px"></span>';
 	make_speedslider(); // delete for release
 }
 
@@ -1309,7 +1513,6 @@ Univ.LoadMenus = function() {
 Game start!
 =====================================**/
 window.onload = function(){
-	Univ.LoadMenus();	
 	Univ.LoadItems();
 	Univ.LoadObjects();
 	Univ.LoadUpgrades();
@@ -1317,6 +1520,8 @@ window.onload = function(){
 	Univ.LoadSave();
 	Univ.ItemMenuHTML();
 	Univ.GeneratorMenuHTML();
+	
+	Univ.TopBarHTML();	
 	Univ.format = new numberformat.Formatter({format: 'standard', sigfigs: 4, maxSmall: 1000})
 	
 	// Latency stuff

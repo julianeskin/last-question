@@ -188,8 +188,6 @@ body{
 	z-index:3;
 	left:495px;
 	top:100px;
-	width:232px;
-	height:224px;
 	margin:5px;
 	text-align:left;
 	user-select: none;
@@ -221,6 +219,7 @@ body{
 	position:relative;
 	left:5px;
 	height:220px;
+	width:400px;
 	border-radius:5px;
 	border:2px solid black;
 	background-color:#f4f4f4;
@@ -231,7 +230,7 @@ body{
 	position:absolute;
 	top:5px;
 	left:5px;
-	right:5px;
+	width:190px;
 	font-size:10px;
 }
 
@@ -240,7 +239,7 @@ body{
 	top:69px;
 	z-index:4;
 	height:48px;
-	width:229px;
+	width:200px;
 	border-top: 2px solid black;
 	border-bottom: 2px solid black;
 	font-size:10px;
@@ -263,7 +262,7 @@ body{
 .generatorrates{
 	position:absolute;
 	top:122px;
-	width:100%;
+	width:200px;
 	height:50px;
 	font-size:10px;
 	border-bottom: 2px solid black;
@@ -295,8 +294,8 @@ body{
 	position:absolute;
 	display:none;
 	top:182px;
-	left:20px;
-	right:20px;
+	left:5px;
+	width:190px;
 	font-size:10px;
 }
 
@@ -402,10 +401,256 @@ body{
 .currentactive{
 	position:absolute;
 	top:20px;
-	left:0px;
-	right:0px;
+	width:190px;
 	text-align:center;
 	font-size:10px;
+}
+
+.upgradecontainer{
+	position:absolute;
+	left:200px;
+	width:200px;
+	height:100%;
+	border-left: 2px solid black;
+}
+
+.upgradestitle{
+	position:absolute;
+	top:5px;
+	width:100%;
+	text-align:center;
+	font-size:10px;
+	font-weight:bold;
+}
+
+.upgrades_grid{
+	position:absolute;
+	top:20px;
+	bottom:5px;
+	left:5px;
+	right:7px;
+}
+
+.upgradebox{
+	position:relative;
+	float:left;
+	width:54px;
+	height:36px;
+	border:1px black solid;
+	border-radius:20px;
+	margin:2px;
+	background-color:#e5e5e5;
+	box-shadow: inset 1px 1px 4px #000;
+}
+
+.upgradebox_icon{
+	position:absolute;
+	width:36px;
+	height:36px;
+	z-index:2;
+	border-radius:50%;
+}
+
+@keyframes switchoff {
+  0% {
+    opacity: 1;
+    left:21px;
+  }
+  100% {
+    opacity: 0.6;
+    left:0px;
+  }
+}
+
+@keyframes switchon {
+  0% {
+    opacity: 0.6;
+    left:0px;
+  }
+  100% {
+    opacity: 1;
+    left:21px;
+  }
+}
+
+.upgrade_slots{
+	position:absolute;
+	left:5px;
+	top:69px;
+	height:27px;
+	width:190px;
+}
+
+.upgrade_slot{
+	position:absolute;
+	float:left;
+	width:25px;
+	height:25px;
+	border:1px black solid;
+	border-radius:50%;
+	margin-right:3px;
+}
+
+.upgrade_activity{
+	position:absolute;
+	left:5px;
+	top:48px;
+}
+
+.upgrade_crystalslot{
+	position:relative;
+	top:-7px;
+	left:3px;
+	font-size:24px;
+}
+
+.upgradeslot_popup{
+	visibility:hidden;
+	position:fixed;
+	z-index:6;
+	left:495px;
+	top:100px;
+	width:200px;
+	height:100px;
+	margin:5px;
+	background-color:#f4f4f4;
+	border:2px solid black;
+	border-radius:5px;
+	text-align:left;
+	user-select:none;
+}
+
+.up_arrow_black {
+	position:absolute;
+	z-index:2;
+	top:-21px;
+	left:10px;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 10px 8px 10px 8px;
+	border-color: transparent transparent #000000  transparent;
+}
+
+.up_arrow_background {
+	position:absolute;
+	top:-18px;
+	left:10px;
+	z-index:3;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 10px 8px 10px 8px;
+	border-color: transparent transparent #f4f4f4 transparent;
+}
+
+.upgradeslot_title{
+	position:absolute;
+	font-size:12px;
+	font-weight:bold;
+	text-align:center;
+	top:0px;
+	left:0px;
+	right:0px;
+}
+
+.upgradeslot_text{
+	position:absolute;
+	font-size:10px;
+	line-height:11px;
+	top:19px;
+	left:5px;
+	right:0px;
+}
+
+.upgradebutton{
+	position:relative;
+	float:left;
+	height:50px;
+	width:50px;
+	margin:5px;
+	background-color:#f4f4f4;
+	border:2px solid grey;
+	border-radius:50%;
+	user-select:none;
+}
+
+.upgradebutton_icon{
+	position:absolute;
+	top:-1px;
+	left:-1px;
+	width:52px;
+	height:52px;
+	border-radius:50%;
+	opacity:0.5;
+}
+
+.upgrade_popup{
+	visibility:hidden;
+	position:fixed;
+	z-index:6;
+	left:495px;
+	top:100px;
+	width:200px;
+	height:100px;
+	padding:5px;
+	background-color:#f4f4f4;
+	border:2px solid black;
+	border-radius:5px;
+	text-align:left;
+	user-select:none;
+}
+
+.upgrade_title{
+	position:absolute;
+	font-size:12px;
+	font-weight:bold;
+	text-align:center;
+	top:2px;
+	left:0px;
+	right:0px;
+}
+
+.upgrade_text{
+	position:absolute;
+	font-size:10px;
+	line-height:11px;
+	top:19px;
+	left:5px;
+	right:0px;
+}
+
+.upgrade_cost{
+	position:absolute;
+	font-size:10px;
+	line-height:11px;
+	bottom:42px;
+	left:5px;
+	right:5px;
+}
+
+.upgrade_crystalinfo{
+	position:absolute;
+	font-size:10px;
+	line-height:11px;
+	bottom:29px;
+	left:5px;
+	right:5px;
+}
+
+
+.upgrade_warning{
+	position:absolute;
+	font-size:10px;
+	line-height:11px;
+	color:red;
+	bottom:5px;
+}
+
+.clickableupgrade{
+	border:2px solid black;
+	color:black;
+	cursor:pointer;
 }
 
 .visible{
@@ -445,48 +690,4 @@ body{
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
-}
-
-.upgradebutton{
-	position:relative;
-	width:180px;
-	left:30px;
-	height:70px;
-	margin:5px;
-	border-radius:5px;
-	text-align:center;
-	user-select:none;
-	color:grey;
-	border:2px solid grey;
-}
-
-.upgradetitle{
-	position:absolute;
-	font-size:15px;
-	top:0px;
-	left:0px;
-	right:0px;
-}
-
-.upgradetext{
-	position:absolute;
-	font-size:10px;
-	line-height:11px;
-	top:22px;
-	left:0px;
-	right:0px;
-}
-
-.upgradecost{
-	position:absolute;
-	font-size:8px;
-	top:60px;
-	left:0px;
-	right:0px;
-}
-
-.clickableupgrade{
-	border:2px solid black;
-	color:black;
-	cursor:pointer;
 }

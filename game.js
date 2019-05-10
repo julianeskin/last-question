@@ -1415,6 +1415,7 @@ Univ.GeneratorMenuHTML = function(){
 	}
 	
 	for (var k in Univ.GeneratorUpgrades){
+		upgrade = Univ.GeneratorUpgrades[k];
 		var num = 0;
  		for (var crystal in upgrade.Crystals) {
  			num++;
@@ -1425,7 +1426,7 @@ Univ.GeneratorMenuHTML = function(){
 			lookup(upgrade.id + '_cost').style.bottom = '5px';
 		}
 	
-		try{throw Univ.GeneratorUpgrades[k]}
+		try{throw upgrade}
 		catch(upgrade){
 			AddEvent(lookup(upgrade.id + '_icon'),'click',function(){return function(){if(upgrade.canBuy()) upgrade.Buy();};}());
 			AddEvent(lookup(upgrade.id + '_button'),'mouseover',function(){return function(){upgrade.showPopup('button');};}());

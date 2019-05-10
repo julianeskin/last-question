@@ -113,8 +113,174 @@ Univ.LoadObjects = function(){
 		{},
 		0 // no special Buy Function
 	);
-	
-
+	new Univ.Object('qfoam5','qfoam','QFoam Generator 5','QFoam Generator 5',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e25 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e24
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+new Univ.Object('qfoam6','qfoam','QFoam Generator 6','QFoam Generator 6',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e31 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e30
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+new Univ.Object('qfoam7','qfoam','QFoam Generator 7','QFoam Generator 7',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e37 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e36
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+new Univ.Object('qfoam8','qfoam','QFoam Generator 8','QFoam Generator 8',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e43 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e42
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+new Univ.Object('qfoam9','qfoam','QFoam Generator 9','QFoam Generator 9',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e49 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e48
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
+new Univ.Object('qfoam10','qfoam','QFoam Generator 10','QFoam Generator 10',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+		function(){ // isVisible
+			return Univ.Items['qfoam'].total_number >= 1e55 / 4;
+		},
+		{ // CostEquation
+			qfoam: {
+				visible: 1,
+				type: 'exp',
+				base: 1.01,
+				start: 1e19
+			}
+		},
+		10, // Base Interval
+		function() { // ProductionEquation
+			var qfoam_rate_factor = 1-1/(1+Math.exp(-2*(Math.log10(Univ.Age)+34)));
+			var production = {
+				qfoam: {
+					visible: 1,
+					type: 'lin',
+					slope: qfoam_rate_factor * 2 * 1e54
+				}
+			}
+			return production;
+		},
+		{},
+		0 // no special Buy Function
+	);
 	
 	
 /* ELEMENTARY PARTICLES */	

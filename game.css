@@ -482,7 +482,7 @@ body{
 }
 
 .upgrade_slot{
-	position:absolute;
+	position:relative;
 	float:left;
 	width:25px;
 	height:25px;
@@ -617,7 +617,7 @@ body{
 	line-height:11px;
 	top:19px;
 	left:5px;
-	right:0px;
+	right:5px;
 }
 
 .upgrade_cost{

@@ -35,4 +35,5 @@ Univ.LoadItems = function(){
 	new Univ.Item('Cosmic Computer','Cosmic Computer','cosmicAC',1,0,0,0,0);
 	
 	new Univ.Crystal('red','Red Crystal|Red Crystals','#ff0008');
+	new Univ.Crystal('blue','Blue Crystal|Blue Crystals','#0061ff');
 }

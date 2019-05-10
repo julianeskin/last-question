@@ -14,11 +14,46 @@ Types should be in the format of {affected function}|{upgrade type}
 	e.g. 'production|multiply' would multiply the production of the chosen generator by magnitude
 **/
 
-new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade Name 1','qfoam','production|multiply','qfoam1|qfoam2|qfoam3',1.1,
-	'Increases the Quantum Foam production of Quantum Field Equations.',
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade 1','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',1.1,
+	'Increases the Quantum Foam production rate of Generators by 10%.',
 	function(){ // cost
 		var prices = {
 			qfoam: 100
+		}
+		return prices;
+	},
+	{}, // crystals
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_2','Upgrade 2','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',1.2,
+	'Increases the Quantum Foam production rate of Generators by 20%.',
+	function(){ // cost
+		var prices = {
+			qfoam: 200
+		}
+		return prices;
+	},
+	{}, // crystals
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 20){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',1.4,
+	'Increases the Quantum Foam production rate of Generators by 40%.',
+	function(){ // cost
+		var prices = {
+			qfoam: 400
 		}
 		return prices;
 	},
@@ -27,136 +62,165 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_1','Upgrade Name 1','qfoam','produc
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam1'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam2'].number >= 10){
 			vis = 1;
 		}
 		return vis;
 	});
-new Univ.GeneratorUpgrade('qfoam1_rateupgrade_2','Upgrade Name 2','qfoam','production|multiply','qfoam1',1.2,
-	'Increases the Quantum Foam production of Quantum Field Equations.',
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',1.6,
+	'Increases the Quantum Foam production rate of Generators by 60%.',
 	function(){ // cost
 		var prices = {
-			qfoam: 200
+			qfoam: 800
 		}
 		return prices;
 	},
-	{},
+	{ // crystals
+		red: 1
+	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam1'].number >= 20){
+		if (!this.bought && Univ.Objects['qfoam3'].number >= 10){
 			vis = 1;
 		}
 		return vis;
 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_3','Upgrade 3','qfoam','production|multiply','qfoam1',1.4,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 400
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 40){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_4','Upgrade 4','qfoam','production|multiply','qfoam1',1.6,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 800
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 80){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_5','Upgrade 5','qfoam','production|multiply','qfoam1',2,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 1600
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 160){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_6','Upgrade 6','qfoam','production|multiply','qfoam1',3,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 3200
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 200){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_7','Upgrade 7','qfoam','production|multiply','qfoam1',4,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 6400
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 250){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_8','Upgrade 8','qfoam','production|multiply','qfoam1',5,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 12800
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 300){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// new Univ.GeneratorUpgrade('qfoam1_rateupgrade_9','Upgrade 9','qfoam','production|multiply','qfoam1',6,
-// 	'Increases the Quantum Foam production of Quantum Field Equations.',
-// 	function(){ // cost
-// 		var prices = {
-// 			qfoam: 25400
-// 		}
-// 		return prices;
-// 	},
-// 	function(){ // visibility
-// 		var vis = 0;
-// 		if (!this.bought && Univ.Objects['qfoam1'].number >= 360){
-// 			vis = 1;
-// 		}
-// 		return vis;
-// 	});
-// 	
-// 	
-// 	
-// 	
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',2,
+	'Doubles the Quantum Foam production rate of Generators.',
+	function(){ // cost
+		var prices = {
+			qfoam: 1600
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam4'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_6','Upgrade 6','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',3,
+	'Triples the Quantum Foam production rate of Generators.',
+	function(){ // cost
+		var prices = {
+			qfoam: 3200
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam5'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_7','Upgrade 7','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',4,
+	'Multiplies the Quantum Foam production rate of Generators by 4.',
+	function(){ // cost
+		var prices = {
+			qfoam: 6400
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam6'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_8','Upgrade 8','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',5,
+	'Multiplies the Quantum Foam production rate of Generators by 5.',
+	function(){ // cost
+		var prices = {
+			qfoam: 12800
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam7'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_9','Upgrade 9','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',6,
+	'Multiplies the Quantum Foam production rate of Generators by 6.',
+	function(){ // cost
+		var prices = {
+			qfoam: 25400
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam8'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_10','Upgrade 10','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',8,
+	'Multiplies the Quantum Foam production rate of Generators by 8.',
+	function(){ // cost
+		var prices = {
+			qfoam: 50000
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam9'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+new Univ.GeneratorUpgrade('qfoam_rateupgrade_11','Upgrade 11','qfoam','production|multiply',
+	'qfoam1|qfoam2|qfoam3|qfoam4|qfoam5|qfoam6|qfoam7|qfoam8|qfoam8|qfoam9|qfoam10',10,
+	'Multiplies the Quantum Foam production rate of Generators by 10.',
+	function(){ // cost
+		var prices = {
+			qfoam: 98000
+		}
+		return prices;
+	},
+	{ // crystals
+		red: 1
+	},
+	function(){ // visibility
+		var vis = 0;
+		if (!this.bought && Univ.Objects['qfoam10'].number >= 10){
+			vis = 1;
+		}
+		return vis;
+	});
+
+
 // new Univ.GeneratorUpgrade('qfoam1_intervalupgrade_1','Upgrade A','qfoam','interval|add','qfoam1',-1/2,
 // 	'Shortens the Interval between Quantum Foam production by Quantum Field Equations.',
 // 	function(){ // cost

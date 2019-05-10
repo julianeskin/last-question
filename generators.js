@@ -123,7 +123,7 @@ Univ.LoadObjects = function(){
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e25
 			}
 		},
 		10, // Base Interval
@@ -151,7 +151,7 @@ new Univ.Object('qfoam6','qfoam','QFoam Generator 6','QFoam Generator 6',0,
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e31
 			}
 		},
 		10, // Base Interval
@@ -179,7 +179,7 @@ new Univ.Object('qfoam7','qfoam','QFoam Generator 7','QFoam Generator 7',0,
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e37
 			}
 		},
 		10, // Base Interval
@@ -207,7 +207,7 @@ new Univ.Object('qfoam8','qfoam','QFoam Generator 8','QFoam Generator 8',0,
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e43
 			}
 		},
 		10, // Base Interval
@@ -235,7 +235,7 @@ new Univ.Object('qfoam9','qfoam','QFoam Generator 9','QFoam Generator 9',0,
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e49
 			}
 		},
 		10, // Base Interval
@@ -263,7 +263,7 @@ new Univ.Object('qfoam10','qfoam','QFoam Generator 10','QFoam Generator 10',0,
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e55
 			}
 		},
 		10, // Base Interval

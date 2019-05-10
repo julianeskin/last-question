@@ -1,5 +1,7 @@
 Univ.LoadObjects = function(){
 //	unique ID, type, Singular Name, Plural Name, number, InfoBlurb, Visibility Fcn, CostEquation, Base Interval, ProductionEquation, ConsumptionEquation, BuyFunction
+
+/* QUANTUM FOAM */
  	new Univ.Object('qfoam1','qfoam','Quantum Field Equation','Quantum Field Equations',0,
  		'Quantum Field Equations are the most basic production unit. Use them to generate Quantum Foam out of nothing.',
 		function(){ // isVisible
@@ -30,14 +32,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 100 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e7 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 100
+				start: 1e7
 			}
 		},
 		4, // Base Interval
@@ -47,7 +49,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 12
+					slope: qfoam_rate_factor * 1.2 * 1e6
 				}
 			}
 			return production;
@@ -58,14 +60,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1000 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e13 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1000
+				start: 1e13
 			}
 		},
 		10, // Base Interval
@@ -75,7 +77,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 150
+					slope: qfoam_rate_factor * 1.5 * 1e12
 				}
 			}
 			return production;
@@ -83,17 +85,17 @@ Univ.LoadObjects = function(){
 		{},
 		0 // no special Buy Function
 	);
-	new Univ.Object('qfoam4','qfoam','Pym Particle Condenser','Pym Particle Condensers',0,
-	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
+	new Univ.Object('qfoam4','qfoam','QFoam Generator 4','QFoam Generator 4',0,
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1000000 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e19 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1000000
+				start: 1e19
 			}
 		},
 		10, // Base Interval
@@ -103,7 +105,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 180000
+					slope: qfoam_rate_factor * 1.8 * 1e18
 				}
 			}
 			return production;
@@ -111,6 +113,12 @@ Univ.LoadObjects = function(){
 		{},
 		0 // no special Buy Function
 	);
+	
+
+	
+	
+/* ELEMENTARY PARTICLES */	
+	
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible

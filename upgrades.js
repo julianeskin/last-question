@@ -36,14 +36,14 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_2','Upgrade 2','qfoam','production|
 	'Increases the Quantum Foam production rate of Generators by 20%.',
 	function(){ // cost
 		var prices = {
-			qfoam: 200
+			qfoam: 1000
 		}
 		return prices;
 	},
 	{}, // crystals
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam1'].number >= 20){
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 40){
 			vis = 1;
 		}
 		return vis;
@@ -53,7 +53,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','production|
 	'Increases the Quantum Foam production rate of Generators by 40%.',
 	function(){ // cost
 		var prices = {
-			qfoam: 400
+			qfoam: 3000
 		}
 		return prices;
 	},
@@ -62,7 +62,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_3','Upgrade 3','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam2'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 100){
 			vis = 1;
 		}
 		return vis;
@@ -72,7 +72,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','production|
 	'Increases the Quantum Foam production rate of Generators by 60%.',
 	function(){ // cost
 		var prices = {
-			qfoam: 800
+			qfoam: 10000
 		}
 		return prices;
 	},
@@ -81,7 +81,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_4','Upgrade 4','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam3'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 200){
 			vis = 1;
 		}
 		return vis;
@@ -91,7 +91,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','production|
 	'Doubles the Quantum Foam production rate of Generators.',
 	function(){ // cost
 		var prices = {
-			qfoam: 1600
+			qfoam: 24000
 		}
 		return prices;
 	},
@@ -100,7 +100,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_5','Upgrade 5','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam4'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 300){
 			vis = 1;
 		}
 		return vis;
@@ -110,7 +110,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_6','Upgrade 6','qfoam','production|
 	'Triples the Quantum Foam production rate of Generators.',
 	function(){ // cost
 		var prices = {
-			qfoam: 3200
+			qfoam: 32000
 		}
 		return prices;
 	},
@@ -119,7 +119,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_6','Upgrade 6','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam5'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam1'].number >= 400){
 			vis = 1;
 		}
 		return vis;
@@ -138,7 +138,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_7','Upgrade 7','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam6'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam2'].number >= 450){
 			vis = 1;
 		}
 		return vis;
@@ -157,7 +157,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_8','Upgrade 8','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam7'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam2'].number >= 600){
 			vis = 1;
 		}
 		return vis;
@@ -176,7 +176,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_9','Upgrade 9','qfoam','production|
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam8'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam2'].number >= 750){
 			vis = 1;
 		}
 		return vis;
@@ -195,7 +195,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_10','Upgrade 10','qfoam','productio
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam9'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam3'].number >= 800){
 			vis = 1;
 		}
 		return vis;
@@ -214,7 +214,7 @@ new Univ.GeneratorUpgrade('qfoam_rateupgrade_11','Upgrade 11','qfoam','productio
 	},
 	function(){ // visibility
 		var vis = 0;
-		if (!this.bought && Univ.Objects['qfoam10'].number >= 10){
+		if (!this.bought && Univ.Objects['qfoam3'].number >= 950){
 			vis = 1;
 		}
 		return vis;

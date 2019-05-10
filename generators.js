@@ -11,7 +11,7 @@ Univ.LoadObjects = function(){
 			qfoam: {
 				visible: 1,
 				type: 'exp',
-				base: 1.01,
+				base: 1.005,
 				start: 10
 			}
 		},
@@ -32,14 +32,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam2','qfoam','Quantum Field Fluctuator','Quantum Field Fluctuators',0,
 	'Quantum Field Fluctuators generate more Quantum Foam, faster.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1e7 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e6 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
-				base: 1.01,
-				start: 1e7
+				base: 1.005,
+				start: 1e6
 			}
 		},
 		4, // Base Interval
@@ -49,7 +49,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 1.2 * 1e6
+					slope: qfoam_rate_factor * 1.2 * 1e5
 				}
 			}
 			return production;
@@ -60,14 +60,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam3','qfoam','Quantum Field Actuator','Quantum Field Actuators',0,
 	'Quantum Field Actuators generate even more Quantum Foam, even faster. It\'s what the people want. Well, people don\'t exist yet, but they would love this stuff.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1e13 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e11 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
-				base: 1.01,
-				start: 1e13
+				base: 1.005,
+				start: 1e11
 			}
 		},
 		10, // Base Interval
@@ -77,7 +77,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 1.5 * 1e12
+					slope: qfoam_rate_factor * 1.5 * 1e10
 				}
 			}
 			return production;
@@ -88,14 +88,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam4','qfoam','QFoam Generator 4','QFoam Generator 4',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1e19 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e16 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e19
+				start: 1e16
 			}
 		},
 		10, // Base Interval
@@ -105,7 +105,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 1.8 * 1e18
+					slope: qfoam_rate_factor * 1.8 * 1e15
 				}
 			}
 			return production;
@@ -116,14 +116,14 @@ Univ.LoadObjects = function(){
 	new Univ.Object('qfoam5','qfoam','QFoam Generator 5','QFoam Generator 5',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1e25 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e21 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e25
+				start: 1e21
 			}
 		},
 		10, // Base Interval
@@ -133,7 +133,7 @@ Univ.LoadObjects = function(){
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 2 * 1e24
+					slope: qfoam_rate_factor * 2 * 1e20
 				}
 			}
 			return production;
@@ -144,14 +144,14 @@ Univ.LoadObjects = function(){
 new Univ.Object('qfoam6','qfoam','QFoam Generator 6','QFoam Generator 6',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 1e31 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e26 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
 				visible: 1,
 				type: 'exp',
 				base: 1.01,
-				start: 1e31
+				start: 1e26
 			}
 		},
 		10, // Base Interval
@@ -161,7 +161,7 @@ new Univ.Object('qfoam6','qfoam','QFoam Generator 6','QFoam Generator 6',0,
 				qfoam: {
 					visible: 1,
 					type: 'lin',
-					slope: qfoam_rate_factor * 2 * 1e30
+					slope: qfoam_rate_factor * 2 * 1e25
 				}
 			}
 			return production;
@@ -288,7 +288,7 @@ new Univ.Object('qfoam10','qfoam','QFoam Generator 10','QFoam Generator 10',0,
 	new Univ.Object('elementary1','elementary','Sphaleron','Sphalerons',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 5000 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e60 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
@@ -317,7 +317,7 @@ new Univ.Object('qfoam10','qfoam','QFoam Generator 10','QFoam Generator 10',0,
 	new Univ.Object('elementary2','elementary','Symmetry Violator','Symmetry Violators',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 20000 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e60 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
@@ -345,7 +345,7 @@ new Univ.Object('qfoam10','qfoam','QFoam Generator 10','QFoam Generator 10',0,
 	new Univ.Object('elementary3','elementary','Quark Mixing Matrix','Quark Mixing Matrices',0,
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		function(){ // isVisible
-			return Univ.Items['qfoam'].total_number >= 80000 / 4;
+			return Univ.Items['qfoam'].total_number >= 1e60 / 4;
 		},
 		{ // CostEquation
 			qfoam: {
